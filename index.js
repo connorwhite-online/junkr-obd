@@ -6,3 +6,5 @@ board.on("ready", () => {
     const led = new five.Led(3);
     led.blink(250);
 });
+
+const sensorA4 = new five.Sensor();
