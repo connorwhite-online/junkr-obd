@@ -93,11 +93,10 @@ void Display_Init() {
 
 void Display_UpdateGauges(
   float boostPSI,
-  float intakeTemp,
+  float iatPre,
+  float iatPost,
   float exhaustTemp,
-  float coolantTemp,
-  float oilTemp,
-  float batteryV
+  float coolantTemp
 ) {
   // Throttle updates to prevent overwhelming the display
   unsigned long now = millis();
@@ -108,11 +107,10 @@ void Display_UpdateGauges(
   
   // Update each gauge
   Display_UpdateBoost(boostPSI);
-  Display_UpdateIntakeTemp(intakeTemp);
+  Display_UpdateIntakeTempPre(iatPre);
+  Display_UpdateIntakeTempPost(iatPost);
   Display_UpdateExhaustTemp(exhaustTemp);
   Display_UpdateCoolantTemp(coolantTemp);
-  Display_UpdateOilTemp(oilTemp);
-  Display_UpdateBatteryVoltage(batteryV);
 }
 
 void Display_UpdateBoost(float boostPSI) {
@@ -134,23 +132,42 @@ void Display_UpdateBoost(float boostPSI) {
   Display_SetColor(NEXTION_BOOST_VALUE, "pco", color);
 }
 
-void Display_UpdateIntakeTemp(float temp) {
+void Display_UpdateIntakeTempPre(float temp) {
   // Format to 0 decimal places
   char buffer[16];
   dtostrf(temp, 0, 0, buffer);
   
   char cmd[32];
-  snprintf(cmd, sizeof(cmd), "%s.txt=\"%s\"", NEXTION_IAT_VALUE, buffer);
+  snprintf(cmd, sizeof(cmd), "%s.txt=\"%s\"", NEXTION_IAT_PRE_VALUE, buffer);
   Display_SendCommand(cmd);
   
   // Set color based on value
   uint16_t color = COLOR_GREEN;
-  if (temp > IAT_CRITICAL) {
+  if (temp > IAT_PRE_CRITICAL) {
     color = COLOR_RED;
-  } else if (temp > IAT_WARNING) {
+  } else if (temp > IAT_PRE_WARNING) {
     color = COLOR_YELLOW;
   }
-  Display_SetColor(NEXTION_IAT_VALUE, "pco", color);
+  Display_SetColor(NEXTION_IAT_PRE_VALUE, "pco", color);
+}
+
+void Display_UpdateIntakeTempPost(float temp) {
+  // Format to 0 decimal places
+  char buffer[16];
+  dtostrf(temp, 0, 0, buffer);
+  
+  char cmd[32];
+  snprintf(cmd, sizeof(cmd), "%s.txt=\"%s\"", NEXTION_IAT_POST_VALUE, buffer);
+  Display_SendCommand(cmd);
+  
+  // Set color based on value
+  uint16_t color = COLOR_GREEN;
+  if (temp > IAT_POST_CRITICAL) {
+    color = COLOR_RED;
+  } else if (temp > IAT_POST_WARNING) {
+    color = COLOR_YELLOW;
+  }
+  Display_SetColor(NEXTION_IAT_POST_VALUE, "pco", color);
 }
 
 void Display_UpdateExhaustTemp(float temp) {
@@ -195,41 +212,6 @@ void Display_UpdateCoolantTemp(float temp) {
   Display_SetColor(NEXTION_COOLANT_VALUE, "pco", color);
 }
 
-void Display_UpdateOilTemp(float temp) {
-  // Format to 0 decimal places
-  char buffer[16];
-  dtostrf(temp, 0, 0, buffer);
-  
-  char cmd[32];
-  snprintf(cmd, sizeof(cmd), "%s.txt=\"%s\"", NEXTION_OIL_VALUE, buffer);
-  Display_SendCommand(cmd);
-  
-  // Set color based on value
-  uint16_t color = COLOR_GREEN;
-  if (temp > OIL_CRITICAL) {
-    color = COLOR_RED;
-  } else if (temp > OIL_WARNING) {
-    color = COLOR_YELLOW;
-  }
-  Display_SetColor(NEXTION_OIL_VALUE, "pco", color);
-}
-
-void Display_UpdateBatteryVoltage(float voltage) {
-  // Format to 1 decimal place
-  char buffer[16];
-  dtostrf(voltage, 0, 1, buffer);
-  
-  char cmd[32];
-  snprintf(cmd, sizeof(cmd), "%s.txt=\"%s\"", NEXTION_BATTERY_VALUE, buffer);
-  Display_SendCommand(cmd);
-  
-  // Set color based on value
-  uint16_t color = COLOR_GREEN;
-  if (voltage < BATTERY_MIN || voltage > BATTERY_MAX) {
-    color = COLOR_RED;
-  }
-  Display_SetColor(NEXTION_BATTERY_VALUE, "pco", color);
-}
 
 // ============================================================================
 // PUBLIC FUNCTIONS - STATUS AND ALERTS

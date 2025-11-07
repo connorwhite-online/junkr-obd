@@ -26,19 +26,17 @@ void Display_Init();
 /**
  * Update all gauge values on the display
  * @param boostPSI Boost pressure in PSI (gauge)
- * @param intakeTemp Intake air temperature in °C
+ * @param iatPre Intake air temperature pre-intercooler in °C
+ * @param iatPost Intake air temperature post-intercooler in °C
  * @param exhaustTemp Exhaust gas temperature in °C
  * @param coolantTemp Coolant temperature in °C
- * @param oilTemp Oil temperature in °C
- * @param batteryV Battery voltage
  */
 void Display_UpdateGauges(
   float boostPSI,
-  float intakeTemp,
+  float iatPre,
+  float iatPost,
   float exhaustTemp,
-  float coolantTemp,
-  float oilTemp,
-  float batteryV
+  float coolantTemp
 );
 
 /**
@@ -48,10 +46,16 @@ void Display_UpdateGauges(
 void Display_UpdateBoost(float boostPSI);
 
 /**
- * Update intake temperature display
+ * Update intake temperature display - Pre-Intercooler
  * @param temp Temperature in °C
  */
-void Display_UpdateIntakeTemp(float temp);
+void Display_UpdateIntakeTempPre(float temp);
+
+/**
+ * Update intake temperature display - Post-Intercooler
+ * @param temp Temperature in °C
+ */
+void Display_UpdateIntakeTempPost(float temp);
 
 /**
  * Update exhaust temperature display
@@ -64,18 +68,6 @@ void Display_UpdateExhaustTemp(float temp);
  * @param temp Temperature in °C
  */
 void Display_UpdateCoolantTemp(float temp);
-
-/**
- * Update oil temperature display
- * @param temp Temperature in °C
- */
-void Display_UpdateOilTemp(float temp);
-
-/**
- * Update battery voltage display
- * @param voltage Voltage in volts
- */
-void Display_UpdateBatteryVoltage(float voltage);
 
 // ============================================================================
 // STATUS AND ALERTS

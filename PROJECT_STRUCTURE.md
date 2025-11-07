@@ -99,9 +99,9 @@ jnkr-gauge/
 #### config.h
 **Purpose:** System configuration  
 **Contents:**
-- Pin assignments
+- Pin assignments (dual IAT sensors)
 - Sensor calibration values
-- Temperature thresholds
+- Temperature thresholds (pre/post intercooler IAT)
 - Pressure limits
 - Alert levels
 - Display settings
@@ -123,13 +123,12 @@ jnkr-gauge/
 #### sensors.cpp
 **Purpose:** Sensor implementation  
 **Handles:**
-- NTC thermistor reading (IAT, coolant, oil)
+- NTC thermistor reading (dual IAT: pre/post intercooler, coolant)
 - EGT reading via MAX31855
 - MAP/boost pressure reading
-- Battery voltage monitoring
 - Signal filtering
 - Fault detection
-- Calibration offsets
+- Calibration offsets (separate for each IAT sensor)
 
 ---
 
@@ -394,7 +393,7 @@ alerts.cpp
 
 **To change pin assignments:**
 1. Edit `config.h`
-2. Modify `#define PIN_XXX` values
+2. Modify `#define PIN_XXX` values (e.g., PIN_IAT_PRE_IC, PIN_IAT_POST_IC)
 3. Upload code to Arduino
 
 **To change thresholds:**
@@ -428,7 +427,8 @@ alerts.cpp
 **Sensors:**
 ```cpp
 // In loop(), add debug output:
-Serial.print("IAT: "); Serial.println(Sensors_GetIntakeTemp());
+Serial.print("IAT Pre: "); Serial.println(Sensors_GetIntakeTempPre());
+Serial.print("IAT Post: "); Serial.println(Sensors_GetIntakeTempPost());
 ```
 
 **Display:**
