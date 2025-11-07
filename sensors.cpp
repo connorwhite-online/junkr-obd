@@ -15,27 +15,26 @@
 // ============================================================================
 
 // Current sensor readings (filtered)
-static float intakeTemp = 25.0;
+static float intakeTempPre = 25.0;   // Pre-intercooler
+static float intakeTempPost = 25.0;  // Post-intercooler
 static float exhaustTemp = 0.0;
 static float coolantTemp = 25.0;
-static float oilTemp = 25.0;
 static float boostPressureBar = 1.0;  // Absolute pressure
-static float batteryVoltage = 12.0;
 
 // Previous readings (for filtering)
-static float prevIntakeTemp = 25.0;
+static float prevIntakeTempPre = 25.0;
+static float prevIntakeTempPost = 25.0;
 static float prevExhaustTemp = 0.0;
 static float prevCoolantTemp = 25.0;
-static float prevOilTemp = 25.0;
 static float prevBoostPressure = 1.0;
-static float prevBatteryVoltage = 12.0;
 
 // Sensor status
 static uint16_t faultFlags = 0;
 static bool egtAvailable = false;
 
 // Calibration offsets
-static float iatOffset = 0.0;
+static float iatPreOffset = 0.0;
+static float iatPostOffset = 0.0;
 static float boostOffset = 0.0;
 
 // ============================================================================
@@ -217,29 +216,6 @@ float readEGT(float prevValue) {
   return emaFilter(temperature, prevValue, FILTER_ALPHA * 0.5);
 }
 
-/**
- * Read battery voltage through voltage divider
- */
-float readBatteryVoltage(float prevValue) {
-  // Read ADC with averaging
-  int adcValue = readAnalogAveraged(PIN_BATTERY_VOLTAGE, ANALOG_SAMPLES);
-  
-  // Convert to voltage
-  float voltage = adcToVoltage(adcValue);
-  
-  // Apply voltage divider ratio
-  float batteryV = voltage * BATTERY_DIVIDER_RATIO;
-  
-  // Check for fault
-  if (batteryV < BATTERY_MIN || batteryV > BATTERY_MAX) {
-    faultFlags |= FAULT_BATTERY;
-  } else {
-    faultFlags &= ~FAULT_BATTERY;
-  }
-  
-  // Apply EMA filter
-  return emaFilter(batteryV, prevValue, FILTER_ALPHA);
-}
 
 // ============================================================================
 // PUBLIC FUNCTIONS
@@ -247,11 +223,10 @@ float readBatteryVoltage(float prevValue) {
 
 void Sensors_Init() {
   // Configure analog input pins
-  pinMode(PIN_INTAKE_TEMP, INPUT);
+  pinMode(PIN_IAT_PRE_IC, INPUT);
+  pinMode(PIN_IAT_POST_IC, INPUT);
   pinMode(PIN_COOLANT_TEMP, INPUT);
-  pinMode(PIN_OIL_TEMP, INPUT);
   pinMode(PIN_BOOST_PRESSURE, INPUT);
-  pinMode(PIN_BATTERY_VOLTAGE, INPUT);
   
   // Configure SPI for MAX31855
   pinMode(PIN_EGT_CS, OUTPUT);
@@ -278,9 +253,9 @@ void Sensors_Init() {
 
 void Sensors_Update() {
   // Read all temperature sensors
-  intakeTemp = readThermistor(PIN_INTAKE_TEMP, prevIntakeTemp);
+  intakeTempPre = readThermistor(PIN_IAT_PRE_IC, prevIntakeTempPre);
+  intakeTempPost = readThermistor(PIN_IAT_POST_IC, prevIntakeTempPost);
   coolantTemp = readThermistor(PIN_COOLANT_TEMP, prevCoolantTemp);
-  oilTemp = readThermistor(PIN_OIL_TEMP, prevOilTemp);
   
   // Read EGT
   exhaustTemp = readEGT(prevExhaustTemp);
@@ -288,22 +263,24 @@ void Sensors_Update() {
   // Read boost pressure
   boostPressureBar = readBoostPressure(prevBoostPressure);
   
-  // Read battery voltage
-  batteryVoltage = readBatteryVoltage(prevBatteryVoltage);
-  
   // Update previous values for next iteration
-  prevIntakeTemp = intakeTemp;
+  prevIntakeTempPre = intakeTempPre;
+  prevIntakeTempPost = intakeTempPost;
   prevCoolantTemp = coolantTemp;
-  prevOilTemp = oilTemp;
   prevExhaustTemp = exhaustTemp;
   prevBoostPressure = boostPressureBar;
-  prevBatteryVoltage = batteryVoltage;
   
   // Check for sensor-specific faults
-  if (intakeTemp < TEMP_MIN_VALID || intakeTemp > TEMP_MAX_VALID) {
-    faultFlags |= FAULT_IAT_SENSOR;
+  if (intakeTempPre < TEMP_MIN_VALID || intakeTempPre > TEMP_MAX_VALID) {
+    faultFlags |= FAULT_IAT_PRE_SENSOR;
   } else {
-    faultFlags &= ~FAULT_IAT_SENSOR;
+    faultFlags &= ~FAULT_IAT_PRE_SENSOR;
+  }
+  
+  if (intakeTempPost < TEMP_MIN_VALID || intakeTempPost > TEMP_MAX_VALID) {
+    faultFlags |= FAULT_IAT_POST_SENSOR;
+  } else {
+    faultFlags &= ~FAULT_IAT_POST_SENSOR;
   }
   
   if (coolantTemp < TEMP_MIN_VALID || coolantTemp > TEMP_MAX_VALID) {
@@ -311,20 +288,18 @@ void Sensors_Update() {
   } else {
     faultFlags &= ~FAULT_COOLANT_SENSOR;
   }
-  
-  if (oilTemp < TEMP_MIN_VALID || oilTemp > TEMP_MAX_VALID) {
-    faultFlags |= FAULT_OIL_SENSOR;
-  } else {
-    faultFlags &= ~FAULT_OIL_SENSOR;
-  }
 }
 
 // ============================================================================
 // GETTER FUNCTIONS
 // ============================================================================
 
-float Sensors_GetIntakeTemp() {
-  return intakeTemp + iatOffset;
+float Sensors_GetIntakeTempPre() {
+  return intakeTempPre + iatPreOffset;
+}
+
+float Sensors_GetIntakeTempPost() {
+  return intakeTempPost + iatPostOffset;
 }
 
 float Sensors_GetExhaustTemp() {
@@ -333,10 +308,6 @@ float Sensors_GetExhaustTemp() {
 
 float Sensors_GetCoolantTemp() {
   return coolantTemp;
-}
-
-float Sensors_GetOilTemp() {
-  return oilTemp;
 }
 
 float Sensors_GetBoostBar() {
@@ -353,9 +324,6 @@ float Sensors_GetBoostAbsolute() {
   return boostPressureBar;
 }
 
-float Sensors_GetBatteryVoltage() {
-  return batteryVoltage;
-}
 
 // ============================================================================
 // STATUS FUNCTIONS
@@ -381,11 +349,20 @@ void Sensors_ClearFaults() {
 // CALIBRATION FUNCTIONS
 // ============================================================================
 
-void Sensors_SetIATOffset(float offset) {
-  iatOffset = offset;
+void Sensors_SetIATPreOffset(float offset) {
+  iatPreOffset = offset;
   
   #if ENABLE_SERIAL_DEBUG
-  Serial.print(F("Sensors: IAT offset set to "));
+  Serial.print(F("Sensors: IAT Pre-IC offset set to "));
+  Serial.println(offset);
+  #endif
+}
+
+void Sensors_SetIATPostOffset(float offset) {
+  iatPostOffset = offset;
+  
+  #if ENABLE_SERIAL_DEBUG
+  Serial.print(F("Sensors: IAT Post-IC offset set to "));
   Serial.println(offset);
   #endif
 }
@@ -400,7 +377,8 @@ void Sensors_SetBoostOffset(float offset) {
 }
 
 void Sensors_ResetCalibration() {
-  iatOffset = 0.0;
+  iatPreOffset = 0.0;
+  iatPostOffset = 0.0;
   boostOffset = 0.0;
   
   #if ENABLE_SERIAL_DEBUG

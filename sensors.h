@@ -34,10 +34,16 @@ void Sensors_Update();
 // ============================================================================
 
 /**
- * Get intake air temperature (°C)
+ * Get intake air temperature - Pre-Intercooler (°C)
  * @return Temperature in Celsius
  */
-float Sensors_GetIntakeTemp();
+float Sensors_GetIntakeTempPre();
+
+/**
+ * Get intake air temperature - Post-Intercooler (°C)
+ * @return Temperature in Celsius
+ */
+float Sensors_GetIntakeTempPost();
 
 /**
  * Get exhaust gas temperature (°C)
@@ -50,12 +56,6 @@ float Sensors_GetExhaustTemp();
  * @return Temperature in Celsius
  */
 float Sensors_GetCoolantTemp();
-
-/**
- * Get oil temperature (°C)
- * @return Temperature in Celsius (0 if not installed)
- */
-float Sensors_GetOilTemp();
 
 // ============================================================================
 // PRESSURE READINGS
@@ -81,15 +81,6 @@ float Sensors_GetBoostPSI();
  */
 float Sensors_GetBoostAbsolute();
 
-// ============================================================================
-// ELECTRICAL READINGS
-// ============================================================================
-
-/**
- * Get battery voltage
- * @return Voltage in volts
- */
-float Sensors_GetBatteryVoltage();
 
 // ============================================================================
 // SENSOR STATUS
@@ -124,10 +115,16 @@ void Sensors_ClearFaults();
 // ============================================================================
 
 /**
- * Set calibration offset for intake temperature
+ * Set calibration offset for intake temperature - Pre-IC
  * @param offset Offset to add to reading (°C)
  */
-void Sensors_SetIATOffset(float offset);
+void Sensors_SetIATPreOffset(float offset);
+
+/**
+ * Set calibration offset for intake temperature - Post-IC
+ * @param offset Offset to add to reading (°C)
+ */
+void Sensors_SetIATPostOffset(float offset);
 
 /**
  * Set calibration offset for boost pressure

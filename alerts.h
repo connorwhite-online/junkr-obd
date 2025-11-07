@@ -28,20 +28,18 @@ void Alerts_Init();
  * Should be called regularly (every 500ms recommended)
  * 
  * @param boostPSI Boost pressure in PSI (gauge)
- * @param intakeTemp Intake air temperature in °C
+ * @param iatPre Intake air temperature pre-IC in °C
+ * @param iatPost Intake air temperature post-IC in °C
  * @param exhaustTemp Exhaust gas temperature in °C
  * @param coolantTemp Coolant temperature in °C
- * @param oilTemp Oil temperature in °C
- * @param batteryV Battery voltage
  * @return Current alert level (ALERT_NONE, ALERT_WARNING, etc.)
  */
 uint8_t Alerts_CheckAll(
   float boostPSI,
-  float intakeTemp,
+  float iatPre,
+  float iatPost,
   float exhaustTemp,
-  float coolantTemp,
-  float oilTemp,
-  float batteryV
+  float coolantTemp
 );
 
 /**

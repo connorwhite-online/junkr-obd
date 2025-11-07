@@ -1,19 +1,19 @@
 /*
  * JNKR Gauge System
  * 
- * Read-only engine monitoring gauge for 1KZTE turbodiesel
+ * Read-only engine monitoring gauge for turbodiesel engines
  * Displays critical engine parameters with audio alerts
  * 
  * Hardware:
  *   - Arduino Mega 2560
- *   - Nextion NX4832T035 (3.5" touch display)
+ *   - Nextion NX4832T035 (3.5" touch display) - remotely mounted
  *   - MAX31855 K-type thermocouple amplifier (EGT)
  *   - 3-bar MAP sensor (boost pressure)
- *   - NTC thermistors (intake, coolant, oil temps)
+ *   - NTC thermistors (dual IAT: pre/post intercooler, coolant temp)
  *   - Piezo buzzer (alerts)
  * 
  * Features:
- *   - Real-time display of boost, IAT, EGT, coolant, oil temps
+ *   - Real-time display of boost, dual IAT, EGT, coolant temp
  *   - Color-coded warnings (green/yellow/orange/red)
  *   - Multi-level audio alerts with beep patterns
  *   - Sensor fault detection
@@ -36,11 +36,10 @@
 // Sensor readings
 struct SensorData {
   float boostPSI;
-  float intakeTemp;
+  float intakeTempPre;   // Pre-intercooler
+  float intakeTempPost;  // Post-intercooler
   float exhaustTemp;
   float coolantTemp;
-  float oilTemp;
-  float batteryVoltage;
   uint16_t faultFlags;
 } sensorData;
 
@@ -149,11 +148,10 @@ void loop() {
     
     // Store readings in structure
     sensorData.boostPSI = Sensors_GetBoostPSI();
-    sensorData.intakeTemp = Sensors_GetIntakeTemp();
+    sensorData.intakeTempPre = Sensors_GetIntakeTempPre();
+    sensorData.intakeTempPost = Sensors_GetIntakeTempPost();
     sensorData.exhaustTemp = Sensors_GetExhaustTemp();
     sensorData.coolantTemp = Sensors_GetCoolantTemp();
-    sensorData.oilTemp = Sensors_GetOilTemp();
-    sensorData.batteryVoltage = Sensors_GetBatteryVoltage();
     sensorData.faultFlags = Sensors_GetFaultFlags();
   }
   
@@ -166,11 +164,10 @@ void loop() {
     // Update all gauge values on display
     Display_UpdateGauges(
       sensorData.boostPSI,
-      sensorData.intakeTemp,
+      sensorData.intakeTempPre,
+      sensorData.intakeTempPost,
       sensorData.exhaustTemp,
-      sensorData.coolantTemp,
-      sensorData.oilTemp,
-      sensorData.batteryVoltage
+      sensorData.coolantTemp
     );
     
     // Process any incoming display messages
@@ -186,11 +183,10 @@ void loop() {
     // Check all thresholds and determine alert level
     uint8_t alertLevel = Alerts_CheckAll(
       sensorData.boostPSI,
-      sensorData.intakeTemp,
+      sensorData.intakeTempPre,
+      sensorData.intakeTempPost,
       sensorData.exhaustTemp,
-      sensorData.coolantTemp,
-      sensorData.oilTemp,
-      sensorData.batteryVoltage
+      sensorData.coolantTemp
     );
     
     // Update display alert level
@@ -264,19 +260,24 @@ void printDebugInfo() {
   Serial.println(F("\n========== Engine Status =========="));
   
   // Boost pressure
-  Serial.print(F("Boost:    "));
+  Serial.print(F("Boost:      "));
   Serial.print(sensorData.boostPSI, 1);
   Serial.print(F(" PSI  ("));
   Serial.print(Sensors_GetBoostBar(), 2);
   Serial.println(F(" bar)"));
   
-  // Intake temperature
-  Serial.print(F("Intake:   "));
-  Serial.print(sensorData.intakeTemp, 1);
+  // Intake temperature - Pre-IC
+  Serial.print(F("IAT Pre:    "));
+  Serial.print(sensorData.intakeTempPre, 1);
+  Serial.println(F(" C"));
+  
+  // Intake temperature - Post-IC
+  Serial.print(F("IAT Post:   "));
+  Serial.print(sensorData.intakeTempPost, 1);
   Serial.println(F(" C"));
   
   // Exhaust temperature
-  Serial.print(F("Exhaust:  "));
+  Serial.print(F("Exhaust:    "));
   if (Sensors_IsEGTAvailable()) {
     Serial.print(sensorData.exhaustTemp, 0);
     Serial.println(F(" C"));
@@ -285,19 +286,9 @@ void printDebugInfo() {
   }
   
   // Coolant temperature
-  Serial.print(F("Coolant:  "));
+  Serial.print(F("Coolant:    "));
   Serial.print(sensorData.coolantTemp, 1);
   Serial.println(F(" C"));
-  
-  // Oil temperature
-  Serial.print(F("Oil:      "));
-  Serial.print(sensorData.oilTemp, 1);
-  Serial.println(F(" C"));
-  
-  // Battery voltage
-  Serial.print(F("Battery:  "));
-  Serial.print(sensorData.batteryVoltage, 1);
-  Serial.println(F(" V"));
   
   // Alert status
   uint8_t alertLevel = Alerts_GetLevel();
@@ -332,18 +323,16 @@ void printDebugInfo() {
     Serial.print(F("Faults:   0x"));
     Serial.println(sensorData.faultFlags, HEX);
     
-    if (Sensors_IsFaulted(FAULT_IAT_SENSOR))
-      Serial.println(F("  - Intake temp sensor"));
+    if (Sensors_IsFaulted(FAULT_IAT_PRE_SENSOR))
+      Serial.println(F("  - Intake temp pre-IC sensor"));
+    if (Sensors_IsFaulted(FAULT_IAT_POST_SENSOR))
+      Serial.println(F("  - Intake temp post-IC sensor"));
     if (Sensors_IsFaulted(FAULT_EGT_SENSOR))
       Serial.println(F("  - Exhaust temp sensor"));
     if (Sensors_IsFaulted(FAULT_COOLANT_SENSOR))
       Serial.println(F("  - Coolant temp sensor"));
-    if (Sensors_IsFaulted(FAULT_OIL_SENSOR))
-      Serial.println(F("  - Oil temp sensor"));
     if (Sensors_IsFaulted(FAULT_BOOST_SENSOR))
       Serial.println(F("  - Boost pressure sensor"));
-    if (Sensors_IsFaulted(FAULT_BATTERY))
-      Serial.println(F("  - Battery voltage"));
   }
   
   Serial.println(F("===================================\n"));

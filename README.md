@@ -65,13 +65,13 @@ A comprehensive, Arduino-based engine monitoring system that displays critical p
 | Component | Part Number | Quantity | Purpose |
 |-----------|-------------|----------|---------|
 | Arduino Mega 2560 | ATmega2560 | 1 | Main controller |
-| Nextion Display | NX4832T035 | 1 | 3.5" touchscreen HMI |
+| Nextion Display | NX4832T035 | 1 | 3.5" touchscreen HMI (remotely mounted) |
 | MAX31855 Module | MAX31855 | 1 | K-type thermocouple amplifier |
 | K-Type Thermocouple | M6 thread | 1 | EGT sensor (0-1000°C) |
 | MAP Sensor | 0-3 bar | 1 | Boost pressure sensor |
-| NTC Thermistors | 2.2kΩ @ 25°C | 3-4 | Temperature sensors |
+| NTC Thermistors | 2.2kΩ @ 25°C | 3 | Temperature sensors (2x IAT, 1x coolant) |
 | Piezo Buzzer | 2kHz active | 1 | Audio alerts |
-| Enclosure | IP65 rated | 1 | Weather protection |
+| Enclosure | IP65 rated | 1 | Arduino enclosure (display mounted remotely) |
 
 ### Supporting Components
 
@@ -94,15 +94,15 @@ A comprehensive, Arduino-based engine monitoring system that displays critical p
 │   Electrical    │
 └────────┬────────┘
          │
-         ├──→ Buck Converter ──→ 5V ──→ Arduino Mega 2560
+         ├──→ Buck Converter ──→ 5V ──→ Arduino Mega 2560 (in enclosure)
          │                              ├─ SPI ──→ MAX31855 ──→ EGT Sensor
          │                              ├─ ADC ──→ MAP Sensor (Boost)
-         │                              ├─ ADC ──→ NTC Thermistors (IAT, Coolant, Oil)
-         │                              ├─ ADC ──→ Voltage Divider (Battery)
+         │                              ├─ ADC ──→ NTC (IAT Pre-IC)
+         │                              ├─ ADC ──→ NTC (IAT Post-IC)
+         │                              ├─ ADC ──→ NTC (Coolant)
          │                              ├─ PWM ──→ Buzzer (Alerts)
-         │                              └─ UART ─→ Nextion Display
+         │                              └─ UART ─→ Nextion Display (remotely mounted)
          │
-         └──→ Voltage Divider ─────────────────┘
 ```
 
 ---
@@ -113,15 +113,14 @@ A comprehensive, Arduino-based engine monitoring system that displays critical p
 
 | Pin | Function | Component |
 |-----|----------|-----------|
-| A0 | Analog Input | Intake Air Temperature (NTC) |
-| A1 | Analog Input | Coolant Temperature (NTC) |
-| A2 | Analog Input | Oil Temperature (NTC) |
+| A0 | Analog Input | Intake Air Temp Pre-Intercooler (NTC) |
+| A1 | Analog Input | Intake Air Temp Post-Intercooler (NTC) |
+| A2 | Analog Input | Coolant Temperature (NTC) |
 | A3 | Analog Input | Boost Pressure (MAP) |
-| A7 | Analog Input | Battery Voltage (Divider) |
 | 8 | Digital Output | Piezo Buzzer |
 | 10 | SPI CS | MAX31855 (EGT) |
 | 13 | Digital Output | Status LED (built-in) |
-| 16/17 | UART (Serial2) | Nextion Display TX/RX |
+| 16/17 | UART (Serial2) | Nextion Display TX/RX (use longer cable) |
 | 50 | SPI MISO | MAX31855 Data |
 | 52 | SPI SCK | MAX31855 Clock |
 
@@ -135,8 +134,8 @@ A comprehensive, Arduino-based engine monitoring system that displays critical p
 
 1. **Prepare the Enclosure**
    - Drill mounting holes for Arduino Mega
-   - Cut opening for Nextion display
-   - Install cable glands for sensor wires
+   - Install cable glands for sensor wires and display cable
+   - Display will be mounted remotely (not in Arduino enclosure)
 
 2. **Mount Components**
    - Secure Arduino Mega with standoffs
@@ -190,9 +189,9 @@ A comprehensive, Arduino-based engine monitoring system that displays critical p
    - Mount sensor in protected location
 
 3. **Temperature Sensors**
-   - **IAT**: Install in intake pipe post-intercooler
+   - **IAT Pre-IC**: Install in intake pipe before intercooler (near turbo outlet)
+   - **IAT Post-IC**: Install in intake pipe after intercooler (near manifold)
    - **Coolant**: Use existing coolant temp sensor port or T-adapter
-   - **Oil**: Install in oil pan or filter adapter (if monitoring)
 
 4. **Power Connection**
    - Connect to switched 12V (ignition)
@@ -232,8 +231,9 @@ If your sensors read incorrectly, you can apply calibration offsets:
 
 ```cpp
 // In setup() function:
-Sensors_SetIATOffset(2.5);    // Add 2.5°C to IAT reading
-Sensors_SetBoostOffset(0.05);  // Add 0.05 bar to boost reading
+Sensors_SetIATPreOffset(2.5);   // Add 2.5°C to IAT Pre-IC reading
+Sensors_SetIATPostOffset(-1.0); // Subtract 1.0°C from IAT Post-IC reading
+Sensors_SetBoostOffset(0.05);   // Add 0.05 bar to boost reading
 ```
 
 ### Display Settings
@@ -321,8 +321,9 @@ Adjust update rates and filtering:
 **Problem**: Temperature readings too high/low
 - Apply calibration offset in `config.h`
 - Verify thermistor type (2.2kΩ @ 25°C)
-- Check reference resistor value
+- Check reference resistor value (2.2kΩ)
 - Verify voltage divider wiring
+- For IAT sensors, ensure good thermal contact with intake pipe
 
 **Problem**: Boost pressure incorrect
 - Verify MAP sensor wiring
@@ -455,6 +456,6 @@ For questions, issues, or support:
 
 ---
 
-**Built with ❤️ for the 1KZTE community**
+**Built with ❤️ for the turbodiesel community**
 
 **Version 1.0.0** | Last Updated: 2025-11-07

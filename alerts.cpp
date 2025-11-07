@@ -131,11 +131,10 @@ void Alerts_Init() {
 
 uint8_t Alerts_CheckAll(
   float boostPSI,
-  float intakeTemp,
+  float iatPre,
+  float iatPost,
   float exhaustTemp,
-  float coolantTemp,
-  float oilTemp,
-  float batteryV
+  float coolantTemp
 ) {
   // Throttle alert checks
   unsigned long now = millis();
@@ -160,13 +159,24 @@ uint8_t Alerts_CheckAll(
     true  // Higher is bad
   );
   
-  // Check intake temperature
+  // Check intake temperature - Pre-Intercooler
   checkCondition(
-    intakeTemp,
-    IAT_WARNING,
-    IAT_CRITICAL,
-    IAT_CRITICAL + 10.0,  // Danger threshold
-    "INTAKE",
+    iatPre,
+    IAT_PRE_WARNING,
+    IAT_PRE_CRITICAL,
+    IAT_PRE_CRITICAL + 20.0,  // Danger threshold
+    "IAT PRE",
+    "C",
+    true
+  );
+  
+  // Check intake temperature - Post-Intercooler
+  checkCondition(
+    iatPost,
+    IAT_POST_WARNING,
+    IAT_POST_CRITICAL,
+    IAT_POST_CRITICAL + 10.0,  // Danger threshold
+    "IAT POST",
     "C",
     true
   );
@@ -193,30 +203,6 @@ uint8_t Alerts_CheckAll(
     true
   );
   
-  // Check oil temperature
-  checkCondition(
-    oilTemp,
-    OIL_WARNING,
-    OIL_CRITICAL,
-    OIL_CRITICAL + 10.0,  // Danger threshold
-    "OIL",
-    "C",
-    true
-  );
-  
-  // Check battery voltage (lower is bad)
-  if (batteryV < BATTERY_MIN) {
-    if (batteryV < BATTERY_MIN - 1.0) {
-      currentAlertLevel = max(currentAlertLevel, ALERT_CRITICAL);
-      snprintf(alertMessage, sizeof(alertMessage), "BATTERY LOW: %.1fV", batteryV);
-    } else {
-      currentAlertLevel = max(currentAlertLevel, ALERT_WARNING);
-      snprintf(alertMessage, sizeof(alertMessage), "Battery Low: %.1fV", batteryV);
-    }
-  } else if (batteryV > BATTERY_MAX) {
-    currentAlertLevel = max(currentAlertLevel, ALERT_WARNING);
-    snprintf(alertMessage, sizeof(alertMessage), "Voltage High: %.1fV", batteryV);
-  }
   
   // If alert level changed, reset acknowledgment
   if (currentAlertLevel != previousAlertLevel) {
