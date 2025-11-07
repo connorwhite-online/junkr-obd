@@ -10,12 +10,13 @@
  *   - MAX31855 K-type thermocouple amplifier (EGT)
  *   - 3-bar MAP sensor (boost pressure)
  *   - NTC thermistors (dual IAT: pre/post intercooler, coolant temp)
- *   - Piezo buzzer (alerts)
+ *   - DFPlayer Mini speaker module with SD card (audio alerts)
  * 
  * Features:
  *   - Real-time display of boost, dual IAT, EGT, coolant temp
  *   - Color-coded warnings (green/yellow/orange/red)
- *   - Multi-level audio alerts with beep patterns
+ *   - Multi-level audio alerts with preloaded voice/sound warnings
+ *   - Parameter-specific alert sounds (boost, temp, coolant, etc.)
  *   - Sensor fault detection
  *   - Smooth filtered readings
  * 
@@ -217,7 +218,7 @@ void loop() {
   }
   
   // -------------------------
-  // 4. UPDATE ALERT BUZZER (continuous)
+  // 4. UPDATE ALERT SPEAKER (continuous)
   // -------------------------
   Alerts_Update();
   

@@ -15,7 +15,7 @@
 
 /**
  * Initialize alert system
- * Configures buzzer pin and internal state
+ * Configures speaker module and internal state
  */
 void Alerts_Init();
 
@@ -78,36 +78,47 @@ void Alerts_Reset();
 
 /**
  * Enable or disable audio alerts
- * @param enabled true to enable buzzer, false to disable
+ * @param enabled true to enable speaker, false to disable
  */
 void Alerts_SetAudioEnabled(bool enabled);
 
 /**
  * Check if audio alerts are enabled
- * @return true if buzzer is enabled
+ * @return true if speaker is enabled
  */
 bool Alerts_IsAudioEnabled();
 
+/**
+ * Set speaker volume
+ * @param volume Volume level (0-30)
+ */
+void Alerts_SetVolume(uint8_t volume);
+
 // ============================================================================
-// BUZZER CONTROL
+// SPEAKER CONTROL
 // ============================================================================
 
 /**
- * Update buzzer state (call regularly in main loop)
- * Handles beep patterns for different alert levels
+ * Update speaker state (call regularly in main loop)
+ * Handles sound playback for different alert levels
  */
 void Alerts_Update();
 
 /**
- * Play a specific beep pattern
- * @param count Number of beeps (1-5)
- * @param duration Duration of each beep in ms
+ * Play a specific sound file
+ * @param soundNumber Sound file number (1-17)
  */
-void Alerts_PlayBeeps(int count, unsigned long duration);
+void Alerts_PlaySound(uint8_t soundNumber);
 
 /**
- * Stop buzzer immediately
+ * Stop speaker immediately
  */
-void Alerts_StopBuzzer();
+void Alerts_StopSpeaker();
+
+/**
+ * Check if speaker module is ready
+ * @return true if module is initialized and responding
+ */
+bool Alerts_IsSpeakerReady();
 
 #endif // ALERTS_H

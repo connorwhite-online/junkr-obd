@@ -33,6 +33,7 @@ jnkr-gauge/
     ├── BOM.md                   ← Bill of materials with part numbers
     ├── CALIBRATION.md           ← Sensor calibration procedures
     ├── NEXTION.md               ← Nextion display design guide
+    ├── SPEAKER.md               ← Speaker module setup (DFPlayer Mini)
     ├── SHIELD.md                ← Shield PCB design and ordering
     │
     └── shield/                  ← Shield design files
@@ -165,10 +166,12 @@ jnkr-gauge/
 **Handles:**
 - Threshold monitoring
 - Alert level determination
-- Buzzer control
-- Beep patterns
+- Speaker module control (DFPlayer Mini)
+- Sound file playback
+- Parameter-specific audio alerts
 - Alert acknowledgment
 - Audio enable/disable
+- Volume control
 
 ---
 
@@ -243,6 +246,20 @@ jnkr-gauge/
 - Examples and tips
 
 **Read if customizing the display**
+
+### docs/SPEAKER.md
+**For:** Audio alert system setup  
+**Contents:**
+- DFPlayer Mini module wiring
+- SD card preparation
+- Audio file requirements (17 sound files)
+- Sound file naming conventions
+- Creating/recording audio files
+- Volume and EQ configuration
+- Testing procedures
+- Troubleshooting audio issues
+
+**Essential for setting up audio alerts**
 
 ### docs/SHIELD.md
 **For:** PCB shield assembly  
@@ -414,9 +431,11 @@ alerts.cpp
 
 **Steps:**
 1. Define threshold in `config.h`
-2. Add check in `alerts.cpp` → `Alerts_CheckAll()`
-3. Test with Serial Monitor
-4. Verify buzzer pattern
+2. Add sound file definition (if needed)
+3. Add check in `alerts.cpp` → `Alerts_CheckAll()`
+4. Update `getSoundForAlert()` to return correct sound file
+5. Test with Serial Monitor
+6. Verify speaker plays correct alert
 
 ---
 
@@ -441,7 +460,7 @@ Display_UpdateBoost(15.0);  // Should show 15 PSI
 ```cpp
 // In setup(), test:
 Alerts_SetLevel(ALERT_WARNING);
-Alerts_PlayBeeps(3, 250);
+Alerts_PlaySound(SOUND_WARNING);  // Test specific sound file
 ```
 
 ---

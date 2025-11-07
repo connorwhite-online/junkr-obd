@@ -38,7 +38,8 @@
 #define PIN_SPI_SCK         52   // SPI SCK (hardware pin on Mega)
 
 // === DIGITAL OUTPUT (Audio Alert) ===
-#define PIN_BUZZER          8    // Piezo buzzer for alerts
+#define PIN_SPEAKER_TX      8    // TX pin for DFPlayer Mini speaker module
+#define PIN_SPEAKER_RX      9    // RX pin for DFPlayer Mini speaker module
 #define PIN_STATUS_LED      13   // Built-in LED for heartbeat
 
 // === UART (for Nextion Display) ===
@@ -136,15 +137,34 @@ enum AlertLevel {
   ALERT_DANGER = 4     // Danger - continuous alarm
 };
 
-// Buzzer patterns (in milliseconds)
-#define BEEP_SHORT             100      // Short beep duration
-#define BEEP_MEDIUM            250      // Medium beep duration
-#define BEEP_LONG              500      // Long beep duration
-#define BEEP_PAUSE             150      // Pause between beeps
-#define BEEP_REPEAT_DELAY      2000     // Delay before repeating alert
+// Speaker module configuration
+#define SPEAKER_VOLUME         20       // Volume level (0-30 for DFPlayer Mini)
+#define SPEAKER_EQ_MODE        0        // EQ mode (0=Normal, 1=Pop, 2=Rock, 3=Jazz, 4=Classic, 5=Bass)
 
-// Buzzer frequency
-#define BUZZER_FREQUENCY       2000     // Hz (2kHz for piezo buzzer)
+// Sound file assignments (files stored as 0001.mp3, 0002.mp3, etc. on SD card)
+#define SOUND_STARTUP          1        // System startup sound
+#define SOUND_INFO             2        // Informational alert (single tone)
+#define SOUND_WARNING          3        // Warning level alert (double beep)
+#define SOUND_CRITICAL         4        // Critical level alert (urgent beeping)
+#define SOUND_DANGER           5        // Danger level alert (continuous alarm)
+#define SOUND_BOOST_WARNING    6        // Boost pressure warning voice
+#define SOUND_BOOST_CRITICAL   7        // Boost pressure critical voice
+#define SOUND_BOOST_DANGER     8        // Boost pressure danger voice
+#define SOUND_IAT_WARNING      9        // Intake temperature warning voice
+#define SOUND_IAT_CRITICAL     10       // Intake temperature critical voice
+#define SOUND_EGT_WARNING      11       // Exhaust temperature warning voice
+#define SOUND_EGT_CRITICAL     12       // Exhaust temperature critical voice
+#define SOUND_EGT_DANGER       13       // Exhaust temperature danger voice
+#define SOUND_COOLANT_WARNING  14       // Coolant temperature warning voice
+#define SOUND_COOLANT_CRITICAL 15       // Coolant temperature critical voice
+#define SOUND_COOLANT_DANGER   16       // Coolant temperature danger voice
+#define SOUND_ACKNOWLEDGED     17       // Alert acknowledged confirmation
+
+// Alert repeat intervals (milliseconds)
+#define ALERT_REPEAT_INFO      5000     // Repeat info alerts every 5 seconds
+#define ALERT_REPEAT_WARNING   3000     // Repeat warning alerts every 3 seconds
+#define ALERT_REPEAT_CRITICAL  2000     // Repeat critical alerts every 2 seconds
+#define ALERT_REPEAT_DANGER    1000     // Repeat danger alerts every 1 second
 
 // ============================================================================
 // FILTERING AND SAMPLING
