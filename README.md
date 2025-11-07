@@ -27,15 +27,13 @@ A comprehensive, Arduino-based engine monitoring system that displays critical p
 - Alert message display
 
 ### Audio Alerts
-- Multi-level alert system with preloaded voice/sound warnings:
-  - **Info**: Single tone (informational)
-  - **Warning**: Voice warning specific to parameter (boost, temp, etc.)
-  - **Critical**: Urgent voice alert with clear instructions
-  - **Danger**: Continuous alarm with critical warning message
-- Parameter-specific alerts (boost, intake temp, exhaust temp, coolant)
-- Configurable volume and thresholds
+- Multi-level alert system with distinctive beep patterns:
+  - **Info**: 1 beep (informational)
+  - **Warning**: 2 beeps (attention needed)
+  - **Critical**: 3 beeps (immediate attention)
+  - **Danger**: Continuous alarm (pull over immediately)
+- Configurable thresholds
 - Acknowledgeable alerts
-- Uses DFPlayer Mini MP3 module with SD card
 
 ### Safety Features
 - Sensor fault detection and reporting
@@ -72,9 +70,7 @@ A comprehensive, Arduino-based engine monitoring system that displays critical p
 | K-Type Thermocouple | M6 thread | 1 | EGT sensor (0-1000°C) |
 | MAP Sensor | 0-3 bar | 1 | Boost pressure sensor |
 | NTC Thermistors | 2.2kΩ @ 25°C | 3 | Temperature sensors (2x IAT, 1x coolant) |
-| DFPlayer Mini Module | MP3 Player | 1 | Audio alert system |
-| Micro SD Card | 8GB FAT32 | 1 | Audio file storage (17 sound files) |
-| Speaker | 3W 4Ω or 8Ω | 1 | Audio output for alerts |
+| Piezo Buzzer | 2kHz active | 1 | Audio alerts |
 | Enclosure | IP65 rated | 1 | Arduino enclosure (display mounted remotely) |
 
 ### Supporting Components
@@ -104,7 +100,7 @@ A comprehensive, Arduino-based engine monitoring system that displays critical p
          │                              ├─ ADC ──→ NTC (IAT Pre-IC)
          │                              ├─ ADC ──→ NTC (IAT Post-IC)
          │                              ├─ ADC ──→ NTC (Coolant)
-         │                              ├─ Serial ─→ DFPlayer Mini ──→ Speaker (Alerts)
+         │                              ├─ PWM ──→ Buzzer (Alerts)
          │                              └─ UART ─→ Nextion Display (remotely mounted)
          │
 ```
@@ -121,8 +117,7 @@ A comprehensive, Arduino-based engine monitoring system that displays critical p
 | A1 | Analog Input | Intake Air Temp Post-Intercooler (NTC) |
 | A2 | Analog Input | Coolant Temperature (NTC) |
 | A3 | Analog Input | Boost Pressure (MAP) |
-| 8 | Serial TX | DFPlayer Mini Speaker Module |
-| 9 | Serial RX | DFPlayer Mini Speaker Module |
+| 8 | Digital Output | Piezo Buzzer |
 | 10 | SPI CS | MAX31855 (EGT) |
 | 13 | Digital Output | Status LED (built-in) |
 | 16/17 | UART (Serial2) | Nextion Display TX/RX (use longer cable) |
@@ -168,8 +163,6 @@ A comprehensive, Arduino-based engine monitoring system that displays critical p
    - Search and install:
      - `SPI` (built-in)
      - `Wire` (built-in)
-     - `DFRobotDFPlayerMini` (by DFRobot)
-     - `SoftwareSerial` (built-in)
 
 3. **Upload Code**
    - Open `jnkr-gauge.ino` in Arduino IDE
@@ -200,18 +193,12 @@ A comprehensive, Arduino-based engine monitoring system that displays critical p
    - **IAT Post-IC**: Install in intake pipe after intercooler (near manifold)
    - **Coolant**: Use existing coolant temp sensor port or T-adapter
 
-4. **Speaker Module**
-   - Install DFPlayer Mini MP3 module
-   - Connect speaker (3W 4Ω or 8Ω)
-   - Prepare SD card with 17 audio files (0001.mp3 - 0017.mp3)
-   - See [docs/SPEAKER.md](docs/SPEAKER.md) for complete audio setup
-
-5. **Power Connection**
+4. **Power Connection**
    - Connect to switched 12V (ignition)
    - Use 3A fuse for protection
    - Connect ground to chassis
 
-**Detailed Installation**: See [docs/ASSEMBLY.md](docs/ASSEMBLY.md) and [docs/SPEAKER.md](docs/SPEAKER.md)
+**Detailed Installation**: See [docs/ASSEMBLY.md](docs/ASSEMBLY.md)
 
 ---
 
@@ -346,19 +333,16 @@ Adjust update rates and filtering:
 
 ### Audio Alerts
 
-**Problem**: No speaker sound
-- Check SD card has audio files (0001.mp3 - 0017.mp3)
-- Verify DFPlayer Mini wiring (pins 8 & 9)
-- Check speaker connections (SPK_1 and SPK_2)
-- Verify volume is not 0 (default: 20)
-- Check Serial Monitor for "Speaker module initialized"
-- See [docs/SPEAKER.md](docs/SPEAKER.md) for troubleshooting
+**Problem**: No buzzer sound
+- Check pin 8 connection
+- Verify buzzer polarity
+- Test with `Alerts_PlayBeeps(3, 250)`
+- Check if audio is disabled
 
-**Problem**: Garbled or no audio
-- Reformat SD card as FAT32
-- Verify MP3 files are correct format (22050 Hz or 44100 Hz)
-- Check file naming (must be 0001.mp3, 0002.mp3, etc.)
-- Test speaker with multimeter (should be 4Ω or 8Ω)
+**Problem**: Buzzer always on
+- Check for alert condition
+- Verify thresholds in `config.h`
+- Reset system
 
 ### General Issues
 
@@ -419,7 +403,6 @@ For a professional, plug-and-play solution, we've designed a custom Arduino Mega
 - [Complete Wiring Guide](docs/WIRING.md) - Detailed connection instructions
 - [Assembly Guide](docs/ASSEMBLY.md) - Step-by-step build instructions
 - [Bill of Materials](docs/BOM.md) - Complete parts list with suppliers
-- [Speaker Module Guide](docs/SPEAKER.md) - Audio alert setup with DFPlayer Mini
 - [Shield Guide](docs/SHIELD.md) - PCB shield assembly and ordering
 - [Calibration Guide](docs/CALIBRATION.md) - Sensor calibration procedures
 - [Nextion HMI Guide](docs/NEXTION.md) - Display design and customization
