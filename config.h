@@ -1,8 +1,9 @@
 /*
  * JNKR Gauge System - Configuration
  * 
- * Read-only gauge system for 1KZTE engine monitoring
- * Displays intake temp, exhaust temp, coolant temp, and boost pressure
+ * Read-only gauge system for turbodiesel engine monitoring
+ * Displays boost pressure, exhaust temp, coolant temp,
+ * and dual intake air temps (pre & post intercooler)
  * with audio alerts for dangerous thresholds
  * 
  * Hardware: Arduino Mega 2560
@@ -26,11 +27,10 @@
 // ============================================================================
 
 // === ANALOG INPUTS (Temperature & Pressure Sensors) ===
-#define PIN_INTAKE_TEMP     A0   // Intake Air Temperature (NTC thermistor)
-#define PIN_COOLANT_TEMP    A1   // Coolant Temperature (NTC thermistor)
-#define PIN_OIL_TEMP        A2   // Oil Temperature (optional, NTC thermistor)
+#define PIN_IAT_PRE_IC      A0   // Intake Air Temperature - Pre-Intercooler (NTC thermistor)
+#define PIN_IAT_POST_IC     A1   // Intake Air Temperature - Post-Intercooler (NTC thermistor)
+#define PIN_COOLANT_TEMP    A2   // Coolant Temperature (NTC thermistor)
 #define PIN_BOOST_PRESSURE  A3   // MAP/Boost Pressure Sensor (0-3 bar)
-#define PIN_BATTERY_VOLTAGE A7   // Battery voltage monitor (via voltage divider)
 
 // === SPI PINS (for MAX31855 EGT Sensor) ===
 #define PIN_EGT_CS          10   // MAX31855 Chip Select
@@ -78,28 +78,20 @@
 // Conversion factor: bar to PSI
 #define BAR_TO_PSI             14.5038  // 1 bar = 14.5038 psi
 
-// ============================================================================
-// BATTERY VOLTAGE MONITOR
-// ============================================================================
-
-// Voltage divider: R1=10kΩ, R2=2.2kΩ (gives ~5.5:1 ratio)
-// Max input: 16.5V → ADC sees: 3.0V (safe for 5V Arduino)
-#define BATTERY_DIVIDER_R1     10000.0  // Upper resistor (Ohms)
-#define BATTERY_DIVIDER_R2     2200.0   // Lower resistor (Ohms)
-#define BATTERY_DIVIDER_RATIO  ((BATTERY_DIVIDER_R1 + BATTERY_DIVIDER_R2) / BATTERY_DIVIDER_R2)
-
-// Battery voltage limits
-#define BATTERY_MIN            11.0     // Below this = warning
-#define BATTERY_MAX            15.5     // Above this = warning
 
 // ============================================================================
 // TEMPERATURE THRESHOLDS (°C)
 // ============================================================================
 
-// === Intake Air Temperature ===
-#define IAT_NORMAL_MAX         45.0     // Normal operating max
-#define IAT_WARNING            50.0     // Warning threshold
-#define IAT_CRITICAL           60.0     // Critical - reduce power
+// === Intake Air Temperature (Pre-Intercooler) ===
+#define IAT_PRE_NORMAL_MAX     120.0    // Normal operating max (before intercooler)
+#define IAT_PRE_WARNING        140.0    // Warning threshold
+#define IAT_PRE_CRITICAL       160.0    // Critical - check turbo/intercooler
+
+// === Intake Air Temperature (Post-Intercooler) ===
+#define IAT_POST_NORMAL_MAX    45.0     // Normal operating max (after intercooler)
+#define IAT_POST_WARNING       50.0     // Warning threshold
+#define IAT_POST_CRITICAL      60.0     // Critical - intercooler efficiency issue
 
 // === Exhaust Gas Temperature (EGT) ===
 #define EGT_NORMAL_MAX         550.0    // Normal sustained max
@@ -114,10 +106,6 @@
 #define COOLANT_CRITICAL       105.0    // Critical - pull over
 #define COOLANT_DANGER         110.0    // Danger - engine damage
 
-// === Oil Temperature (if monitored) ===
-#define OIL_NORMAL_MAX         110.0    // Normal operating max
-#define OIL_WARNING            120.0    // Warning threshold
-#define OIL_CRITICAL           130.0    // Critical threshold
 
 // ============================================================================
 // PRESSURE THRESHOLDS
@@ -183,14 +171,13 @@ enum AlertLevel {
 #define PAGE_ALERTS            2        // Alert history page (future)
 
 // Nextion component names (must match your Nextion HMI project)
-#define NEXTION_BOOST_VALUE    "nBoost"      // Boost numeric field
-#define NEXTION_IAT_VALUE      "nIAT"        // Intake temp numeric field
-#define NEXTION_EGT_VALUE      "nEGT"        // Exhaust temp numeric field
-#define NEXTION_COOLANT_VALUE  "nCoolant"    // Coolant temp numeric field
-#define NEXTION_OIL_VALUE      "nOil"        // Oil temp numeric field
-#define NEXTION_BATTERY_VALUE  "nBattery"    // Battery voltage field
-#define NEXTION_STATUS_TEXT    "tStatus"     // Status text field
-#define NEXTION_ALERT_TEXT     "tAlert"      // Alert message field
+#define NEXTION_BOOST_VALUE       "nBoost"      // Boost numeric field
+#define NEXTION_IAT_PRE_VALUE     "nIATPre"     // Intake temp pre-IC numeric field
+#define NEXTION_IAT_POST_VALUE    "nIATPost"    // Intake temp post-IC numeric field
+#define NEXTION_EGT_VALUE         "nEGT"        // Exhaust temp numeric field
+#define NEXTION_COOLANT_VALUE     "nCoolant"    // Coolant temp numeric field
+#define NEXTION_STATUS_TEXT       "tStatus"     // Status text field
+#define NEXTION_ALERT_TEXT        "tAlert"      // Alert message field
 
 // Nextion colors (RGB565 format)
 #define COLOR_GREEN            2016         // Normal (green)
@@ -230,16 +217,15 @@ enum AlertLevel {
 // ============================================================================
 
 // Bit positions for fault flags
-#define FAULT_IAT_SENSOR       (1 << 0)     // Intake temp sensor fault
-#define FAULT_EGT_SENSOR       (1 << 1)     // Exhaust temp sensor fault
-#define FAULT_COOLANT_SENSOR   (1 << 2)     // Coolant sensor fault
-#define FAULT_OIL_SENSOR       (1 << 3)     // Oil sensor fault
+#define FAULT_IAT_PRE_SENSOR   (1 << 0)     // Intake temp pre-IC sensor fault
+#define FAULT_IAT_POST_SENSOR  (1 << 1)     // Intake temp post-IC sensor fault
+#define FAULT_EGT_SENSOR       (1 << 2)     // Exhaust temp sensor fault
+#define FAULT_COOLANT_SENSOR   (1 << 3)     // Coolant sensor fault
 #define FAULT_BOOST_SENSOR     (1 << 4)     // Boost sensor fault
-#define FAULT_BATTERY          (1 << 5)     // Battery voltage fault
-#define FAULT_DISPLAY          (1 << 6)     // Display communication fault
-#define FAULT_EGT_HIGH         (1 << 7)     // EGT too high
-#define FAULT_COOLANT_HIGH     (1 << 8)     // Coolant temp too high
-#define FAULT_OVERBOOST        (1 << 9)     // Overboost condition
+#define FAULT_DISPLAY          (1 << 5)     // Display communication fault
+#define FAULT_EGT_HIGH         (1 << 6)     // EGT too high
+#define FAULT_COOLANT_HIGH     (1 << 7)     // Coolant temp too high
+#define FAULT_OVERBOOST        (1 << 8)     // Overboost condition
 
 // ============================================================================
 // ENGINEERING UNITS DISPLAY
