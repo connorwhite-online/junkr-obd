@@ -1,3 +1,460 @@
-# junkr-obd
-Vehicle monitoring on the Arduino ecosystem.
-.
+# JNKR Gauge System
+
+**Read-Only Engine Monitoring Gauge for 1KZTE Turbodiesel**
+
+A comprehensive, Arduino-based engine monitoring system that displays critical parameters with color-coded warnings and audio alerts. Perfect for enthusiasts who want to monitor their turbocharged diesel engine without modifying ECU signals.
+
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Arduino](https://img.shields.io/badge/arduino-Mega%202560-00979D.svg)
+
+---
+
+## 🎯 Features
+
+### Real-Time Monitoring
+- **Boost Pressure** - PSI gauge display (0-25 PSI range)
+- **Intake Air Temperature** - Post-intercooler temp monitoring
+- **Exhaust Gas Temperature** - K-type thermocouple (up to 1000°C)
+- **Coolant Temperature** - Engine operating temperature
+- **Oil Temperature** - Engine oil temp (optional)
+- **Battery Voltage** - Electrical system monitoring
+
+### Visual Feedback
+- 3.5" Nextion touchscreen display
+- Color-coded warnings (Green → Yellow → Orange → Red)
+- Real-time gauge updates (5Hz refresh rate)
+- Alert message display
+
+### Audio Alerts
+- Multi-level alert system with distinctive beep patterns:
+  - **Info**: 1 beep (informational)
+  - **Warning**: 2 beeps (attention needed)
+  - **Critical**: 3 beeps (immediate attention)
+  - **Danger**: Continuous alarm (pull over immediately)
+- Configurable thresholds
+- Acknowledgeable alerts
+
+### Safety Features
+- Sensor fault detection and reporting
+- Out-of-range validation
+- Filtered readings to reduce noise
+- Comprehensive diagnostic output
+
+---
+
+## 📋 Table of Contents
+
+- [Hardware Requirements](#hardware-requirements)
+- [Bill of Materials](#bill-of-materials)
+- [Wiring Guide](#wiring-guide)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [Troubleshooting](#troubleshooting)
+- [Shield PCB Design](#shield-pcb-design)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## 🔧 Hardware Requirements
+
+### Core Components
+
+| Component | Part Number | Quantity | Purpose |
+|-----------|-------------|----------|---------|
+| Arduino Mega 2560 | ATmega2560 | 1 | Main controller |
+| Nextion Display | NX4832T035 | 1 | 3.5" touchscreen HMI |
+| MAX31855 Module | MAX31855 | 1 | K-type thermocouple amplifier |
+| K-Type Thermocouple | M6 thread | 1 | EGT sensor (0-1000°C) |
+| MAP Sensor | 0-3 bar | 1 | Boost pressure sensor |
+| NTC Thermistors | 2.2kΩ @ 25°C | 3-4 | Temperature sensors |
+| Piezo Buzzer | 2kHz active | 1 | Audio alerts |
+| Enclosure | IP65 rated | 1 | Weather protection |
+
+### Supporting Components
+
+- Resistors: 2.2kΩ, 10kΩ (voltage dividers)
+- Capacitors: 0.1µF ceramic (power filtering)
+- Screw terminals: 5mm pitch
+- Power supply: 12V to 5V buck converter (3A minimum)
+- Wiring: 20-22 AWG automotive wire
+- Heat shrink tubing and connectors
+
+**Detailed Bill of Materials**: See [docs/BOM.md](docs/BOM.md)
+
+---
+
+## 📐 Architecture
+
+```
+┌─────────────────┐
+│   12V Vehicle   │
+│   Electrical    │
+└────────┬────────┘
+         │
+         ├──→ Buck Converter ──→ 5V ──→ Arduino Mega 2560
+         │                              ├─ SPI ──→ MAX31855 ──→ EGT Sensor
+         │                              ├─ ADC ──→ MAP Sensor (Boost)
+         │                              ├─ ADC ──→ NTC Thermistors (IAT, Coolant, Oil)
+         │                              ├─ ADC ──→ Voltage Divider (Battery)
+         │                              ├─ PWM ──→ Buzzer (Alerts)
+         │                              └─ UART ─→ Nextion Display
+         │
+         └──→ Voltage Divider ─────────────────┘
+```
+
+---
+
+## 🔌 Pin Assignments
+
+### Arduino Mega 2560
+
+| Pin | Function | Component |
+|-----|----------|-----------|
+| A0 | Analog Input | Intake Air Temperature (NTC) |
+| A1 | Analog Input | Coolant Temperature (NTC) |
+| A2 | Analog Input | Oil Temperature (NTC) |
+| A3 | Analog Input | Boost Pressure (MAP) |
+| A7 | Analog Input | Battery Voltage (Divider) |
+| 8 | Digital Output | Piezo Buzzer |
+| 10 | SPI CS | MAX31855 (EGT) |
+| 13 | Digital Output | Status LED (built-in) |
+| 16/17 | UART (Serial2) | Nextion Display TX/RX |
+| 50 | SPI MISO | MAX31855 Data |
+| 52 | SPI SCK | MAX31855 Clock |
+
+**Complete Wiring**: See [docs/WIRING.md](docs/WIRING.md)
+
+---
+
+## 🚀 Installation
+
+### Step 1: Hardware Assembly
+
+1. **Prepare the Enclosure**
+   - Drill mounting holes for Arduino Mega
+   - Cut opening for Nextion display
+   - Install cable glands for sensor wires
+
+2. **Mount Components**
+   - Secure Arduino Mega with standoffs
+   - Mount buck converter
+   - Install screw terminals
+
+3. **Wire Connections**
+   - Follow the wiring diagram in [docs/WIRING.md](docs/WIRING.md)
+   - Use heat shrink on all connections
+   - Label all wires
+
+**Detailed Assembly**: See [docs/ASSEMBLY.md](docs/ASSEMBLY.md)
+
+### Step 2: Software Setup
+
+1. **Install Arduino IDE**
+   ```bash
+   # Download from: https://www.arduino.cc/en/software
+   # Install version 1.8.x or 2.x
+   ```
+
+2. **Install Required Libraries**
+   - Open Arduino IDE
+   - Go to Sketch → Include Library → Manage Libraries
+   - Search and install:
+     - `SPI` (built-in)
+     - `Wire` (built-in)
+
+3. **Upload Code**
+   - Open `jnkr-gauge.ino` in Arduino IDE
+   - Select **Board**: Arduino Mega 2560
+   - Select **Port**: Your Arduino's COM port
+   - Click **Upload** (→)
+
+4. **Verify Operation**
+   - Open Serial Monitor (115200 baud)
+   - Check for initialization messages
+   - Verify sensor readings
+
+### Step 3: Sensor Installation
+
+1. **EGT Sensor** (Exhaust)
+   - Install in exhaust manifold or downpipe
+   - Use M6 or 1/8" NPT bung
+   - Position 6-12 inches from turbo outlet
+   - Route wiring away from heat
+
+2. **Boost Pressure Sensor**
+   - Connect to intake manifold
+   - Use vacuum hose (4mm or 5/32")
+   - Mount sensor in protected location
+
+3. **Temperature Sensors**
+   - **IAT**: Install in intake pipe post-intercooler
+   - **Coolant**: Use existing coolant temp sensor port or T-adapter
+   - **Oil**: Install in oil pan or filter adapter (if monitoring)
+
+4. **Power Connection**
+   - Connect to switched 12V (ignition)
+   - Use 3A fuse for protection
+   - Connect ground to chassis
+
+**Detailed Installation**: See [docs/ASSEMBLY.md](docs/ASSEMBLY.md)
+
+---
+
+## ⚙️ Configuration
+
+### Temperature Thresholds
+
+Edit `config.h` to customize alert thresholds:
+
+```cpp
+// Exhaust Gas Temperature (°C)
+#define EGT_WARNING            600.0
+#define EGT_CRITICAL           650.0
+#define EGT_DANGER             700.0
+
+// Coolant Temperature (°C)
+#define COOLANT_WARNING        100.0
+#define COOLANT_CRITICAL       105.0
+#define COOLANT_DANGER         110.0
+
+// Boost Pressure (PSI)
+#define BOOST_WARNING_PSI      14.5
+#define BOOST_CRITICAL_PSI     18.8
+#define BOOST_DANGER_PSI       21.8
+```
+
+### Sensor Calibration
+
+If your sensors read incorrectly, you can apply calibration offsets:
+
+```cpp
+// In setup() function:
+Sensors_SetIATOffset(2.5);    // Add 2.5°C to IAT reading
+Sensors_SetBoostOffset(0.05);  // Add 0.05 bar to boost reading
+```
+
+### Display Settings
+
+Adjust update rates and filtering:
+
+```cpp
+#define SENSOR_UPDATE_INTERVAL 100   // Read sensors every 100ms
+#define DISPLAY_UPDATE_INTERVAL 200  // Update display every 200ms
+#define FILTER_ALPHA           0.15  // Smoothing (0.0-1.0)
+```
+
+---
+
+## 📱 Usage
+
+### Startup Sequence
+
+1. Turn ignition to ON position
+2. Wait for display to initialize (~2 seconds)
+3. System performs self-test
+4. Display shows "System Ready"
+5. Gauges begin updating
+
+### Normal Operation
+
+- **Green values**: All parameters normal
+- **Yellow values**: Approaching warning threshold
+- **Orange values**: At critical threshold
+- **Red values**: Dangerous level - take action!
+
+### Alert Responses
+
+| Alert Level | Display | Sound | Action Required |
+|-------------|---------|-------|-----------------|
+| **None** | Green text | Silent | Normal operation |
+| **Warning** | Yellow text | 2 beeps | Monitor closely |
+| **Critical** | Orange text | 3 beeps | Reduce load/speed |
+| **Danger** | Red text | Continuous | Pull over immediately |
+
+### Interpreting Readings
+
+**Boost Pressure (PSI)**
+- 0-12 PSI: Normal driving
+- 12-15 PSI: Moderate boost
+- 15-19 PSI: High boost (modified)
+- >19 PSI: Overboost - danger!
+
+**Exhaust Gas Temperature (°C)**
+- <500°C: Normal cruising
+- 500-600°C: Moderate load
+- 600-650°C: High load (short duration OK)
+- >650°C: Danger - reduce throttle!
+
+**Coolant Temperature (°C)**
+- 75-95°C: Normal operating range
+- 95-100°C: Warming - check cooling system
+- 100-105°C: Overheating - reduce load
+- >105°C: Critical - pull over!
+
+---
+
+## 🛠️ Troubleshooting
+
+### Display Issues
+
+**Problem**: Display doesn't turn on
+- Check 5V power connection
+- Verify Nextion display power LED
+- Check TX/RX wiring (may be reversed)
+
+**Problem**: Garbled display
+- Check baud rate (115200)
+- Verify Serial2 connections
+- Try swapping TX and RX wires
+
+### Sensor Issues
+
+**Problem**: EGT reads 0°C
+- Check MAX31855 wiring
+- Verify thermocouple connection
+- Check SPI pins (10, 50, 52)
+- Test thermocouple with multimeter
+
+**Problem**: Temperature readings too high/low
+- Apply calibration offset in `config.h`
+- Verify thermistor type (2.2kΩ @ 25°C)
+- Check reference resistor value
+- Verify voltage divider wiring
+
+**Problem**: Boost pressure incorrect
+- Verify MAP sensor wiring
+- Check vacuum line for leaks
+- Calibrate using known atmospheric pressure
+- Ensure sensor is rated for 0-3 bar
+
+### Audio Alerts
+
+**Problem**: No buzzer sound
+- Check pin 8 connection
+- Verify buzzer polarity
+- Test with `Alerts_PlayBeeps(3, 250)`
+- Check if audio is disabled
+
+**Problem**: Buzzer always on
+- Check for alert condition
+- Verify thresholds in `config.h`
+- Reset system
+
+### General Issues
+
+**Problem**: Arduino won't upload
+- Check USB cable
+- Select correct board (Mega 2560)
+- Select correct COM port
+- Try pressing reset button
+
+**Problem**: System freezes
+- Check power supply (needs 3A minimum)
+- Verify all wiring connections
+- Check for short circuits
+- Monitor Serial output for errors
+
+---
+
+## 🏗️ Shield PCB Design
+
+For a professional, plug-and-play solution, we've designed a custom Arduino Mega shield that simplifies installation significantly.
+
+### Shield Features
+- Screw terminals for all sensor connections
+- Built-in voltage dividers and filtering
+- MAX31855 module socket
+- Buzzer mount
+- Nextion display connector
+- 12V power input with buck converter
+- LED status indicators
+- Compact design fits in standard enclosure
+
+### PCB Files
+- **Schematic**: `docs/shield/schematic.pdf`
+- **PCB Layout**: `docs/shield/pcb-layout.pdf`
+- **Gerber Files**: `docs/shield/gerbers/` (for PCBWay)
+- **Assembly Drawing**: `docs/shield/assembly.pdf`
+
+### Ordering from PCBWay
+
+1. Visit [PCBWay.com](https://www.pcbway.com)
+2. Click "Quote Now"
+3. Upload gerber ZIP file (`docs/shield/gerbers/jnkr-shield-gerbers.zip`)
+4. Select options:
+   - **Layers**: 2
+   - **PCB Thickness**: 1.6mm
+   - **Surface Finish**: HASL
+   - **Copper Weight**: 1oz
+5. Add to cart and checkout
+
+**Estimated Cost**: $5-15 for 5 PCBs (plus shipping)
+
+**Assembly**: See [docs/SHIELD.md](docs/SHIELD.md) for component placement and soldering guide
+
+---
+
+## 📚 Documentation
+
+- [Complete Wiring Guide](docs/WIRING.md) - Detailed connection instructions
+- [Assembly Guide](docs/ASSEMBLY.md) - Step-by-step build instructions
+- [Bill of Materials](docs/BOM.md) - Complete parts list with suppliers
+- [Shield Guide](docs/SHIELD.md) - PCB shield assembly and ordering
+- [Calibration Guide](docs/CALIBRATION.md) - Sensor calibration procedures
+- [Nextion HMI Guide](docs/NEXTION.md) - Display design and customization
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit pull requests or open issues for:
+- Bug fixes
+- New features
+- Documentation improvements
+- Hardware modifications
+- Shield design improvements
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## ⚠️ Disclaimer
+
+**IMPORTANT**: This system is for monitoring purposes only. It does not modify any engine control signals.
+
+- Use at your own risk
+- Improper installation can damage sensors or vehicle systems
+- Always verify readings against known good gauges
+- Do not rely solely on this system for critical safety decisions
+- Author assumes no liability for damage or injury
+
+---
+
+## 💡 Credits
+
+- Inspired by the [jnkr-ecu](https://github.com/connorwhite-online/jnkr-ecu) project
+- Based on Arduino Mega 2560 platform
+- Nextion HMI display for visualization
+- Thanks to the automotive Arduino community
+
+---
+
+## 📞 Support
+
+For questions, issues, or support:
+- Open an [Issue](https://github.com/connorwhite-online/jnkr-gauge/issues)
+- Check the [Wiki](https://github.com/connorwhite-online/jnkr-gauge/wiki)
+- Join discussions in Issues
+
+---
+
+**Built with ❤️ for the 1KZTE community**
+
+**Version 1.0.0** | Last Updated: 2025-11-07

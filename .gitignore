@@ -1,0 +1,55 @@
+# Arduino IDE files
+*.hex
+*.eep
+*.elf
+*.map
+*.sym
+*.lss
+*.lst
+*.o
+*.d
+*.a
+
+# Build directories
+build/
+.build/
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Compiled output
+*.tft
+*.compiled
+
+# Eagle backup files
+*.b#*
+*.s#*
+*.l#*
+
+# KiCad backup files
+*-backups/
+*-cache.lib
+*-rescue.lib
+*.bak
+*.kicad_pcb-bak
+*.kicad_sch-bak
+
+# Gerber files (keep in dedicated folder)
+# *.gbr
+# *.drl
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# OS specific
+.Trashes
+.Spotlight-V100
+.fseventsd
