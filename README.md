@@ -94,7 +94,54 @@ A comprehensive engine monitoring system powered by ESP32-S3 with a beautiful 2.
 
 ---
 
+## 🔌 Installation Options
+
+### Option A: Traditional Direct Wiring (Original)
+
+All sensors connect directly to ESP32/Arduino with individual wires through firewall.
+
+**Pros:**
+- Lower cost (~$190-230)
+- Uses readily available modules
+- Simpler electronics
+
+**Cons:**
+- 15-20 wires through firewall
+- Multiple firewall penetrations
+- More complex installation
+- Limited cable length (3-5 feet)
+
+**Documentation**: [WIRING.md](docs/WIRING.md), [BREADBOARD_WIRING.md](docs/BREADBOARD_WIRING.md)
+
+### Option B: I2C Sensor Module (Recommended) ⭐ **NEW!**
+
+All sensors connect to a module in the engine bay. Single 4-wire harness with one connector runs through firewall to display.
+
+**Pros:**
+- ✅ Professional installation (automotive-style)
+- ✅ Single connector through firewall (easy removal)
+- ✅ Digital I2C communication (noise immune)
+- ✅ Longer cable runs possible (10+ feet)
+- ✅ Cleaner wire routing
+
+**Cons:**
+- Additional cost (+$60-120)
+- Requires building sensor module
+- Moderate soldering skills needed
+
+**Why choose this?** If you want a clean, professional installation that's easy to service and looks like it came from the factory, this is the way to go. The single connector through the firewall makes removal trivial and eliminates wire management headaches.
+
+**Documentation**:
+- **[I2C_SENSOR_MODULE.md](docs/I2C_SENSOR_MODULE.md)** - Design overview and specifications
+- **[I2C_SHOPPING_LIST.md](docs/I2C_SHOPPING_LIST.md)** - Parts with direct links
+- **[I2C_ASSEMBLY_GUIDE.md](docs/I2C_ASSEMBLY_GUIDE.md)** - Step-by-step build guide
+- **[CUSTOM_PCB_DESIGN.md](docs/CUSTOM_PCB_DESIGN.md)** - Custom PCB option
+
+---
+
 ## 📐 Architecture
+
+### Option A: Traditional Direct Wiring
 
 ```
 ┌──────────────────┐
@@ -117,6 +164,43 @@ A comprehensive engine monitoring system powered by ESP32-S3 with a beautiful 2.
          │                              ├─ SPI ───────────→ MAX31855 ──→ EGT Sensor
          │                              └─ PWM ───────────→ Buzzer (Alerts)
          │
+```
+
+### Option B: I2C Sensor Module (Recommended)
+
+```
+┌──────────────────┐                    ┌────────────────────────┐
+│   12V Vehicle    │                    │  ENGINE BAY I2C MODULE │
+│   Electrical     │                    │  (Weatherproof Box)    │
+└────────┬─────────┘                    │                        │
+         │                              │  ┌─ NTC (IAT Pre-IC)   │
+         │                              │  ├─ NTC (IAT Post-IC)  │
+         ├──→ Sensors in Engine Bay ───┼──┤  NTC (Coolant)      │
+         │                              │  ├─ MAP Sensor (Boost) │
+         │                              │  └─ K-Type (EGT)       │
+         │                              │         ↓               │
+         │                              │    ADS1115 ADC         │
+         │                              │    MCP9600 Amp         │
+         │                              │         ↓               │
+         │                              │    Deutsch Connector   │
+         │                              └────────┬───────────────┘
+         │                                       │
+         │                              4-wire shielded harness
+         │                              (5V, GND, SCL, SDA)
+         │                                       │
+         │                              Single connector
+         │                              through firewall
+         │                                       ↓
+         │
+         ├──→ Buck Converter ──→ 5V ──→ Qualia ESP32-S3 Board
+                                        │
+                                        ├─ 40-pin RGB ───→ 2.1" Round Display
+                                        │                  (480x480, 60 FPS)
+                                        │
+                                        ├─ I2C (GPIO 21/22)
+                                        │   └─ Engine Bay Module (via harness)
+                                        │
+                                        └─ PWM ──────────→ Buzzer (Alerts)
 ```
 
 ---
@@ -418,12 +502,18 @@ For a professional, plug-and-play solution, we've designed a custom Arduino Mega
 - **[Breadboard Wiring Guide](docs/BREADBOARD_WIRING.md) - Prototyping with jumper wires** ⭐ **Build Guide**
 - [PCB Schematic](docs/PCB_SCHEMATIC.md) - Custom shield design for permanent installation
 
+### I2C Sensor Module (Professional Installation) ⭐ **NEW!**
+- **[I2C Sensor Module Overview](docs/I2C_SENSOR_MODULE.md) - Design and specifications**
+- **[I2C Shopping List](docs/I2C_SHOPPING_LIST.md) - Parts with Amazon/Adafruit links**
+- **[I2C Assembly Guide](docs/I2C_ASSEMBLY_GUIDE.md) - Step-by-step build instructions**
+- **[Custom PCB Design](docs/CUSTOM_PCB_DESIGN.md) - Professional PCB option**
+
 ### Display Options
 - **[SquareLine + LVGL Guide](docs/SQUARELINE_LVGL_GUIDE.md) - Visual GUI design** ⭐ **Recommended** (Mac/Windows/Linux)
 - [Nextion HMI Guide](docs/NEXTION.md) - Alternative display option (Windows only)
 
 ### Additional Guides
-- [Complete Wiring Guide](docs/WIRING.md) - Detailed automotive connections
+- [Complete Wiring Guide](docs/WIRING.md) - Detailed automotive connections (traditional)
 - [Assembly Guide](docs/ASSEMBLY.md) - Step-by-step build instructions
 - [Shield Guide](docs/SHIELD.md) - PCB shield assembly and ordering
 - [Calibration Guide](docs/CALIBRATION.md) - Sensor calibration procedures

@@ -24,19 +24,33 @@
 #define PROJECT_NAME "JNKR Gauge System"
 
 // ============================================================================
-// PIN ASSIGNMENTS - Arduino Mega 2560
+// PIN ASSIGNMENTS - ESP32-S3 / Arduino Mega 2560
 // ============================================================================
 
-// === ANALOG INPUTS (Temperature & Pressure Sensors) ===
-#define PIN_IAT_PRE_IC      A0   // Intake Air Temperature - Pre-Intercooler (NTC thermistor)
-#define PIN_IAT_POST_IC     A1   // Intake Air Temperature - Post-Intercooler (NTC thermistor)
-#define PIN_COOLANT_TEMP    A2   // Coolant Temperature (NTC thermistor)
-#define PIN_BOOST_PRESSURE  A3   // MAP/Boost Pressure Sensor (0-3 bar)
+// === I2C PINS (for I2C Sensor Module in Engine Bay) ===
+#define PIN_I2C_SDA         21   // I2C Data (ESP32 GPIO21, Mega pin 20)
+#define PIN_I2C_SCL         22   // I2C Clock (ESP32 GPIO22, Mega pin 21)
 
-// === SPI PINS (for MAX31855 EGT Sensor) ===
-#define PIN_EGT_CS          10   // MAX31855 Chip Select
-#define PIN_SPI_MISO        50   // SPI MISO (hardware pin on Mega)
-#define PIN_SPI_SCK         52   // SPI SCK (hardware pin on Mega)
+// === I2C DEVICE ADDRESSES ===
+#define I2C_ADDR_ADS1115    0x48 // ADS1115 16-bit ADC (default address)
+#define I2C_ADDR_MCP9600    0x60 // MCP9600 thermocouple amplifier (default address)
+
+// Note: If using pre-built modules in engine bay, sensors connect to:
+//   - ADS1115 Channel 0 (A0): IAT Pre-Intercooler
+//   - ADS1115 Channel 1 (A1): IAT Post-Intercooler
+//   - ADS1115 Channel 2 (A2): Coolant Temperature
+//   - ADS1115 Channel 3 (A3): MAP/Boost Pressure Sensor
+//   - MCP9600: K-Type Thermocouple (EGT)
+
+// === LEGACY ANALOG/SPI PINS (if not using I2C module) ===
+// Uncomment these and comment out I2C section above to use direct wiring
+// #define PIN_IAT_PRE_IC      A0   // Intake Air Temperature - Pre-Intercooler (NTC thermistor)
+// #define PIN_IAT_POST_IC     A1   // Intake Air Temperature - Post-Intercooler (NTC thermistor)
+// #define PIN_COOLANT_TEMP    A2   // Coolant Temperature (NTC thermistor)
+// #define PIN_BOOST_PRESSURE  A3   // MAP/Boost Pressure Sensor (0-3 bar)
+// #define PIN_EGT_CS          10   // MAX31855 Chip Select
+// #define PIN_SPI_MISO        50   // SPI MISO (hardware pin on Mega)
+// #define PIN_SPI_SCK         52   // SPI SCK (hardware pin on Mega)
 
 // === DIGITAL OUTPUT (Audio Alert) ===
 #define PIN_BUZZER          8    // Piezo buzzer for alerts
@@ -46,10 +60,8 @@
 #define NEXTION_SERIAL      Serial2  // Hardware Serial2 (pins 16/17)
 #define NEXTION_BAUD        115200   // Baud rate for Nextion
 
-// === I2C (optional - for BMP280 barometric sensor) ===
-#define PIN_I2C_SDA         20   // I2C Data
-#define PIN_I2C_SCL         21   // I2C Clock
-#define BMP280_I2C_ADDR     0x76 // Default I2C address
+// === OPTIONAL: Barometric sensor (for elevation compensation) ===
+#define BMP280_I2C_ADDR     0x76 // Default I2C address (if using BMP280)
 
 // ============================================================================
 // SENSOR CALIBRATION - NTC Thermistors
@@ -62,9 +74,14 @@
 #define THERMISTOR_NOMINAL_TEMP    25.0     // Temperature for nominal resistance (°C)
 #define THERMISTOR_BETA            3950     // Beta coefficient
 
-// ADC reference voltage
-#define ADC_VREF               5.0       // Arduino Mega uses 5V reference
-#define ADC_RESOLUTION         1024     // 10-bit ADC
+// ADC reference voltage (for I2C module or direct analog)
+#define ADC_VREF               4.096    // ADS1115 default range (programmable gain)
+#define ADC_RESOLUTION         32768    // 16-bit ADC (ADS1115)
+// For legacy 10-bit Arduino ADC: use 5.0V and 1024
+
+// ADS1115 Configuration
+#define ADS1115_GAIN           GAIN_ONE // ±4.096V range (or GAIN_TWOTHIRDS for ±6.144V)
+#define ADS1115_DATA_RATE      DR_860SPS // 860 samples/sec (or DR_128SPS for lower noise)
 
 // ============================================================================
 // BOOST/MAP SENSOR CALIBRATION

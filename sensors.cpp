@@ -2,13 +2,33 @@
  * Sensor Library - Implementation
  * 
  * Reads temperature sensors (NTC thermistors), pressure sensors (MAP),
- * and EGT sensor (MAX31855 thermocouple amplifier)
+ * and EGT sensor via I2C sensor module in engine bay
+ * 
+ * I2C Module contains:
+ *   - ADS1115: 16-bit ADC for analog sensors (thermistors, MAP)
+ *   - MCP9600: K-type thermocouple amplifier for EGT
+ * 
+ * Note: Legacy analog/SPI code available in git history
  */
 
 #include "sensors.h"
 #include "config.h"
-#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_ADS1X15.h>  // ADS1115 library
+#include <Adafruit_MCP9600.h>   // MCP9600 library
 #include <math.h>
+
+// ============================================================================
+// I2C SENSOR OBJECTS
+// ============================================================================
+
+// Create I2C sensor objects
+static Adafruit_ADS1115 ads;  // 16-bit ADC for analog sensors
+static Adafruit_MCP9600 mcp;  // Thermocouple amplifier for EGT
+
+// I2C device status
+static bool ads1115Available = false;
+static bool mcp9600Available = false;
 
 // ============================================================================
 // SENSOR STATE VARIABLES
@@ -50,23 +70,38 @@ float emaFilter(float newValue, float prevValue, float alpha) {
 }
 
 /**
- * Read analog pin with multiple samples and averaging
- * Reduces ADC noise
+ * Read I2C ADC with error handling
+ * Returns voltage from ADS1115
  */
-int readAnalogAveraged(int pin, int samples) {
-  long sum = 0;
-  for (int i = 0; i < samples; i++) {
-    sum += analogRead(pin);
-    delayMicroseconds(100);  // Small delay between samples
+float readI2C_ADC_Voltage(uint8_t channel) {
+  if (!ads1115Available) {
+    return 0.0;  // Return 0 if ADS1115 not available
   }
-  return sum / samples;
+  
+  // Read raw ADC value (16-bit signed)
+  int16_t rawADC = ads.readADC_SingleEnded(channel);
+  
+  // Convert to voltage using ADS1115 library
+  float voltage = ads.computeVolts(rawADC);
+  
+  return voltage;
 }
 
 /**
- * Convert ADC reading to voltage
+ * Read I2C ADC with multiple samples and averaging
+ * Reduces noise on analog signals
  */
-float adcToVoltage(int adcValue) {
-  return (adcValue / (float)ADC_RESOLUTION) * ADC_VREF;
+float readI2C_ADC_Averaged(uint8_t channel, int samples) {
+  if (!ads1115Available) {
+    return 0.0;
+  }
+  
+  float sum = 0.0;
+  for (int i = 0; i < samples; i++) {
+    sum += readI2C_ADC_Voltage(channel);
+    delay(2);  // Small delay between samples (ADS1115 conversion time)
+  }
+  return sum / samples;
 }
 
 /**
@@ -109,14 +144,16 @@ float resistanceToTemperature(float resistance) {
 }
 
 /**
- * Read NTC thermistor and return temperature
+ * Read NTC thermistor via I2C ADC and return temperature
  */
-float readThermistor(int pin, float prevValue) {
-  // Read ADC with averaging
-  int adcValue = readAnalogAveraged(pin, ANALOG_SAMPLES);
+float readThermistor(uint8_t channel, float prevValue) {
+  // Read ADC voltage with averaging
+  float voltage = readI2C_ADC_Averaged(channel, ANALOG_SAMPLES);
   
-  // Convert to voltage
-  float voltage = adcToVoltage(adcValue);
+  // If voltage is zero, sensor module may not be responding
+  if (voltage < 0.01) {
+    return prevValue;  // Keep previous value
+  }
   
   // Convert to resistance
   float resistance = voltageToResistance(voltage, THERMISTOR_REF_RESISTANCE);
@@ -134,14 +171,17 @@ float readThermistor(int pin, float prevValue) {
 }
 
 /**
- * Read MAP/Boost pressure sensor
+ * Read MAP/Boost pressure sensor via I2C ADC
  */
 float readBoostPressure(float prevValue) {
-  // Read ADC with averaging
-  int adcValue = readAnalogAveraged(PIN_BOOST_PRESSURE, ANALOG_SAMPLES);
+  // Read ADC voltage with averaging (channel 3 for MAP sensor)
+  float voltage = readI2C_ADC_Averaged(3, ANALOG_SAMPLES);
   
-  // Convert to voltage
-  float voltage = adcToVoltage(adcValue);
+  // If voltage is zero, sensor may not be connected
+  if (voltage < 0.01) {
+    faultFlags |= FAULT_BOOST_SENSOR;
+    return prevValue;
+  }
   
   // Map voltage to pressure (linear)
   float pressure = MAP_PRESSURE_MIN + 
@@ -164,48 +204,29 @@ float readBoostPressure(float prevValue) {
 }
 
 /**
- * Read EGT from MAX31855 K-type thermocouple amplifier
+ * Read EGT from MCP9600 K-type thermocouple amplifier via I2C
  * Returns temperature in Celsius
  */
 float readEGT(float prevValue) {
-  // Select MAX31855 chip
-  digitalWrite(PIN_EGT_CS, LOW);
-  delayMicroseconds(10);
-  
-  // Read 32-bit data
-  uint32_t data = 0;
-  for (int i = 0; i < 4; i++) {
-    data <<= 8;
-    data |= SPI.transfer(0x00);
-  }
-  
-  // Deselect chip
-  digitalWrite(PIN_EGT_CS, HIGH);
-  
-  // Check for faults (bit 16)
-  if (data & 0x04) {
-    // Fault detected (no thermocouple connected)
+  if (!mcp9600Available) {
     faultFlags |= FAULT_EGT_SENSOR;
     egtAvailable = false;
     return 0.0;
   }
   
+  // Read thermocouple temperature from MCP9600
+  float temperature = mcp.readThermocouple();
+  
+  // Check for errors (NaN indicates fault)
+  if (isnan(temperature)) {
+    faultFlags |= FAULT_EGT_SENSOR;
+    egtAvailable = false;
+    return prevValue;
+  }
+  
   // No fault
   faultFlags &= ~FAULT_EGT_SENSOR;
   egtAvailable = true;
-  
-  // Extract temperature data (bits 31-18)
-  // Temperature is in 0.25°C increments
-  int16_t temp = (data >> 18) & 0x3FFF;
-  
-  // Check sign bit (bit 13 of the 14-bit value)
-  if (temp & 0x2000) {
-    // Negative temperature (sign extend)
-    temp |= 0xC000;
-  }
-  
-  // Convert to Celsius (0.25°C per bit)
-  float temperature = temp * 0.25;
   
   // Validate range
   if (temperature < TEMP_MIN_VALID || temperature > TEMP_MAX_VALID) {
@@ -222,46 +243,105 @@ float readEGT(float prevValue) {
 // ============================================================================
 
 void Sensors_Init() {
-  // Configure analog input pins
-  pinMode(PIN_IAT_PRE_IC, INPUT);
-  pinMode(PIN_IAT_POST_IC, INPUT);
-  pinMode(PIN_COOLANT_TEMP, INPUT);
-  pinMode(PIN_BOOST_PRESSURE, INPUT);
+  // Initialize I2C bus
+  Wire.begin();
+  Wire.setClock(400000);  // 400kHz fast I2C
   
-  // Configure SPI for MAX31855
-  pinMode(PIN_EGT_CS, OUTPUT);
-  digitalWrite(PIN_EGT_CS, HIGH);
-  SPI.begin();
-  SPI.setClockDivider(SPI_CLOCK_DIV16);  // Slow SPI clock for MAX31855
+  #if ENABLE_SERIAL_DEBUG
+  Serial.println(F("Sensors: Initializing I2C sensor module..."));
+  #endif
   
-  // Set ADC reference to default (5V on Mega)
-  analogReference(DEFAULT);
+  // Initialize ADS1115 ADC
+  if (ads.begin(I2C_ADDR_ADS1115)) {
+    ads1115Available = true;
+    ads.setGain(ADS1115_GAIN);        // Set voltage range (default ±4.096V)
+    ads.setDataRate(ADS1115_DATA_RATE); // Set sample rate
+    
+    #if ENABLE_SERIAL_DEBUG
+    Serial.print(F("  - ADS1115 ADC found at 0x"));
+    Serial.println(I2C_ADDR_ADS1115, HEX);
+    #endif
+  } else {
+    ads1115Available = false;
+    #if ENABLE_SERIAL_DEBUG
+    Serial.println(F("  - WARNING: ADS1115 ADC not found!"));
+    Serial.println(F("    Check I2C connections and module power"));
+    #endif
+  }
+  
+  // Initialize MCP9600 thermocouple amplifier
+  if (mcp.begin(I2C_ADDR_MCP9600)) {
+    mcp9600Available = true;
+    mcp.setADCresolution(MCP9600_ADCRESOLUTION_18);  // 18-bit resolution
+    mcp.setThermocoupleType(MCP9600_TYPE_K);         // K-type thermocouple
+    mcp.setFilterCoefficient(3);                     // Light filtering
+    mcp.enable(true);
+    
+    #if ENABLE_SERIAL_DEBUG
+    Serial.print(F("  - MCP9600 thermocouple amp found at 0x"));
+    Serial.println(I2C_ADDR_MCP9600, HEX);
+    #endif
+    
+    egtAvailable = true;
+  } else {
+    mcp9600Available = false;
+    egtAvailable = false;
+    
+    #if ENABLE_SERIAL_DEBUG
+    Serial.println(F("  - WARNING: MCP9600 thermocouple amp not found!"));
+    Serial.println(F("    EGT monitoring will not be available"));
+    #endif
+  }
+  
+  // Check if any I2C devices were found
+  if (!ads1115Available && !mcp9600Available) {
+    #if ENABLE_SERIAL_DEBUG
+    Serial.println(F(""));
+    Serial.println(F("  *** ERROR: No I2C sensor module detected! ***"));
+    Serial.println(F("  *** Check harness connection through firewall ***"));
+    Serial.println(F("  *** Verify module power (5V) and I2C lines ***"));
+    Serial.println(F(""));
+    #endif
+  }
   
   // Initial sensor reading
   delay(100);
   Sensors_Update();
   
   #if ENABLE_SERIAL_DEBUG
-  Serial.println(F("Sensors: Initialized"));
-  if (egtAvailable) {
-    Serial.println(F("  - EGT sensor detected"));
-  } else {
-    Serial.println(F("  - WARNING: EGT sensor not detected"));
-  }
+  Serial.println(F("Sensors: Initialization complete"));
   #endif
 }
 
 void Sensors_Update() {
-  // Read all temperature sensors
-  intakeTempPre = readThermistor(PIN_IAT_PRE_IC, prevIntakeTempPre);
-  intakeTempPost = readThermistor(PIN_IAT_POST_IC, prevIntakeTempPost);
-  coolantTemp = readThermistor(PIN_COOLANT_TEMP, prevCoolantTemp);
+  // Only read sensors if I2C devices are available
+  if (ads1115Available) {
+    // Read all temperature sensors via I2C ADC
+    // Channel 0: IAT Pre-Intercooler
+    // Channel 1: IAT Post-Intercooler
+    // Channel 2: Coolant Temperature
+    intakeTempPre = readThermistor(0, prevIntakeTempPre);
+    intakeTempPost = readThermistor(1, prevIntakeTempPost);
+    coolantTemp = readThermistor(2, prevCoolantTemp);
+    
+    // Read boost pressure (channel 3)
+    boostPressureBar = readBoostPressure(prevBoostPressure);
+  } else {
+    // If ADS1115 not available, keep previous values
+    // Set fault flags for all sensors
+    faultFlags |= FAULT_IAT_PRE_SENSOR;
+    faultFlags |= FAULT_IAT_POST_SENSOR;
+    faultFlags |= FAULT_COOLANT_SENSOR;
+    faultFlags |= FAULT_BOOST_SENSOR;
+  }
   
-  // Read EGT
-  exhaustTemp = readEGT(prevExhaustTemp);
-  
-  // Read boost pressure
-  boostPressureBar = readBoostPressure(prevBoostPressure);
+  // Read EGT from MCP9600
+  if (mcp9600Available) {
+    exhaustTemp = readEGT(prevExhaustTemp);
+  } else {
+    exhaustTemp = 0.0;
+    egtAvailable = false;
+  }
   
   // Update previous values for next iteration
   prevIntakeTempPre = intakeTempPre;
@@ -270,23 +350,25 @@ void Sensors_Update() {
   prevExhaustTemp = exhaustTemp;
   prevBoostPressure = boostPressureBar;
   
-  // Check for sensor-specific faults
-  if (intakeTempPre < TEMP_MIN_VALID || intakeTempPre > TEMP_MAX_VALID) {
-    faultFlags |= FAULT_IAT_PRE_SENSOR;
-  } else {
-    faultFlags &= ~FAULT_IAT_PRE_SENSOR;
-  }
-  
-  if (intakeTempPost < TEMP_MIN_VALID || intakeTempPost > TEMP_MAX_VALID) {
-    faultFlags |= FAULT_IAT_POST_SENSOR;
-  } else {
-    faultFlags &= ~FAULT_IAT_POST_SENSOR;
-  }
-  
-  if (coolantTemp < TEMP_MIN_VALID || coolantTemp > TEMP_MAX_VALID) {
-    faultFlags |= FAULT_COOLANT_SENSOR;
-  } else {
-    faultFlags &= ~FAULT_COOLANT_SENSOR;
+  // Check for sensor-specific faults (only if ADS1115 is available)
+  if (ads1115Available) {
+    if (intakeTempPre < TEMP_MIN_VALID || intakeTempPre > TEMP_MAX_VALID) {
+      faultFlags |= FAULT_IAT_PRE_SENSOR;
+    } else {
+      faultFlags &= ~FAULT_IAT_PRE_SENSOR;
+    }
+    
+    if (intakeTempPost < TEMP_MIN_VALID || intakeTempPost > TEMP_MAX_VALID) {
+      faultFlags |= FAULT_IAT_POST_SENSOR;
+    } else {
+      faultFlags &= ~FAULT_IAT_POST_SENSOR;
+    }
+    
+    if (coolantTemp < TEMP_MIN_VALID || coolantTemp > TEMP_MAX_VALID) {
+      faultFlags |= FAULT_COOLANT_SENSOR;
+    } else {
+      faultFlags &= ~FAULT_COOLANT_SENSOR;
+    }
   }
 }
 
