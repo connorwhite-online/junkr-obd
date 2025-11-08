@@ -220,34 +220,152 @@ Key ACC → Should read 12-14V
 
 If it reads 12V with key off, it's constant power (some vehicles). You can still use it, but consider adding a switch.
 
-**Step 3A: Direct Connection Method**
+**Step 3A: Tap/Splice Method (Keep Lighter Functional!) ⭐ BEST OPTION**
 
-If you're mounting gauge near the lighter location:
+This is the ideal solution - lighter keeps working, gauge gets power, 100% reversible!
 
-1. **Connect directly**:
+**Using T-Tap or Posi-Tap Connectors (Recommended):**
+
+**Why This Method is Best:**
+- ✅ No cutting original wires
+- ✅ Lighter keeps working
+- ✅ 100% reversible (just remove T-Tap)
+- ✅ Easy to install (no soldering)
+- ✅ Reliable connection
+
+**1. Get the right connectors**:
+
+| Connector Type | Cost | Quality | Ease | Best For |
+|---------------|------|---------|------|----------|
+| **Posi-Tap** | $3-5/pair | Excellent | Very Easy | Professional installation |
+| **T-Tap** | $0.50-1 | Good | Easy | Budget-friendly |
+| **Scotch Lock** | $0.25-0.50 | Fair | Very Easy | Temporary/testing only |
+
+   - Available at: Auto parts stores, Amazon, hardware stores
+   - Size: Match your wire gauge (typically 18-22 AWG)
+
+**2. Tap into power wire** (red or red/yellow wire):
+
+   ```
+                      YOUR GAUGE
+                          ↑
+                    [3A Fuse] ← Important: on YOUR wire only!
+                          ↑
+                    [T-Tap Connector]
+                          ↑
+   Lighter 12V wire: ═════╪═════ (wire stays intact!)
+                          │
+                          ↓
+                  Continues to lighter
+                  (lighter still works!)
+   ```
+
+**3. Tap into ground wire** (black wire):
+
+   ```
+                      YOUR GAUGE
+                          ↑
+                    [T-Tap Connector]
+                          ↑
+   Lighter GND wire: ═════╪═════ (wire stays intact!)
+                          │
+                          ↓
+                  Continues to lighter ground
+                  (lighter still works!)
+   ```
+
+**4. How to Install T-Tap**:
+
+   **Step-by-Step:**
+   1. Open T-Tap connector (looks like a small clamp)
+   2. Insert lighter wire into main channel
+   3. Insert YOUR wire into side tap channel
+   4. Close T-Tap with pliers (metal blade pierces both wires' insulation)
+   5. Connection made! No cutting, no stripping!
+
+   **Visual:**
+   ```
+   T-Tap Connector (side view):
+   
+   ┌──────────────────┐
+   │  Your wire  ↓    │  ← Side tap (new wire goes here)
+   │         ┌───┐    │
+   │═════════│ │ │════│  ← Main channel (lighter wire goes through)
+   │         └───┘    │     Metal blade inside pierces both
+   └──────────────────┘
+   ```
+
+**5. Add fuse to YOUR wire**:
+   - Within 6" of T-Tap
+   - 3A inline fuse
+   - Protects your gauge only
+
+**6. Route wires to gauge location**
+
+**7. Test both circuits**:
+   - Lighter: Should still work normally
+   - Gauge: Should power on with ignition
+
+**⚠️ CRITICAL: Fuse Placement**
+
+**WRONG** ❌:
+```
+Lighter wire ──[Your 3A fuse]──┬── To lighter (now limited to 3A - lighter won't work!)
+                               └── To gauge
+```
+
+**CORRECT** ✅:
+```
+Lighter wire ──┬── To lighter (original fuse still protects this)
+               │
+               └──[Your 3A fuse]── To gauge (only your gauge protected)
+```
+
+**Why This Matters:**
+- Cigarette lighter needs 10-15A for accessories (phone chargers, etc.)
+- Your 3A fuse would blow when using lighter!
+- Fuse goes on YOUR branch wire ONLY
+- Main lighter wire keeps original 15A fuse protection
+
+**Using Solder + Splice Method (Most Reliable):**
+
+1. **Carefully strip a small section** of insulation from lighter wires (don't cut wire!)
+   - Use a sharp knife to carefully cut insulation lengthwise
+   - Peel back ~1/2" section
+   - Expose copper WITHOUT cutting wire strands
+
+2. **Wrap new wire around exposed section**:
+   ```
+   Lighter wire: ═══════╪═══════  (wire continuous)
+                        │
+                   Your wire soldered here
+   ```
+
+3. **Solder connection**:
+   - Apply flux to exposed area
+   - Wrap your wire around (3-4 wraps)
+   - Solder well (shiny, not cold joint)
+   - Let cool
+
+4. **Add 3A inline fuse** within 6" on YOUR wire (not lighter's main wire)
+
+5. **Heat shrink or electrical tape** over splice
+
+6. **Test both**:
+   - Lighter should work normally
+   - Your gauge should power on
+
+**Step 3B: Direct Connection Method (Lighter Stops Working)**
+
+Only if you want to remove lighter completely:
+
+1. **Unplug lighter connector**
+2. **Connect directly**:
    ```
    Lighter +12V wire → [Inline 3A fuse] → Buck converter +12V
    Lighter Ground wire → Buck converter GND
    ```
-
-2. **Mount gauge in or near lighter opening**
-3. **Buck converter goes behind dash (hidden)**
-4. **Run sensor wires through existing lighter hole**
-
-**Step 3B: Wire Extension Method**
-
-If gauge is going elsewhere:
-
-1. **Splice extension wires**:
-   ```
-   Lighter +12V → [Solder + heat shrink] → 20AWG red wire → Buck converter
-   Lighter GND → [Solder + heat shrink] → 20AWG black wire → Buck converter
-   ```
-
-2. **Add 3A inline fuse** within 6" of splice point
-3. **Route wires to gauge location**
-4. **Use lighter hole for wire pass-through**
-5. **Cap off or plug original lighter socket hole** (blank plate, or reinstall socket with no connection)
+3. **Store lighter socket for later**
 
 **Step 4: Clean Installation**
 
@@ -270,11 +388,20 @@ Most 1990s-2000s Toyota trucks with 1KZTE:
 - Easy to access under center console
 - Perfect for custom gauge installation
 
-**Pro Tip:** Keep the lighter socket and wiring intact! Just:
-1. Unplug it
-2. Tap into the harness BEFORE the socket
-3. Keep socket stored in glove box
-4. 100% reversible for resale
+**Pro Tips:**
+
+**Option A - Keep Lighter Working (Recommended!):**
+1. Use T-Tap or Posi-Tap connectors
+2. Splice into wires without cutting
+3. Add 3A fuse on YOUR wire only
+4. Lighter keeps working, gauge gets power
+5. 100% reversible (just remove T-Taps)
+
+**Option B - Remove Lighter:**
+1. Unplug lighter connector
+2. Use wires directly or tap before connector
+3. Keep socket in glove box for resale
+4. Still reversible
 
 ### Option 2B: Plug Into Cigarette Lighter (Temporary Only)
 
@@ -701,12 +828,17 @@ Since you're building this for a 1KZTE turbodiesel, here's specific guidance:
    Lighter plug red/yellow wire → [3A inline fuse] → Buck converter 12V+
    Lighter plug black wire → Buck converter GND
    ```
-6. **Options for mounting**:
-   - **A**: Mount gauge IN the lighter opening (clean!)
-   - **B**: Use lighter hole to route wires, install blank plate
-   - **C**: Keep lighter plugged in but tap wires before connector (100% reversible)
+6. **Options for connection**:
+   - **A**: Tap wires with T-Tap (lighter keeps working!) ⭐ **RECOMMENDED**
+   - **B**: Solder splice (lighter keeps working, most reliable)
+   - **C**: Unplug and use wires directly (lighter stops working)
 
-**Result**: Cleaner than fuse box tap, fewer wires, looks factory!
+7. **Options for mounting**:
+   - **A**: Mount gauge elsewhere, tap into wires (lighter stays functional)
+   - **B**: Mount gauge IN the lighter opening (remove socket)
+   - **C**: Use lighter hole to route wires, install blank plate
+
+**Result**: Cleaner than fuse box tap, fewer wires, lighter can still work!
 
 #### Method 2: Fuse Box Tap (Standard Method)
 
@@ -1067,19 +1199,26 @@ We'll help you figure it out!
 **Total Cost**: $10-20 for Add-A-Circuit, fuse, and wire  
 **Skill Level**: Basic (if you can use a multimeter, you can do this)
 
-### Option B: Cigarette Lighter Wiring (If You Don't Use It) ⭐
+### Option B: Cigarette Lighter Wiring (Splice/Tap Method) ⭐⭐
 
-1. **Power Source**: Existing cigarette lighter wiring (already switched and fused!)
-2. **Fuse**: Add 3A inline fuse for gauge protection
-3. **Wire**: May not need any - direct connection possible
-4. **Ground**: Use lighter's ground wire
-5. **Mounting**: Can mount gauge IN the lighter location, or use hole for wiring
-6. **Result**: Ultra-clean installation, looks factory, 100% reversible
+**This is the BEST option - keeps lighter working AND powers your gauge!**
 
-**Total Time**: 20-30 minutes  
-**Total Cost**: $5-10 for inline fuse and connectors  
-**Skill Level**: Basic (even easier than fuse box tap!)  
-**Why It's Great**: Perfect for older 1KZTE trucks where lighter isn't used, gauge fits perfectly in lighter opening
+1. **Power Source**: Tap into existing cigarette lighter wiring (already switched and fused!)
+2. **Method**: T-Tap or Posi-Tap connectors (no cutting!)
+3. **Fuse**: Add 3A inline fuse on YOUR wire only
+4. **Ground**: Tap lighter's ground wire same way
+5. **Lighter**: Keeps working normally (or remove if you want)
+6. **Result**: Ultra-clean installation, 100% reversible, lighter still functions
+
+**Total Time**: 15-20 minutes  
+**Total Cost**: $5-15 for T-Taps, inline fuse, and wire  
+**Skill Level**: Very Basic (easiest option!)  
+**Why It's Best**: 
+- No fuse box access needed
+- Wiring already there
+- Lighter keeps working (or remove it if you want)
+- Completely reversible
+- Perfect for 1KZTE trucks
 
 ---
 
