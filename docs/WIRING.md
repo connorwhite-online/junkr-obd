@@ -1,8 +1,10 @@
 # Wiring Guide - JNKR Gauge System
 
-**Complete Electrical Connection Instructions for Beginners**
+**Complete Electrical Connection Instructions for ESP32-S3**
 
-This guide provides step-by-step instructions for wiring the JNKR Gauge System. Even if you're new to electronics, this guide will walk you through every connection with detailed explanations.
+This guide provides step-by-step instructions for wiring the JNKR Gauge System with the Qualia ESP32-S3. Even if you're new to electronics, this guide will walk you through every connection with detailed explanations.
+
+> **Note**: For breadboard prototyping, see [BREADBOARD_WIRING.md](BREADBOARD_WIRING.md)
 
 ---
 

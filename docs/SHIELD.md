@@ -1,8 +1,8 @@
-# Arduino Mega Shield - JNKR Gauge System
+# PCB Design Notes - JNKR Gauge System
 
-**Custom PCB Shield for Simplified Installation**
+**Optional Custom PCB for Simplified Installation**
 
-This document describes the custom Arduino Mega shield designed for the JNKR Gauge System. The shield eliminates most hand-wiring and provides a professional, plug-and-play solution.
+This document contains notes on creating an optional custom PCB for the JNKR Gauge System. The Qualia ESP32-S3 board already has the display connector built-in, so a custom shield is not required - this is for those who want a more permanent, professional installation with integrated sensor connections.
 
 ---
 

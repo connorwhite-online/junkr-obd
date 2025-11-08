@@ -6,9 +6,10 @@
  * and dual intake air temps (pre & post intercooler)
  * with audio alerts for dangerous thresholds
  * 
- * Hardware: Arduino Mega 2560
- * Display: Nextion NX4832T035 (3.5" touch display)
- * Alert: Piezo buzzer on Pin 8
+ * Hardware: Qualia ESP32-S3 (Adafruit #5800)
+ * Display: 2.1" Round RGB Display (480x480) with LVGL
+ * 
+ * See: docs/ESP32_SETUP.md and docs/BREADBOARD_WIRING.md for wiring
  */
 
 #ifndef CONFIG_H

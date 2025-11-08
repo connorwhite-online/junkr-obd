@@ -2,7 +2,7 @@
 
 **Step-by-Step Instructions from Parts to Running System**
 
-This guide walks you through the complete assembly and installation process, from building the enclosure to mounting sensors in your vehicle.
+This guide walks you through the complete assembly and installation process for the Qualia ESP32-S3 based JNKR Gauge System, from building the enclosure to mounting sensors in your vehicle.
 
 ---
 

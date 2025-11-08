@@ -1,8 +1,8 @@
-# JNKR Gauge Shield - Schematic Description
+# JNKR Gauge - Circuit Design Notes
 
 **Circuit Design and Component Specifications**
 
-This document describes the electrical schematic for the JNKR Gauge Shield PCB. The actual schematic diagrams would be created using electronic design software (KiCad, Eagle, Altium, etc.) and exported as PDFs.
+This document contains circuit design notes for sensor interfaces and signal conditioning used in the JNKR Gauge System. These principles apply whether you're building on breadboard or designing a custom PCB.
 
 ---
 

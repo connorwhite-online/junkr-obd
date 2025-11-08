@@ -4,6 +4,8 @@
 
 This document explains the organization of the JNKR Gauge System repository and describes each file's purpose.
 
+**Platform**: Qualia ESP32-S3 + 2.1" Round RGB Display (480x480)
+
 ---
 
 ## 📁 Repository Structure
@@ -28,21 +30,20 @@ jnkr-gauge/
 ├── alerts.cpp                   ← Alert system implementation
 │
 └── docs/                        ← Documentation folder
-    ├── WIRING.md                ← Complete wiring guide for beginners
-    ├── ASSEMBLY.md              ← Step-by-step assembly instructions
-    ├── BOM.md                   ← Bill of materials with part numbers
+    ├── COMPLETE_BOM.md          ← ⭐ Complete parts list with links
+    ├── ESP32_SETUP.md           ← ⭐ Arduino IDE setup for ESP32-S3
+    ├── BREADBOARD_WIRING.md     ← ⭐ Wiring guide for prototyping
+    ├── SQUARELINE_LVGL_GUIDE.md ← ⭐ GUI design with LVGL
     ├── CALIBRATION.md           ← Sensor calibration procedures
-    ├── NEXTION.md               ← Nextion display design guide
-    ├── SHIELD.md                ← Shield PCB design and ordering
+    ├── WIRING.md                ← Detailed wiring guide
+    ├── ASSEMBLY.md              ← Assembly instructions
+    ├── BOM.md                   ← Bill of materials
+    ├── NEXTION.md               ← Display design notes
+    ├── SHIELD.md                ← PCB design notes
+    ├── PCB_SCHEMATIC.md         ← PCB schematic reference
     │
-    └── shield/                  ← Shield design files
-        ├── schematic-description.md  ← Circuit explanations
-        ├── schematic.pdf        ← [To be created] Schematic diagram
-        ├── pcb-layout.pdf       ← [To be created] PCB layout
-        ├── assembly.pdf         ← [To be created] Assembly drawing
-        │
-        └── gerbers/             ← [To be created] PCB manufacturing files
-            └── jnkr-shield-gerbers.zip
+    └── shield/                  ← Circuit design files
+        └── schematic-description.md  ← Circuit design notes
 ```
 
 ---
@@ -536,5 +537,6 @@ This project is maintained by the community. Contributions, feedback, and succes
 
 ---
 
-**Last Updated:** 2025-11-07  
-**Project Version:** 1.0.0
+**Last Updated:** 2025-11-08  
+**Project Version:** 2.0.0  
+**Platform:** Qualia ESP32-S3

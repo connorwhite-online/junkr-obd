@@ -2,7 +2,9 @@
 
 **Complete parts list with part numbers, specifications, and suppliers**
 
-This document lists every component needed to build the JNKR Gauge System, including electronics, hardware, and consumables. All prices are approximate in USD as of 2025.
+This document lists every component needed to build the JNKR Gauge System with Qualia ESP32-S3, including electronics, hardware, and consumables. All prices are approximate in USD as of 2025.
+
+> **Note**: For complete parts list with exact links, see [COMPLETE_BOM.md](COMPLETE_BOM.md)
 
 ---
 

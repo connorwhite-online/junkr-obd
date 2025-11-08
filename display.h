@@ -1,7 +1,8 @@
 /*
  * Display Manager - Header
  * 
- * Handles communication with Nextion HMI display
+ * Handles display interface for JNKR Gauge System
+ * Using LVGL on 2.1" Round RGB Display (Qualia ESP32-S3)
  */
 
 #ifndef DISPLAY_H

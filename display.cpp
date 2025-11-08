@@ -1,7 +1,10 @@
 /*
  * Display Manager - Implementation
  * 
- * Handles all communication with the Nextion HMI touchscreen display
+ * Handles all display operations for JNKR Gauge System
+ * Using LVGL on 2.1" Round RGB Display (Qualia ESP32-S3)
+ * 
+ * See docs/SQUARELINE_LVGL_GUIDE.md for GUI design guide.
  */
 
 #include "display.h"

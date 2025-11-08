@@ -1,8 +1,10 @@
-# Nextion Display Design Guide
+# Display Design with SquareLine Studio & LVGL
 
 **Creating Custom Display Interfaces for JNKR Gauge System**
 
-This guide explains how to design and customize the Nextion HMI touchscreen display for your JNKR Gauge System. Whether you want to modify the existing design or create something completely custom, this guide covers everything you need to know.
+This guide explains how to design and customize the display interface for your JNKR Gauge System using SquareLine Studio and LVGL on the Qualia ESP32-S3 with 2.1" Round RGB Display.
+
+> **Note**: For the complete SquareLine Studio guide, see [SQUARELINE_LVGL_GUIDE.md](SQUARELINE_LVGL_GUIDE.md)
 
 ---
 
