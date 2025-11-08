@@ -1,8 +1,18 @@
-# Wiring Guide - JNKR Gauge System
+# Wiring Guide - JNKR Gauge System (Legacy)
 
-**Complete Electrical Connection Instructions for Beginners**
+> ⚠️ **DEPRECATED**: This guide is for the **legacy Arduino Mega + Nextion** setup.
+> 
+> **Current Platform**: Qualia ESP32-S3 with 2.1" Round RGB Display
+> 
+> **See instead**: [BREADBOARD_WIRING.md](BREADBOARD_WIRING.md) and [ESP32_SETUP.md](ESP32_SETUP.md) for current wiring.
+>
+> This document is kept for reference only.
 
-This guide provides step-by-step instructions for wiring the JNKR Gauge System. Even if you're new to electronics, this guide will walk you through every connection with detailed explanations.
+---
+
+**Complete Electrical Connection Instructions for Beginners (Legacy Arduino Mega)**
+
+This guide provides step-by-step instructions for wiring the legacy Arduino Mega version of the JNKR Gauge System. Even if you're new to electronics, this guide will walk you through every connection with detailed explanations.
 
 ---
 

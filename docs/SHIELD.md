@@ -1,8 +1,18 @@
-# Arduino Mega Shield - JNKR Gauge System
+# Arduino Mega Shield - JNKR Gauge System (Legacy)
 
-**Custom PCB Shield for Simplified Installation**
+> ⚠️ **DEPRECATED**: This is documentation for the **legacy Arduino Mega** shield.
+> 
+> **Current Platform**: Qualia ESP32-S3 (no custom shield needed - display plugs in directly!)
+> 
+> **See instead**: [COMPLETE_BOM.md](COMPLETE_BOM.md) and [BREADBOARD_WIRING.md](BREADBOARD_WIRING.md) for current build.
+>
+> This document is kept for reference only.
 
-This document describes the custom Arduino Mega shield designed for the JNKR Gauge System. The shield eliminates most hand-wiring and provides a professional, plug-and-play solution.
+---
+
+**Custom PCB Shield for Simplified Installation (Legacy Arduino Mega)**
+
+This document describes the custom Arduino Mega shield designed for the legacy version of the JNKR Gauge System. The shield eliminates most hand-wiring and provides a professional, plug-and-play solution.
 
 ---
 

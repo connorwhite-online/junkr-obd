@@ -1,6 +1,6 @@
 # Breadboard Wiring Diagram - JNKR Gauge System
 
-**Complete Prototyping Guide with Jumper Wires**
+**Complete Prototyping Guide for Qualia ESP32-S3**
 
 This guide shows you how to wire up your JNKR Gauge system on a breadboard for testing before final installation.
 
@@ -9,8 +9,11 @@ This guide shows you how to wire up your JNKR Gauge system on a breadboard for t
 ## 📋 What You Need
 
 ### Hardware
-- Arduino Mega 2560
-- Adafruit TFT Display (3.5" or 2.8")
+- **Qualia ESP32-S3** (Adafruit #5800)
+- **2.1" Round RGB Display** (480x480, RGB-666)
+- **40-pin FFC Cable** (included with display)
+- **ADS1015 I2C ADC Module** (for extra analog inputs)
+- **Stemma QT Cable** (for I2C connection)
 - MAX31855 Thermocouple Amplifier
 - K-Type Thermocouple
 - 3-Bar MAP Sensor
@@ -18,6 +21,8 @@ This guide shows you how to wire up your JNKR Gauge system on a breadboard for t
 - Piezo Buzzer
 - 830-point Breadboard
 - DuPont Jumper Wires (Male-Male, Male-Female)
+
+> **Note**: The Qualia board has the display connector built-in. Simply plug the 40-pin FFC cable from the display into the Qualia board.
 
 ### Components
 - 3x 2.2kΩ Resistors (for NTC voltage dividers)

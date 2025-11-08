@@ -145,13 +145,14 @@ A comprehensive engine monitoring system powered by ESP32-S3 with a beautiful 2.
 ### Step 1: Hardware Assembly
 
 1. **Prepare the Enclosure**
-   - Drill mounting holes for Arduino Mega
+   - Drill mounting holes for Qualia ESP32-S3 board
    - Install cable glands for sensor wires and display cable
-   - Display will be mounted remotely (not in Arduino enclosure)
+   - Display connects via 40-pin FFC cable (included)
 
 2. **Mount Components**
-   - Secure Arduino Mega with standoffs
-   - Mount buck converter
+   - Secure Qualia ESP32-S3 with standoffs
+   - Connect round display via 40-pin cable
+   - Install buck converter
    - Install screw terminals
 
 3. **Wire Connections**
@@ -178,8 +179,8 @@ A comprehensive engine monitoring system powered by ESP32-S3 with a beautiful 2.
 
 3. **Upload Code**
    - Open `jnkr-gauge.ino` in Arduino IDE
-   - Select **Board**: Arduino Mega 2560
-   - Select **Port**: Your Arduino's COM port
+   - Select **Board**: Adafruit Feather ESP32-S3 No PSRAM
+   - Select **Port**: Your ESP32's COM port
    - Click **Upload** (→)
 
 4. **Verify Operation**
@@ -313,14 +314,14 @@ Adjust update rates and filtering:
 ### Display Issues
 
 **Problem**: Display doesn't turn on
-- Check 5V power connection
-- Verify Nextion display power LED
-- Check TX/RX wiring (may be reversed)
+- Check 5V power connection via USB-C or VIN
+- Verify 40-pin FFC cable is fully inserted
+- Check cable orientation (contacts facing correct direction)
 
-**Problem**: Garbled display
-- Check baud rate (115200)
-- Verify Serial2 connections
-- Try swapping TX and RX wires
+**Problem**: Garbled display or flickering
+- Verify 40-pin cable connection
+- Check power supply (needs stable 5V/2A minimum)
+- Ensure proper LVGL configuration in code
 
 ### Sensor Issues
 
@@ -358,11 +359,11 @@ Adjust update rates and filtering:
 
 ### General Issues
 
-**Problem**: Arduino won't upload
-- Check USB cable
-- Select correct board (Mega 2560)
+**Problem**: ESP32 won't upload
+- Check USB-C cable (must be data-capable)
+- Select correct board (Adafruit Feather ESP32-S3)
 - Select correct COM port
-- Try pressing reset button
+- Try holding BOOT button while uploading
 
 **Problem**: System freezes
 - Check power supply (needs 3A minimum)

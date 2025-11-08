@@ -2,6 +2,11 @@
 
 **Complete Repository Layout and File Guide**
 
+> 📢 **Platform Update**: This project now uses **Qualia ESP32-S3** + **2.1" Round RGB Display**
+> 
+> Some documentation marked as "Legacy" refers to the previous Arduino Mega platform.
+> See [MIGRATION_SUMMARY.md](MIGRATION_SUMMARY.md) for details.
+
 This document explains the organization of the JNKR Gauge System repository and describes each file's purpose.
 
 ---
@@ -28,21 +33,24 @@ jnkr-gauge/
 ├── alerts.cpp                   ← Alert system implementation
 │
 └── docs/                        ← Documentation folder
-    ├── WIRING.md                ← Complete wiring guide for beginners
-    ├── ASSEMBLY.md              ← Step-by-step assembly instructions
-    ├── BOM.md                   ← Bill of materials with part numbers
-    ├── CALIBRATION.md           ← Sensor calibration procedures
-    ├── NEXTION.md               ← Nextion display design guide
-    ├── SHIELD.md                ← Shield PCB design and ordering
     │
-    └── shield/                  ← Shield design files
-        ├── schematic-description.md  ← Circuit explanations
-        ├── schematic.pdf        ← [To be created] Schematic diagram
-        ├── pcb-layout.pdf       ← [To be created] PCB layout
-        ├── assembly.pdf         ← [To be created] Assembly drawing
-        │
-        └── gerbers/             ← [To be created] PCB manufacturing files
-            └── jnkr-shield-gerbers.zip
+    ├── ⭐ CURRENT PLATFORM DOCS (ESP32-S3):
+    ├── COMPLETE_BOM.md          ← ⭐ Parts list for ESP32-S3 build
+    ├── ESP32_SETUP.md           ← ⭐ Arduino IDE setup for ESP32-S3
+    ├── BREADBOARD_WIRING.md     ← ⭐ Wiring guide for ESP32-S3
+    ├── SQUARELINE_LVGL_GUIDE.md ← ⭐ GUI design with LVGL
+    ├── CALIBRATION.md           ← Sensor calibration (platform-agnostic)
+    │
+    ├── 📦 LEGACY DOCS (Arduino Mega - Reference Only):
+    ├── BOM.md                   ← [Legacy] Arduino Mega parts list
+    ├── WIRING.md                ← [Legacy] Arduino Mega wiring
+    ├── ASSEMBLY.md              ← [Legacy] Arduino Mega assembly
+    ├── NEXTION.md               ← [Legacy] Nextion display guide
+    ├── SHIELD.md                ← [Legacy] Arduino shield design
+    ├── PCB_SCHEMATIC.md         ← [Legacy] Arduino shield PCB
+    │
+    └── shield/                  ← [Legacy] Shield design files
+        └── schematic-description.md  ← [Legacy] Circuit explanations
 ```
 
 ---
@@ -536,5 +544,6 @@ This project is maintained by the community. Contributions, feedback, and succes
 
 ---
 
-**Last Updated:** 2025-11-07  
-**Project Version:** 1.0.0
+**Last Updated:** 2025-11-08  
+**Project Version:** 2.0.0 (ESP32-S3)  
+**Previous Version:** 1.0.0 (Arduino Mega - Legacy)

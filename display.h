@@ -1,7 +1,12 @@
 /*
  * Display Manager - Header
  * 
- * Handles communication with Nextion HMI display
+ * ⚠️ LEGACY CODE: Nextion HMI Display (Arduino Mega)
+ * 
+ * CURRENT TARGET: LVGL on 2.1" Round RGB Display (Qualia ESP32-S3)
+ * 
+ * This file handles Nextion serial protocol communication.
+ * Will be replaced with LVGL graphics library for ESP32 platform.
  */
 
 #ifndef DISPLAY_H
