@@ -987,38 +987,40 @@ Vehicle 12V (switched) ──[3A Fuse]── Buck Converter in engine bay
 
 **How Power Distribution Works:**
 
-ONE buck converter powers ALL devices in parallel:
+ONE buck converter powers the system:
 
 ```
                     Buck Converter (in cabin)
                            ↓
                       5V Output
                            │
-         ┌─────────────────┼─────────────────┐
-         ↓                 ↓                  ↓
-    ESP32-S3          Display          I2C Module
-    150-300mA         200-400mA        15-20mA
-                                       (in engine bay)
+                  ┌────────┴────────┐
+                  ↓                 ↓
+            ESP32-S3          I2C Module
+          (+ Display)          15-20mA
+          350-700mA         (in engine bay)
+               │
+               └─→ Display via 40-pin ribbon cable
+                   (powered by ESP32 internally)
 ```
 
 **Important**: 
-- ❌ ESP32 does NOT power the I2C module
-- ❌ They don't have separate buck converters
-- ✅ ONE buck converter powers all three in parallel
+- ✅ Display is powered BY the ESP32 board (via ribbon cable)
+- ✅ You only need TWO power connections from buck converter
+- ✅ ESP32 does NOT power the I2C module (separate connection)
 - ✅ Buck converter must supply TOTAL current (365-720mA @ 5V)
 
 **Physical Wiring in Cabin:**
 
-You'll need to split the buck converter's 5V output three ways:
+You'll need to split the buck converter's 5V output TWO ways:
 
 **Method 1: Terminal Block (Recommended)**
 ```
 Buck Converter
     ↓
 Terminal Block (5V and GND rails)
-    ├─→ ESP32 (red + black wires)
-    ├─→ Display (red + black wires)
-    └─→ 4-wire harness to engine bay
+    ├─→ ESP32 board (includes display power via ribbon cable)
+    └─→ 4-wire harness to engine bay I2C module
 ```
 
 **Method 2: Splice Connectors**
@@ -1026,9 +1028,14 @@ Terminal Block (5V and GND rails)
 Buck Converter Output
     ↓
 Use crimp splice connectors or solder to split:
-    - 5V wire into 3 branches
-    - GND wire into 3 branches
+    - 5V wire into 2 branches
+    - GND wire into 2 branches
 ```
+
+**Display Connection:**
+- Display connects to ESP32 via **40-pin FFC ribbon cable** (included with Qualia board)
+- Power flows through ribbon cable automatically
+- No separate power wiring needed for display!
 
 **Wire Requirements for 5V to Engine Bay:**
 - **Distance**: 6-10 feet typical (cabin to engine bay)
@@ -1039,15 +1046,18 @@ Use crimp splice connectors or solder to split:
 
 **Total System Power Draw with I2C Module:**
 
-| Location | Components | Current @ 5V |
-|----------|-----------|--------------|
-| **Cabin** | ESP32-S3 + Display + Buzzer | 400-700 mA |
-| **Engine Bay** | I2C Module (ADS1115 + MCP9600) | 15-20 mA |
-| **TOTAL** | Complete system | **420-720 mA @ 5V** |
+| Location | Components | Current @ 5V | Power Connections |
+|----------|-----------|--------------|-------------------|
+| **Cabin** | ESP32-S3 + Display + Buzzer | 350-700 mA | 1 connection (display via ribbon cable) |
+| **Engine Bay** | I2C Module (ADS1115 + MCP9600) | 15-20 mA | 1 connection (via 4-wire harness) |
+| **TOTAL** | Complete system | **365-720 mA @ 5V** | **2 power connections total** |
 
-**From 12V (via buck converter):** ~360-620 mA
+**From 12V (via buck converter):** ~310-620 mA
 
-**Conclusion**: Your 3A fuse and buck converter have **plenty** of headroom! The I2C module draws almost nothing.
+**Conclusion**: 
+- Your 3A fuse and buck converter have **plenty** of headroom!
+- Only TWO power connections needed (ESP32 board + I2C module)
+- Display power handled by ESP32 board via ribbon cable
 
 ---
 

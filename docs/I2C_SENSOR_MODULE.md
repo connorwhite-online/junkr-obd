@@ -66,7 +66,7 @@ The module contains **active components** (ADS1115 and MCP9600 chips) that requi
 - **Power needed**: 5V @ 15-20mA (very low!)
 - **Source**: Same buck converter that powers ESP32 and display (NOT powered by ESP32!)
 
-**Power Flow - All Three Devices in Parallel:**
+**Power Flow - Two Power Connections:**
 
 ```
 Vehicle 12V (switched) ──→ Cigarette lighter tap or fuse box
@@ -75,11 +75,11 @@ Vehicle 12V (switched) ──→ Cigarette lighter tap or fuse box
         ↓
    Buck Converter (in cabin)
         ↓
-   5V Output (ONE source for all devices)
+   5V Output (ONE source for system)
         │
-        ├──→ ESP32-S3 (150-300mA)
-        │
-        ├──→ Display (200-400mA)
+        ├──→ ESP32-S3 board (350-700mA)
+        │       │
+        │       └──→ Display (powered via 40-pin ribbon cable)
         │
         └──→ 4-wire harness to engine bay I2C module (15-20mA)
              (5V, GND, SCL, SDA)
@@ -88,10 +88,10 @@ Total Current: 365-720mA @ 5V
 ```
 
 **Key Points:**
-- ✅ ONE buck converter powers everything
-- ✅ All devices connected in parallel (not series)
-- ✅ ESP32 does NOT power the I2C module
-- ✅ All three devices see the same 5V simultaneously
+- ✅ ONE buck converter powers entire system
+- ✅ Display is powered BY the ESP32 board (via ribbon cable)
+- ✅ Only TWO power connections needed from buck converter
+- ✅ ESP32 does NOT power the I2C module (separate connection)
 - ✅ Buck converter needs 1A minimum output (3A recommended)
 
 **Key Points:**
