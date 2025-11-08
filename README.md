@@ -402,14 +402,20 @@ For a professional, plug-and-play solution, we've designed a custom Arduino Mega
 
 ## 📚 Documentation
 
-- [Complete Wiring Guide](docs/WIRING.md) - Detailed connection instructions
+### Getting Started
+- **[Complete Bill of Materials](docs/COMPLETE_BOM.md) - Exact parts with links** ⭐ **Start Here!**
+- **[Breadboard Wiring Guide](docs/BREADBOARD_WIRING.md) - Prototyping with jumper wires** ⭐ **Build Guide**
+- [PCB Schematic](docs/PCB_SCHEMATIC.md) - Custom shield design for permanent installation
+
+### Display Options
+- **[SquareLine + LVGL Guide](docs/SQUARELINE_LVGL_GUIDE.md) - Visual GUI design** ⭐ **Recommended** (Mac/Windows/Linux)
+- [Nextion HMI Guide](docs/NEXTION.md) - Alternative display option (Windows only)
+
+### Additional Guides
+- [Complete Wiring Guide](docs/WIRING.md) - Detailed automotive connections
 - [Assembly Guide](docs/ASSEMBLY.md) - Step-by-step build instructions
-- [Bill of Materials](docs/BOM.md) - Complete parts list with suppliers
 - [Shield Guide](docs/SHIELD.md) - PCB shield assembly and ordering
 - [Calibration Guide](docs/CALIBRATION.md) - Sensor calibration procedures
-- **[SquareLine + LVGL Guide](docs/SQUARELINE_LVGL_GUIDE.md) - Mac-compatible visual GUI design** ⭐ Recommended for Mac users
-- [Nextion HMI Guide](docs/NEXTION.md) - Display design and customization (Windows)
-- [Adafruit TFT Migration Guide](docs/ADAFRUIT_TFT_MIGRATION.md) - Comparison of display options
 
 ---
 

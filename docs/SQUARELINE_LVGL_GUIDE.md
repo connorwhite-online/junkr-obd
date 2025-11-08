@@ -1,32 +1,32 @@
-# SquareLine Studio + LVGL for JNKR Gauge Display
+# SquareLine Studio + LVGL Display Guide
 
-**The BEST Solution for Mac-Compatible Visual GUI Design**
+**Mac-Compatible Visual GUI Design for Your Engine Gauge**
 
-This guide explains how to use **SquareLine Studio** (visual GUI designer) with **LVGL** (Light and Versatile Graphics Library) to create a professional display for your JNKR Gauge system - all on your Mac!
+This guide shows you how to use **SquareLine Studio** (visual GUI designer) with **LVGL** (Light and Versatile Graphics Library) to create a professional display for your JNKR Gauge system - all from your Mac, with no Windows required!
 
 ---
 
-## 🎯 Why SquareLine Studio + LVGL is Perfect for This Project
+## 🎯 Why SquareLine Studio + LVGL?
 
-### The Problem We're Solving
-- ❌ Nextion Editor only works well on Windows
-- ❌ Hand-coding TFT graphics is tedious and slow
-- ✅ **SquareLine Studio**: Visual editor that runs on Mac!
-- ✅ **LVGL**: Modern graphics library that's way better than basic Adafruit GFX
+### The Benefits
+- ✅ **SquareLine Studio**: Professional visual GUI editor that runs on Mac!
+- ✅ **LVGL**: Modern, powerful graphics library
+- ✅ **100% Mac compatible**: No Windows, no VM, no Boot Camp needed
+- ✅ **Drag-and-drop design**: Professional-looking gauges in minutes
 
-### What You Get
+### Feature Comparison
 
-| Feature | Nextion | Hand-Coded TFT | **SquareLine + LVGL** |
-|---------|---------|----------------|----------------------|
-| **Mac Compatible** | ❌ No | ✅ Yes | ✅ **YES!** |
-| **Visual Editor** | ✅ Yes | ❌ No | ✅ **YES!** |
-| **Fast Updates** | ✅ Fast | ⚠️ Slow | ✅ **Fast** |
-| **Professional UI** | ✅ Yes | ⚠️ Manual | ✅ **YES!** |
-| **Animations** | ⚠️ Limited | ⚠️ Hard | ✅ **Built-in** |
-| **Widgets** | ⚠️ Basic | ⚠️ DIY | ✅ **Rich** |
-| **Arduino Overhead** | ✅ Low | ⚠️ High | ⚠️ **Medium** |
+| Feature | SquareLine + LVGL | Notes |
+|---------|-------------------|-------|
+| **Mac Compatible** | ✅ **YES!** | Native Mac application |
+| **Visual Editor** | ✅ **YES!** | Drag-and-drop interface |
+| **Fast Updates** | ✅ **Fast** | Optimized rendering |
+| **Professional UI** | ✅ **YES!** | Built-in beautiful widgets |
+| **Animations** | ✅ **Built-in** | Smooth transitions |
+| **Widgets** | ✅ **Rich** | 30+ professional widgets |
+| **Arduino Overhead** | ⚠️ **Medium** | More than serial, less than basic drawing |
 
-**This is the best approach for your situation!**
+**Perfect for creating a professional engine monitoring display!**
 
 ---
 
