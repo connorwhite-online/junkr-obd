@@ -183,7 +183,100 @@ Your vehicle has two types of 12V circuits:
 7. **Connect red wire** to Add-A-Circuit wire
 8. **Test again** with multimeter
 
-### Option 2: Cigarette Lighter / Accessory Outlet
+### Option 2A: Replace Cigarette Lighter Socket (Excellent for Older Vehicles!) ⭐
+
+**If you don't use your cigarette lighter, this is perfect:**
+
+**Pros:**
+- ✅ Uses existing switched 12V wiring (already fused!)
+- ✅ Professional, hidden installation
+- ✅ Perfect power capacity (typically 10-15A circuit)
+- ✅ Already has ground wire
+- ✅ Hole in dash for mounting gauge or running wires
+- ✅ 100% reversible (keep the socket to reinstall later)
+
+**Cons:**
+- Lose cigarette lighter function (but who uses these anymore?)
+- Need to remove trim to access
+
+**How to Do It:**
+
+**Step 1: Locate and Remove Cigarette Lighter**
+
+1. **Find the cigarette lighter socket** (usually in center console or dashboard)
+2. **Remove surrounding trim** (pry gently with plastic trim tool)
+3. **Unplug lighter socket** from behind
+4. **Note the wiring**:
+   - Usually 2 wires: Red/Yellow (+12V) and Black (Ground)
+   - Sometimes 3 wires: +12V, Ground, and Illumination (ignore the illumination wire)
+
+**Step 2: Test the Wiring**
+
+Use multimeter:
+```
+Key OFF → Should read 0V (switched power - perfect!)
+Key ACC → Should read 12-14V
+```
+
+If it reads 12V with key off, it's constant power (some vehicles). You can still use it, but consider adding a switch.
+
+**Step 3A: Direct Connection Method**
+
+If you're mounting gauge near the lighter location:
+
+1. **Connect directly**:
+   ```
+   Lighter +12V wire → [Inline 3A fuse] → Buck converter +12V
+   Lighter Ground wire → Buck converter GND
+   ```
+
+2. **Mount gauge in or near lighter opening**
+3. **Buck converter goes behind dash (hidden)**
+4. **Run sensor wires through existing lighter hole**
+
+**Step 3B: Wire Extension Method**
+
+If gauge is going elsewhere:
+
+1. **Splice extension wires**:
+   ```
+   Lighter +12V → [Solder + heat shrink] → 20AWG red wire → Buck converter
+   Lighter GND → [Solder + heat shrink] → 20AWG black wire → Buck converter
+   ```
+
+2. **Add 3A inline fuse** within 6" of splice point
+3. **Route wires to gauge location**
+4. **Use lighter hole for wire pass-through**
+5. **Cap off or plug original lighter socket hole** (blank plate, or reinstall socket with no connection)
+
+**Step 4: Clean Installation**
+
+Option A - **Gauge in Lighter Location:**
+- Mount gauge directly where lighter was
+- Perfect size for 2.1" round display!
+- Ultra clean, looks factory
+
+Option B - **Use Lighter Hole for Wiring:**
+- Run wires through hole
+- Install blank plate over hole (available at auto parts stores)
+- Or keep lighter socket installed but disconnected (looks stock)
+
+**Why This is Great for 1KZTE Vehicles:**
+
+Most 1990s-2000s Toyota trucks with 1KZTE:
+- Have cigarette lighter that's rarely used
+- It's already switched power (turns off with key)
+- Circuit is 10-15A (more than enough)
+- Easy to access under center console
+- Perfect for custom gauge installation
+
+**Pro Tip:** Keep the lighter socket and wiring intact! Just:
+1. Unplug it
+2. Tap into the harness BEFORE the socket
+3. Keep socket stored in glove box
+4. 100% reversible for resale
+
+### Option 2B: Plug Into Cigarette Lighter (Temporary Only)
 
 **Pros:**
 - Very easy
@@ -204,7 +297,7 @@ Use a 12V cigarette lighter adapter with bare wire output:
 4. Connect to buck converter input
 5. Plug into outlet
 
-**Best For**: Testing and temporary installations
+**Best For**: Testing and bench testing only
 
 ### Option 3: Accessory Wire Behind Dash
 
@@ -576,14 +669,46 @@ Since you're building this for a 1KZTE turbodiesel, here's specific guidance:
 
 **Best Options (in order of preference):**
 
-| Circuit | Fuse Location | Fuse Rating | Why It's Good |
-|---------|--------------|-------------|---------------|
-| **1. Radio/Audio** | Interior fuse box | 15A | Switched, low current, easy access |
-| **2. Cigarette Lighter** | Interior fuse box | 15A | Switched, purpose-built for accessories |
-| **3. Power Windows** | Interior fuse box | 20-30A | Switched, high capacity circuit |
-| **4. Accessory** | Interior or engine fuse box | 10-15A | Switched, dedicated accessory power |
+| Circuit | Fuse Location | Fuse Rating | Why It's Good | Best For |
+|---------|--------------|-------------|---------------|----------|
+| **1. Cigarette Lighter Wiring** | Behind dash (or center console) | 10-15A | Already wired, switched, has ground! | If you don't use lighter - EASIEST! |
+| **2. Radio/Audio** | Interior fuse box | 15A | Switched, low current, easy access | Standard installation |
+| **3. Cigarette Lighter Fuse** | Interior fuse box | 15A | Switched, purpose-built for accessories | Using Add-A-Circuit method |
+| **4. Power Windows** | Interior fuse box | 20-30A | Switched, high capacity circuit | Alternate if radio not available |
+| **5. Accessory** | Interior or engine fuse box | 10-15A | Switched, dedicated accessory power | Alternate option |
 
 ### Step-by-Step for 1KZ-TE
+
+#### Method 1: Use Cigarette Lighter Wiring (Recommended if Available!)
+
+**Why This is Perfect for 1KZ-TE Trucks:**
+- Most 1990s-2000s Toyota trucks have cigarette lighter in center console
+- It's rarely used (everyone uses USB now)
+- Already switched power (confirmed on most 1KZ-TE Land Cruisers/Hilux)
+- Perfect location for gauge mounting
+- 2.1" round display fits nicely in lighter opening!
+
+**Procedure:**
+
+1. **Locate cigarette lighter** (usually center console)
+2. **Remove center console trim** (4-6 screws typically)
+3. **Unplug lighter from behind** (squeeze tab and pull connector)
+4. **Test with multimeter**:
+   - Key OFF: 0V (switched - perfect!)
+   - Key ON: 12-14V
+5. **Connect your gauge**:
+   ```
+   Lighter plug red/yellow wire → [3A inline fuse] → Buck converter 12V+
+   Lighter plug black wire → Buck converter GND
+   ```
+6. **Options for mounting**:
+   - **A**: Mount gauge IN the lighter opening (clean!)
+   - **B**: Use lighter hole to route wires, install blank plate
+   - **C**: Keep lighter plugged in but tap wires before connector (100% reversible)
+
+**Result**: Cleaner than fuse box tap, fewer wires, looks factory!
+
+#### Method 2: Fuse Box Tap (Standard Method)
 
 **1. Access Interior Fuse Box**
    - Open driver door
@@ -927,7 +1052,9 @@ We'll help you figure it out!
 
 ## ✅ Summary
 
-**For the JNKR Gauge System, here's the simplest approach:**
+**For the JNKR Gauge System, you have two excellent options:**
+
+### Option A: Fuse Box Tap (Most Common)
 
 1. **Power Source**: Interior fuse box, radio circuit, using Add-A-Circuit
 2. **Fuse**: 3A blade fuse in Add-A-Circuit
@@ -939,6 +1066,20 @@ We'll help you figure it out!
 **Total Time**: 30 minutes  
 **Total Cost**: $10-20 for Add-A-Circuit, fuse, and wire  
 **Skill Level**: Basic (if you can use a multimeter, you can do this)
+
+### Option B: Cigarette Lighter Wiring (If You Don't Use It) ⭐
+
+1. **Power Source**: Existing cigarette lighter wiring (already switched and fused!)
+2. **Fuse**: Add 3A inline fuse for gauge protection
+3. **Wire**: May not need any - direct connection possible
+4. **Ground**: Use lighter's ground wire
+5. **Mounting**: Can mount gauge IN the lighter location, or use hole for wiring
+6. **Result**: Ultra-clean installation, looks factory, 100% reversible
+
+**Total Time**: 20-30 minutes  
+**Total Cost**: $5-10 for inline fuse and connectors  
+**Skill Level**: Basic (even easier than fuse box tap!)  
+**Why It's Great**: Perfect for older 1KZTE trucks where lighter isn't used, gauge fits perfectly in lighter opening
 
 ---
 
