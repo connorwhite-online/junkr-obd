@@ -92,6 +92,8 @@ A comprehensive engine monitoring system powered by ESP32-S3 with a beautiful 2.
 
 **Detailed Bill of Materials**: See [docs/BOM.md](docs/BOM.md)
 
+**Sensor Selection Guide**: See [docs/AUTOMOTIVE_SENSORS.md](docs/AUTOMOTIVE_SENSORS.md) for heavy-duty automotive sensors vs. hobbyist sensors
+
 ---
 
 ## 🔌 Installation Options
@@ -512,12 +514,16 @@ For a professional, plug-and-play solution, we've designed a custom Arduino Mega
 - **[SquareLine + LVGL Guide](docs/SQUARELINE_LVGL_GUIDE.md) - Visual GUI design** ⭐ **Recommended** (Mac/Windows/Linux)
 - [Nextion HMI Guide](docs/NEXTION.md) - Alternative display option (Windows only)
 
+### Sensor Selection & Calibration ⭐ **IMPORTANT!**
+- **[Heavy-Duty Automotive Sensors Guide](docs/AUTOMOTIVE_SENSORS.md) - OEM vs. generic sensors** ⭐ **Read First!**
+- **[`calibration.h`](calibration.h) - Easy sensor calibration config file** ⭐ **Edit This!**
+- [Calibration Guide](docs/CALIBRATION.md) - Detailed calibration procedures
+
 ### Additional Guides
 - **[Automotive Power Guide](docs/AUTOMOTIVE_POWER.md) - How to power from vehicle** ⭐ **Essential!**
 - [Complete Wiring Guide](docs/WIRING.md) - Detailed automotive connections (traditional)
 - [Assembly Guide](docs/ASSEMBLY.md) - Step-by-step build instructions
 - [Shield Guide](docs/SHIELD.md) - PCB shield assembly and ordering
-- [Calibration Guide](docs/CALIBRATION.md) - Sensor calibration procedures
 
 ---
 
