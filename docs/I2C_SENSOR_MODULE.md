@@ -56,6 +56,44 @@ Right now, you need to run **multiple individual wires** through the firewall:
 
 ## 🔧 Recommended Implementation
 
+### Power Source for I2C Module
+
+> **📖 IMPORTANT**: See [AUTOMOTIVE_POWER.md](AUTOMOTIVE_POWER.md) for complete vehicle power integration guide!
+
+**The I2C module needs 5V power - where does it come from?**
+
+The module contains **active components** (ADS1115 and MCP9600 chips) that require power:
+- **Power needed**: 5V @ 15-20mA (very low!)
+- **Source**: Buck converter that also powers ESP32 and display
+
+**Recommended Setup:**
+
+```
+Vehicle 12V (switched) ──→ Cigarette lighter tap or fuse box
+        ↓
+   [3A Fuse]
+        ↓
+   Buck Converter (in cabin) ──→ 5V output
+        │
+        ├──→ ESP32-S3
+        ├──→ Display  
+        └──→ 4-wire harness to engine bay I2C module
+            (5V, GND, SCL, SDA)
+```
+
+**Key Points:**
+- ✅ Use **switched 12V** (turns on/off with ignition)
+- ✅ Buck converter in cabin (protected from weather)
+- ✅ Only 4 wires through firewall
+- ✅ I2C module draws <20mA (negligible)
+- ✅ Total system: <1A @ 12V
+
+See [AUTOMOTIVE_POWER.md](AUTOMOTIVE_POWER.md) for:
+- Where to tap 12V in your vehicle
+- Cigarette lighter splice method (easiest!)
+- Fuse box Add-A-Circuit method
+- Grounding best practices
+
 ### Option 1: Pre-Built Modules (Easiest)
 
 **Hardware Required:**
@@ -70,7 +108,7 @@ Right now, you need to run **multiple individual wires** through the firewall:
 | Protoboard | Perforated PCB for mounting | 1 | $3-5 | Amazon |
 | Wire & Connectors | Automotive wire, heat shrink | - | $10-15 | Amazon |
 
-**Total Cost: ~$57-86**
+**Total Cost: ~$57-86** (plus buck converter and power wiring - see AUTOMOTIVE_POWER.md)
 
 ### Option 2: Custom PCB (Most Professional)
 

@@ -889,9 +889,43 @@ Since you're building this for a 1KZTE turbodiesel, here's specific guidance:
 
 ### Power Requirements for I2C Sensor Module
 
-**If using the I2C sensor module in engine bay:**
+**Important**: The I2C module is NOT just passive wiring - it contains **active components that need power**!
 
-The module needs power from the same buck converter:
+**What's Inside the I2C Module:**
+- **ADS1115** - 16-bit analog-to-digital converter chip (needs 5V @ 5-10mA)
+- **MCP9600** - Thermocouple amplifier chip (needs 5V @ 5-10mA)
+- **Purpose**: These digitize sensor readings and send data via I2C to ESP32
+
+**Power Draw:**
+- ADS1115: ~5-10 mA
+- MCP9600: ~5-10 mA
+- **Total module draw: ~15-20 mA** (very small, but still needs power!)
+
+**The 4-Wire Harness Contains:**
+```
+┌────────────────────────────────────────┐
+│  ENGINE BAY I2C MODULE                 │
+│                                        │
+│  Sensors → ADS1115 & MCP9600 ──→ I2C  │
+│            (need 5V power!)            │
+└────────────┬───────────────────────────┘
+             │
+             │  4-wire harness through firewall
+             │  ┌─ Wire 1: 5V Power (red)
+             │  ├─ Wire 2: GND (black)
+             │  ├─ Wire 3: SCL - I2C Clock (yellow)
+             │  └─ Wire 4: SDA - I2C Data (green)
+             ↓
+┌────────────────────────────────────────┐
+│  CABIN (ESP32 + DISPLAY)               │
+└────────────────────────────────────────┘
+```
+
+**Two Power Routing Options:**
+
+**Option A: Buck Converter in Cabin (Recommended)** ⭐
+
+All power conversion happens in cabin, only low-voltage runs to engine:
 
 ```
 Vehicle 12V (switched)
@@ -900,24 +934,75 @@ Vehicle 12V (switched)
     ↓
 Buck Converter (in cabin with gauge)
     ↓
-5V Output ──┬──→ Qualia ESP32-S3
-            ├──→ Display
-            └──→ I2C Module in engine bay (via harness)
+5V Output
+    │
+    ┌───────────┼───────────┐
+    ↓           ↓           ↓
+ESP32-S3    Display    4-wire to engine bay
+                       (5V+GND+SCL+SDA)
 ```
 
-**Alternatively (cleaner for I2C setup):**
+**Pros:**
+- ✅ Buck converter protected from weather
+- ✅ Easy to adjust voltage if needed
+- ✅ Only low-voltage wires to engine bay
+- ✅ All electronics in climate-controlled space
+- ✅ Easier troubleshooting
+
+**Cons:**
+- Slightly longer wire run to engine bay (but I2C handles 10+ feet easily)
+
+**Option B: Buck Converter in Engine Bay**
+
+Power converted at engine bay module, power + I2C to cabin:
 
 ```
-Vehicle 12V (switched) ──[3A Fuse]── Buck Converter ──→ 5V to I2C module
-                                                     |
-                                                     └──→ Single 4-wire harness to cabin
-                                                          (5V, GND, SCL, SDA)
+Vehicle 12V (switched) ──[3A Fuse]── Buck Converter in engine bay
+                                            ↓
+                                     5V to I2C Module
+                                            ↓
+                        4-wire to cabin: 5V + GND + SCL + SDA
+                                            ↓
+                                       ESP32 in cabin
 ```
 
-This way the buck converter is in the engine bay with the sensor module, and you only run:
-- Low-voltage 5V power (safer)
-- Digital I2C signals (noise immune)
-- Single small 4-wire harness through firewall
+**Pros:**
+- ✅ Ultra-clean cabin wiring
+- ✅ Engine bay is self-contained unit
+- ✅ Can unplug single connector to remove entire engine bay module
+
+**Cons:**
+- Buck converter exposed to weather (needs weatherproof enclosure!)
+- Harder to adjust voltage
+- 12V wire runs to engine bay (but through existing harness)
+
+**Our Recommendation: Option A** (buck converter in cabin)
+
+**Why:**
+1. Buck converter stays dry and accessible
+2. Safer - only 5V to engine bay
+3. Easier troubleshooting
+4. Don't need weatherproof buck converter enclosure
+5. Can adjust voltage easily if needed
+
+**Wire Requirements for 5V to Engine Bay:**
+- **Distance**: 6-10 feet typical (cabin to engine bay)
+- **Current**: 15-20 mA (very low!)
+- **Voltage drop**: < 0.1V (negligible at 20mA)
+- **Wire gauge**: 22 AWG sufficient, 20 AWG better for durability
+- **Type**: Automotive primary wire or shielded 4-conductor cable
+
+**Total System Power Draw with I2C Module:**
+
+| Location | Components | Current @ 5V |
+|----------|-----------|--------------|
+| **Cabin** | ESP32-S3 + Display + Buzzer | 400-700 mA |
+| **Engine Bay** | I2C Module (ADS1115 + MCP9600) | 15-20 mA |
+| **TOTAL** | Complete system | **420-720 mA @ 5V** |
+
+**From 12V (via buck converter):** ~360-620 mA
+
+**Conclusion**: Your 3A fuse and buck converter have **plenty** of headroom! The I2C module draws almost nothing.
 
 ---
 
