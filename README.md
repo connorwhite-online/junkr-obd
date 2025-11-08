@@ -2,11 +2,12 @@
 
 **Read-Only Engine Monitoring Gauge for 1KZTE Turbodiesel**
 
-A comprehensive, Arduino-based engine monitoring system that displays critical parameters with color-coded warnings and audio alerts. Perfect for enthusiasts who want to monitor their turbocharged diesel engine without modifying ECU signals.
+A comprehensive engine monitoring system powered by ESP32-S3 with a beautiful 2.1" round display. Features real-time sensor data, color-coded warnings, audio alerts, and smooth 60 FPS graphics. Perfect for enthusiasts who want to monitor their turbocharged diesel engine without modifying ECU signals.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
-![Arduino](https://img.shields.io/badge/arduino-Mega%202560-00979D.svg)
+![Platform](https://img.shields.io/badge/platform-ESP32--S3-red.svg)
+![Display](https://img.shields.io/badge/display-2.1%22%20Round%20480x480-green.svg)
 
 ---
 
@@ -14,17 +15,16 @@ A comprehensive, Arduino-based engine monitoring system that displays critical p
 
 ### Real-Time Monitoring
 - **Boost Pressure** - PSI gauge display (0-25 PSI range)
-- **Intake Air Temperature** - Post-intercooler temp monitoring
+- **Intake Air Temperature (Dual)** - Pre & Post-intercooler monitoring
 - **Exhaust Gas Temperature** - K-type thermocouple (up to 1000°C)
 - **Coolant Temperature** - Engine operating temperature
-- **Oil Temperature** - Engine oil temp (optional)
-- **Battery Voltage** - Electrical system monitoring
 
 ### Visual Feedback
-- 3.5" Nextion touchscreen display
+- 2.1" round RGB display (480x480 pixels)
+- Smooth 60 FPS graphics
 - Color-coded warnings (Green → Yellow → Orange → Red)
-- Real-time gauge updates (5Hz refresh rate)
-- Alert message display
+- Professional automotive gauge appearance
+- LVGL-powered GUI with SquareLine Studio design
 
 ### Audio Alerts
 - Multi-level alert system with distinctive beep patterns:
@@ -64,16 +64,22 @@ A comprehensive, Arduino-based engine monitoring system that displays critical p
 
 | Component | Part Number | Quantity | Purpose |
 |-----------|-------------|----------|---------|
-| Arduino Mega 2560 | ATmega2560 | 1 | Main controller |
-| TFT Display | Adafruit 2.8-3.5" | 1 | Color touchscreen (with LVGL support) |
-| MAX31855 Module | MAX31855 | 1 | K-type thermocouple amplifier |
-| K-Type Thermocouple | M6 thread | 1 | EGT sensor (0-1000°C) |
-| MAP Sensor | 0-3 bar | 1 | Boost pressure sensor |
-| NTC Thermistors | 2.2kΩ @ 25°C | 3 | Temperature sensors (2x IAT, 1x coolant) |
-| Piezo Buzzer | 2kHz active | 1 | Audio alerts |
-| Enclosure | IP65 rated | 1 | Arduino enclosure (display mounted remotely) |
+| **Qualia ESP32-S3** | Adafruit #5800 | 1 | Main controller (240 MHz, 8MB RAM) |
+| **Round RGB Display** | 2.1" 480x480 | 1 | High-res automotive gauge display |
+| **I2C ADC Module** | Adafruit ADS1015 | 1 | Extra analog inputs for sensors |
+| **MAX31855 Module** | MAX31855 | 1 | K-type thermocouple amplifier |
+| **K-Type Thermocouple** | M6 thread | 1 | EGT sensor (0-1000°C) |
+| **MAP Sensor** | 0-3 bar | 1 | Boost pressure sensor |
+| **NTC Thermistors** | 2.2kΩ @ 25°C | 3 | Temperature sensors (2x IAT, 1x coolant) |
+| **Piezo Buzzer** | 2kHz active | 1 | Audio alerts |
 
-**Display Options:** See [SquareLine + LVGL Guide](docs/SQUARELINE_LVGL_GUIDE.md) for Mac-compatible visual GUI design, or [Nextion Guide](docs/NEXTION.md) for Windows-based design.
+**Why ESP32-S3?**
+- ✅ **10x faster** than Arduino Mega (240 MHz vs 16 MHz)
+- ✅ **1000x more RAM** (8MB vs 8KB) - LVGL runs perfectly
+- ✅ **60 FPS graphics** via RGB-666 parallel interface
+- ✅ **WiFi + Bluetooth** built-in (future data logging)
+- ✅ **Round display** for authentic automotive gauge look
+- ✅ **Same sensors, same Arduino IDE**
 
 ### Supporting Components
 
@@ -91,19 +97,25 @@ A comprehensive, Arduino-based engine monitoring system that displays critical p
 ## 📐 Architecture
 
 ```
-┌─────────────────┐
-│   12V Vehicle   │
-│   Electrical    │
-└────────┬────────┘
+┌──────────────────┐
+│   12V Vehicle    │
+│   Electrical     │
+└────────┬─────────┘
          │
-         ├──→ Buck Converter ──→ 5V ──→ Arduino Mega 2560 (in enclosure)
-         │                              ├─ SPI ──→ MAX31855 ──→ EGT Sensor
-         │                              ├─ ADC ──→ MAP Sensor (Boost)
-         │                              ├─ ADC ──→ NTC (IAT Pre-IC)
-         │                              ├─ ADC ──→ NTC (IAT Post-IC)
-         │                              ├─ ADC ──→ NTC (Coolant)
-         │                              ├─ PWM ──→ Buzzer (Alerts)
-         │                              └─ SPI/UART ─→ TFT Display (LVGL/Nextion)
+         ├──→ Buck Converter ──→ 5V ──→ Qualia ESP32-S3 Board
+         │                              │
+         │                              ├─ 40-pin RGB ───→ 2.1" Round Display
+         │                              │                  (480x480, 60 FPS)
+         │                              │
+         │                              ├─ Analog ────────→ MAP Sensor (Boost)
+         │                              ├─ Analog ────────→ NTC (IAT Pre-IC)
+         │                              │
+         │                              ├─ I2C (Stemma QT)
+         │                              │   └─ ADS1015 ADC ─→ NTC (IAT Post-IC)
+         │                              │                  └─ NTC (Coolant)
+         │                              │
+         │                              ├─ SPI ───────────→ MAX31855 ──→ EGT Sensor
+         │                              └─ PWM ───────────→ Buzzer (Alerts)
          │
 ```
 
@@ -111,22 +123,20 @@ A comprehensive, Arduino-based engine monitoring system that displays critical p
 
 ## 🔌 Pin Assignments
 
-### Arduino Mega 2560
+### ESP32-S3 Qualia Board
 
-| Pin | Function | Component |
-|-----|----------|-----------|
-| A0 | Analog Input | Intake Air Temp Pre-Intercooler (NTC) |
-| A1 | Analog Input | Intake Air Temp Post-Intercooler (NTC) |
-| A2 | Analog Input | Coolant Temperature (NTC) |
-| A3 | Analog Input | Boost Pressure (MAP) |
-| 8 | Digital Output | Piezo Buzzer |
-| 10 | SPI CS | MAX31855 (EGT) |
-| 13 | Digital Output | Status LED (built-in) |
-| 16/17 | UART (Serial2) | Nextion Display TX/RX (use longer cable) |
-| 50 | SPI MISO | MAX31855 Data |
-| 52 | SPI SCK | MAX31855 Clock |
+| Interface | Component | Connection Method |
+|-----------|-----------|-------------------|
+| **40-pin RGB Connector** | Round Display | Plug-in ribbon cable |
+| **Analog GPIO 1** | MAP Sensor | Direct analog input |
+| **Analog GPIO 2** | NTC (IAT Pre) | Direct analog input w/ voltage divider |
+| **I2C (Stemma QT)** | ADS1015 ADC Module | Stemma QT cable |
+| **ADS1015 Ch 0** | NTC (IAT Post) | Via I2C ADC |
+| **ADS1015 Ch 1** | NTC (Coolant) | Via I2C ADC |
+| **SPI (via expander)** | MAX31855 (EGT) | PCA9554 I/O expander |
+| **Digital (via expander)** | Buzzer | PCA9554 I/O expander |
 
-**Complete Wiring**: See [docs/WIRING.md](docs/WIRING.md)
+**Complete Wiring**: See [docs/BREADBOARD_WIRING.md](docs/BREADBOARD_WIRING.md)
 
 ---
 

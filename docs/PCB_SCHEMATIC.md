@@ -1,8 +1,19 @@
 # PCB Schematic & Shield Design - JNKR Gauge System
 
-**Professional Arduino Mega Shield for Engine Monitoring**
+**⚠️ LEGACY DOCUMENT - Arduino Mega Version**
 
-This document provides the complete schematic and PCB layout for a custom Arduino Mega shield that simplifies installation and creates a professional, reliable system.
+**Note:** This project has been updated to use **ESP32-S3 Qualia** platform instead of Arduino Mega. This document is kept for reference but is no longer the recommended approach.
+
+**For current ESP32-S3 build**, see:
+- [COMPLETE_BOM.md](COMPLETE_BOM.md) - ESP32-S3 parts list
+- [BREADBOARD_WIRING.md](BREADBOARD_WIRING.md) - ESP32-S3 wiring
+- [ESP32_SETUP.md](ESP32_SETUP.md) - ESP32-S3 Arduino IDE setup
+
+---
+
+## 📋 Legacy Arduino Mega Shield Documentation
+
+This document provides the complete schematic and PCB layout for a custom Arduino Mega shield that simplifies installation. **This is no longer recommended** as the ESP32-S3 Qualia board provides better performance, easier setup, and lower cost.
 
 ---
 

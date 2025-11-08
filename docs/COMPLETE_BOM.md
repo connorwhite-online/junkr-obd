@@ -1,8 +1,10 @@
 # Complete Bill of Materials - JNKR Gauge System
 
-**Everything You Need to Build Your Engine Monitoring Gauge**
+**Everything You Need to Build Your Engine Monitoring Gauge with ESP32-S3**
 
 This is the complete parts list with exact product links, part numbers, and prices. All links are current as of November 2024.
+
+**Platform:** Adafruit Qualia ESP32-S3 + Round RGB Display
 
 ---
 
@@ -12,65 +14,58 @@ This is the complete parts list with exact product links, part numbers, and pric
 
 | Category | Estimated Cost |
 |----------|---------------|
-| Core Electronics | $150-180 |
-| Sensors | $60-80 |
+| Core Electronics | $95-110 |
+| Sensors | $70-90 |
 | Wiring & Connectors | $30-40 |
-| Enclosure & Hardware | $40-60 |
-| **TOTAL** | **$280-360** |
+| Enclosure & Hardware | $30-50 |
+| **TOTAL** | **$225-290** |
+
+💰 **Cheaper than Arduino Mega setup** and much more powerful!
 
 ---
 
-## 📱 Core Electronics
+# Core Electronics
 
-### Arduino Controller
+## 🎯 ESP32-S3 Development Board + Display
+
+### **Main Controller & Display System**
 
 | Item | Part Number | Qty | Price | Link |
 |------|-------------|-----|-------|------|
-| **Arduino Mega 2560 R3** | A000067 | 1 | $48.90 | [Arduino Store](https://store.arduino.cc/products/arduino-mega-2560-rev3) |
-| *Alternative: Compatible Mega* | ELEGOO Mega | 1 | $21.99 | [Amazon](https://www.amazon.com/ELEGOO-ATmega2560-ATMEGA16U2-Projects-Compliant/dp/B01H4ZDYCE) |
+| **Adafruit Qualia ESP32-S3 RGB-666 Dev Board** | #5800 | 1 | $39.95 | [Adafruit](https://www.adafruit.com/product/5800) |
+| **2.1" Round RGB TTL Display (480x480)** | TL021WVC02-B1323B* | 1 | $34.95 | [Adafruit](https://www.adafruit.com/product/5806) |
+| **40-pin FFC Cable** | Usually included | 1 | (Included) | - |
 
-**Recommendation:** Genuine Arduino for best quality, ELEGOO for budget build.
+\* *Product name: "Round RGB TTL TFT Display - 2.1" 480x480 - No Touchscreen"*
+
+**Specifications:**
+- **Processor:** ESP32-S3 dual-core @ 240 MHz
+- **RAM:** 8MB PSRAM (1000x more than Arduino Mega!)
+- **Flash:** 16MB
+- **Display:** 2.1" round, 480x480 pixels, RGB-666 parallel interface
+- **Graphics:** 60 FPS smooth updates
+- **Connectivity:** WiFi + Bluetooth built-in
+- **Programming:** Arduino IDE or CircuitPython
+- **Interface:** 40-pin connector (simple plug-in)
 
 ---
 
-### Display (Choose ONE Option)
-
-**Option 1: 3.5" TFT (Recommended - Same size as Nextion)**
+### **I2C ADC Module (For Extra Analog Inputs)**
 
 | Item | Part Number | Qty | Price | Link |
 |------|-------------|-----|-------|------|
-| **Adafruit 3.5" TFT LCD Touchscreen Breakout** | 2050 | 1 | $54.95 | [Adafruit](https://www.adafruit.com/product/2050) |
-| microSD Card (for images/fonts) | Any 8-32GB | 1 | $5-10 | [Amazon](https://www.amazon.com/s?k=microsd+card+8gb) |
+| **Adafruit ADS1015 12-Bit ADC** | #1083 | 1 | $9.95 | [Adafruit](https://www.adafruit.com/product/1083) |
+| **Stemma QT Cable (100mm)** | #4210 | 1 | $0.95 | [Adafruit](https://www.adafruit.com/product/4210) |
 
-- **Resolution:** 320x480 pixels
-- **Touch:** Resistive (works with gloves)
-- **Interface:** SPI
-- **Size:** 3.5" diagonal (similar to Nextion 3.5")
+**Why needed:** ESP32-S3 Qualia has 2 analog pins available after display. The ADS1015 adds 4 more analog inputs via I2C for thermistors.
 
-**Option 2: 2.8" TFT Shield (Easiest - Plugs Right In)**
+**Specifications:**
+- 4 single-ended or 2 differential inputs
+- 12-bit resolution (0-4095 range)
+- I2C interface (Stemma QT connector)
+- Programmable gain amplifier
 
-| Item | Part Number | Qty | Price | Link |
-|------|-------------|-----|-------|------|
-| **Adafruit 2.8" TFT Touch Shield for Arduino** | 1651 | 1 | $44.95 | [Adafruit](https://www.adafruit.com/product/1651) |
-
-- **Resolution:** 240x320 pixels
-- **Touch:** Resistive
-- **Interface:** SPI
-- **Size:** 2.8" diagonal
-- **Advantage:** Plugs directly onto Arduino Mega (no wiring needed!)
-
-**Option 3: 2.8" TFT Breakout (Compact)**
-
-| Item | Part Number | Qty | Price | Link |
-|------|-------------|-----|-------|------|
-| **Adafruit 2.8" TFT LCD Touchscreen Breakout** | 1770 | 1 | $39.95 | [Adafruit](https://www.adafruit.com/product/1770) |
-
-- **Resolution:** 240x320 pixels
-- **Touch:** Resistive
-- **Interface:** SPI
-- **Size:** 2.8" diagonal
-
-**My Recommendation:** Get the **3.5" (#2050)** for maximum visibility, or the **2.8" Shield (#1651)** for easiest assembly.
+**Core Electronics Subtotal:** ~$86
 
 ---
 
@@ -79,10 +74,12 @@ This is the complete parts list with exact product links, part numbers, and pric
 | Item | Part Number | Qty | Price | Link |
 |------|-------------|-----|-------|------|
 | **12V to 5V DC-DC Buck Converter (3A)** | LM2596 Module | 1 | $8.99 | [Amazon](https://www.amazon.com/dp/B08CDMXGFX) |
-| **Barrel Jack Adapter for Arduino** | 2.1mm Female | 1 | $7.99 | [Amazon](https://www.amazon.com/dp/B07C7KKQWZ) |
-| *Alternative: USB Cable Power* | USB A to B | 1 | $6.99 | [Amazon](https://www.amazon.com/dp/B00P0E3954) |
+| **USB-C Cable (for programming/testing)** | 6ft USB-C | 1 | $7.99 | [Amazon](https://www.amazon.com/dp/B07D7S97JD) |
 
-**Note:** For automotive use, use the buck converter. For bench testing, USB cable works.
+**Note:** 
+- Buck converter provides 5V to ESP32-S3 via USB-C or VIN pin
+- ESP32-S3 has onboard 3.3V regulator for logic
+- For bench testing, USB-C cable to computer works fine
 
 ---
 
@@ -229,92 +226,85 @@ You'll need these for installing sensors in your vehicle:
 
 ---
 
-## 📦 Pre-Made Kit Option
+## 🛠️ Complete Build Cost
 
-**Don't want to source everything separately?**
+### **ESP32-S3 Qualia Build** (Recommended)
 
-I recommend buying the following "starter kits" which include many components:
+| Component Category | Cost |
+|-------------------|------|
+| **Core Electronics:** | |
+| - Qualia ESP32-S3 Board | $39.95 |
+| - 2.1" Round Display | $34.95 |
+| - ADS1015 I2C ADC | $9.95 |
+| - Stemma QT Cable | $0.95 |
+| - Buck Converter | $8.99 |
+| - USB-C Cable | $7.99 |
+| **Sensors:** | |
+| - EGT Sensor + MAX31855 | $39.94 |
+| - 3-Bar MAP Sensor | $18.99 |
+| - NTC Thermistors (3x) | $40.97 |
+| - Piezo Buzzer | $6.99 |
+| **Wiring & Components:** | |
+| - Wire, resistors, caps, etc. | $30.00 |
+| **Enclosure & Hardware:** | |
+| - Enclosure, standoffs, etc. | $30.00 |
+| **SUBTOTAL** | **$269.67** |
+| **Tools** (if needed) | +$100.00 |
+| **TOTAL** | **~$270-370** |
 
-| Kit | Contents | Price | Link |
-|-----|----------|-------|------|
-| **Arduino Mega Starter Kit** | Mega + wires + breadboard + components | $54.99 | [Amazon](https://www.amazon.com/dp/B01EWNUUUA) |
-| **Sensor Kit for Arduino** | Various sensors including thermistors | $34.99 | [Amazon](https://www.amazon.com/dp/B01N79PG4G) |
-
----
-
-## 🛠️ Complete Build Options
-
-### Budget Build (~$240)
-
-- ELEGOO Mega 2560 ($22)
-- Adafruit 2.8" TFT Shield ($45)
-- Budget EGT Kit ($16)
-- 3-Bar MAP Sensor ($19)
-- NTC Thermistors x3 ($40)
-- Wire & Connectors ($30)
-- Enclosure ($17)
-- Buck Converter ($9)
-- Misc Components ($20)
-- **Tools** (if needed) (+$100)
-
-### Recommended Build (~$310)
-
-- Arduino Mega 2560 (genuine) ($49)
-- Adafruit 3.5" TFT Breakout ($55)
-- Quality EGT Sensor + MAX31855 ($40)
-- 3-Bar MAP Sensor ($19)
-- NTC Thermistors x3 ($40)
-- Wire & Connectors ($40)
-- Enclosure ($17)
-- Buck Converter ($9)
-- Misc Components ($30)
-- **Tools** (if needed) (+$100)
+**💡 Comparison:** Arduino Mega setup would be $280-360 before tools, but with:
+- ❌ Slower graphics (5-10 FPS vs 60 FPS)
+- ❌ Less memory (8KB vs 8MB)
+- ❌ Rectangular display vs round
+- ❌ No WiFi/Bluetooth
 
 ---
 
-## 📦 Order Summary
+## 📦 Order Checklist
 
 **Copy this checklist when ordering:**
 
-### Core (Required)
-- [ ] Arduino Mega 2560
-- [ ] TFT Display (choose one: 2.8" shield OR 3.5" breakout)
-- [ ] 12V-5V Buck Converter
-- [ ] microSD Card (if using 3.5" display)
+### Core Electronics (Required)
+- [ ] **Adafruit Qualia ESP32-S3 Board** (#5800)
+- [ ] **2.1" Round RGB Display** (TL021WVC02-B1323B)
+- [ ] **ADS1015 I2C ADC Module** (#1083)
+- [ ] **Stemma QT Cable** (100mm, #4210)
+- [ ] **12V-5V Buck Converter** (3A, LM2596)
+- [ ] **USB-C Cable** (for programming)
 
 ### Sensors (Required)
-- [ ] K-Type Thermocouple + MAX31855
-- [ ] 3-Bar MAP Sensor
-- [ ] NTC Thermistors (2x for IAT)
-- [ ] NTC Thermistor (1x for coolant)
-- [ ] Piezo Buzzer
+- [ ] **K-Type Thermocouple** (M6 or 1/8" NPT thread)
+- [ ] **MAX31855 Module** (Adafruit #269)
+- [ ] **3-Bar MAP Sensor** (0.5-4.5V output)
+- [ ] **NTC Thermistors** (2x for IAT, 2.2kΩ @ 25°C)
+- [ ] **NTC Thermistor** (1x for coolant, 2.2kΩ @ 25°C)
+- [ ] **Piezo Buzzer** (active, 3-5V)
 
-### Wiring (Required)
-- [ ] 22 AWG Wire (multiple colors)
-- [ ] DuPont Jumper Wires (M-M and M-F)
-- [ ] Screw Terminals
-- [ ] Heat Shrink Tubing
-- [ ] Weatherpack Connectors
-- [ ] Inline Fuse Holders + Fuses
+### Wiring & Components (Required)
+- [ ] **22 AWG Wire** (multiple colors)
+- [ ] **DuPont Jumper Wires** (M-M and M-F)
+- [ ] **Screw Terminals** (5mm pitch)
+- [ ] **Heat Shrink Tubing** (assorted sizes)
+- [ ] **Weatherpack Connectors** (automotive)
+- [ ] **2.2kΩ Resistors** (3x for voltage dividers)
+- [ ] **0.1µF Capacitors** (10x for filtering)
+- [ ] **Inline Fuse Holders + 3A Fuses**
 
-### Components (Required)
-- [ ] 2.2kΩ Resistors (3x minimum)
-- [ ] 0.1µF Capacitors (10x)
+### Enclosure & Hardware (Required)
+- [ ] **Project Enclosure** (for ESP32 board)
+- [ ] **M2.5/M3 Standoffs Kit**
+- [ ] **Cable Glands** (waterproof)
 
-### Enclosure (Required)
-- [ ] Arduino Enclosure
-- [ ] M3 Standoffs
-- [ ] Cable Glands
+### Prototyping (Highly Recommended)
+- [ ] **Breadboard** (830-point)
+- [ ] **Breadboard Jumper Wires**
 
-### Prototyping (Recommended)
-- [ ] Breadboard (830-point)
-- [ ] Breadboard Jumper Wires
-
-### Tools (If Needed)
-- [ ] Soldering Iron
-- [ ] Wire Strippers
-- [ ] Multimeter
-- [ ] Crimping Tool
+### Tools (If You Don't Have)
+- [ ] **Soldering Iron Kit** (60W)
+- [ ] **Wire Strippers** (10-22 AWG)
+- [ ] **Multimeter** (digital)
+- [ ] **Crimping Tool** (for connectors)
+- [ ] **Heat Gun** (for heat shrink)
 
 ---
 
@@ -349,22 +339,44 @@ I recommend buying the following "starter kits" which include many components:
 
 **Total Cost Summary:**
 
-| Component | Budget | Recommended |
-|-----------|--------|-------------|
-| Electronics | $67 | $104 |
-| Sensors | $62 | $80 |
-| Wiring | $30 | $40 |
-| Enclosure | $17 | $17 |
-| Components | $20 | $30 |
-| **Subtotal** | **$196** | **$271** |
-| **Tools** (if needed) | **+$100** | **+$100** |
-| **Grand Total** | **$296** | **$371** |
+| Component | ESP32-S3 Build |
+|-----------|---------------|
+| Core Electronics | $103 |
+| Sensors | $107 |
+| Wiring & Components | $35 |
+| Enclosure | $25 |
+| **Subtotal** | **$270** |
+| **Tools** (if needed) | **+$100** |
+| **Grand Total** | **$270-370** |
+
+**💰 Value:** For the same price as Arduino Mega setup, you get:
+- ✅ 10x faster processor
+- ✅ 1000x more RAM
+- ✅ Beautiful round display
+- ✅ 60 FPS smooth graphics
+- ✅ WiFi + Bluetooth built-in
+- ✅ Future expandability
 
 ---
 
-**Ready to order? Check out the wiring diagrams next!**
+## 🚀 Next Steps
 
-See: [BREADBOARD_WIRING.md](BREADBOARD_WIRING.md) for prototyping connections.
+**After ordering:**
+
+1. ✅ **Install Arduino IDE** and ESP32 board support
+   - See: [ESP32_SETUP.md](ESP32_SETUP.md)
+
+2. ✅ **Install SquareLine Studio** for GUI design
+   - See: [SQUARELINE_LVGL_GUIDE.md](SQUARELINE_LVGL_GUIDE.md)
+
+3. ✅ **Build breadboard prototype**
+   - See: [BREADBOARD_WIRING.md](BREADBOARD_WIRING.md)
+
+4. ✅ **Design your GUI** visually
+   - See: [SQUARELINE_LVGL_GUIDE.md](SQUARELINE_LVGL_GUIDE.md)
+
+5. ✅ **Test and calibrate sensors**
+   - See: [CALIBRATION.md](CALIBRATION.md)
 
 ---
 
