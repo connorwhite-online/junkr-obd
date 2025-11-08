@@ -1,18 +1,10 @@
-# Bill of Materials (BOM) - JNKR Gauge System (Legacy)
+# Bill of Materials (BOM) - JNKR Gauge System
 
-> ⚠️ **DEPRECATED**: This is the parts list for the **legacy Arduino Mega** setup.
-> 
-> **Current Platform**: Qualia ESP32-S3 with 2.1" Round RGB Display
-> 
-> **See instead**: [COMPLETE_BOM.md](COMPLETE_BOM.md) for current parts list.
->
-> This document is kept for reference only.
+**Complete parts list with part numbers, specifications, and suppliers**
 
----
+This document lists every component needed to build the JNKR Gauge System with Qualia ESP32-S3, including electronics, hardware, and consumables. All prices are approximate in USD as of 2025.
 
-**Complete parts list with part numbers, specifications, and suppliers (Legacy Arduino Mega)**
-
-This document lists every component needed to build the legacy Arduino Mega version of the JNKR Gauge System, including electronics, hardware, and consumables. All prices are approximate in USD as of 2025.
+> **Note**: For complete parts list with exact links, see [COMPLETE_BOM.md](COMPLETE_BOM.md)
 
 ---
 

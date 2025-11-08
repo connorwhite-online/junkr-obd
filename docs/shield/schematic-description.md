@@ -1,16 +1,8 @@
-# JNKR Gauge Shield - Schematic Description (Legacy)
+# JNKR Gauge - Circuit Design Notes
 
-> ⚠️ **DEPRECATED**: This is for the **legacy Arduino Mega** shield.
-> 
-> **Current Platform**: Qualia ESP32-S3 with integrated display connector
-> 
-> This document is kept for reference only.
+**Circuit Design and Component Specifications**
 
----
-
-**Circuit Design and Component Specifications (Legacy Arduino Mega Shield)**
-
-This document describes the electrical schematic for the legacy Arduino Mega JNKR Gauge Shield PCB. The actual schematic diagrams would be created using electronic design software (KiCad, Eagle, Altium, etc.) and exported as PDFs.
+This document contains circuit design notes for sensor interfaces and signal conditioning used in the JNKR Gauge System. These principles apply whether you're building on breadboard or designing a custom PCB.
 
 ---
 

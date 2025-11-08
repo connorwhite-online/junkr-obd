@@ -1,18 +1,8 @@
-# Assembly & Installation Guide - JNKR Gauge System (Legacy)
+# Assembly & Installation Guide - JNKR Gauge System
 
-> ⚠️ **DEPRECATED**: This guide is for the **legacy Arduino Mega** setup.
-> 
-> **Current Platform**: Qualia ESP32-S3 with 2.1" Round RGB Display
-> 
-> **See instead**: [BREADBOARD_WIRING.md](BREADBOARD_WIRING.md) and [ESP32_SETUP.md](ESP32_SETUP.md) for current assembly.
->
-> This document is kept for reference only.
+**Step-by-Step Instructions from Parts to Running System**
 
----
-
-**Step-by-Step Instructions from Parts to Running System (Legacy Arduino Mega)**
-
-This guide walks you through the complete assembly and installation process for the legacy Arduino Mega version, from building the enclosure to mounting sensors in your vehicle.
+This guide walks you through the complete assembly and installation process for the Qualia ESP32-S3 based JNKR Gauge System, from building the enclosure to mounting sensors in your vehicle.
 
 ---
 

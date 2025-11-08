@@ -6,20 +6,10 @@
  * and dual intake air temps (pre & post intercooler)
  * with audio alerts for dangerous thresholds
  * 
- * ⚠️ PLATFORM MIGRATION IN PROGRESS ⚠️
+ * Hardware: Qualia ESP32-S3 (Adafruit #5800)
+ * Display: 2.1" Round RGB Display (480x480) with LVGL
  * 
- * LEGACY CODE: This configuration is for Arduino Mega 2560 + Nextion display.
- * 
- * CURRENT TARGET: Qualia ESP32-S3 + 2.1" Round RGB Display (480x480) with LVGL
- * 
- * This code will be updated to support ESP32-S3 platform:
- * - Pin assignments will change (ESP32 GPIO vs Arduino pins)
- * - Display code will use LVGL instead of Nextion
- * - RGB-666 parallel interface replaces serial Nextion protocol
- * - I2C ADC (ADS1015) will be added for extra analog inputs
- * - PCA9554 I/O expander will be used for buzzer/SPI
- * 
- * See: docs/ESP32_SETUP.md and docs/BREADBOARD_WIRING.md for new platform
+ * See: docs/ESP32_SETUP.md and docs/BREADBOARD_WIRING.md for wiring
  */
 
 #ifndef CONFIG_H

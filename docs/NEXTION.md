@@ -1,18 +1,10 @@
-# Nextion Display Design Guide
+# Display Design with SquareLine Studio & LVGL
 
-> ⚠️ **DEPRECATED**: This guide is for the **legacy Arduino Mega + Nextion** setup.
-> 
-> **Current Platform**: Qualia ESP32-S3 with 2.1" Round RGB Display using LVGL
-> 
-> **See instead**: [SQUARELINE_LVGL_GUIDE.md](SQUARELINE_LVGL_GUIDE.md) for the modern display system.
->
-> This document is kept for reference only.
+**Creating Custom Display Interfaces for JNKR Gauge System**
 
----
+This guide explains how to design and customize the display interface for your JNKR Gauge System using SquareLine Studio and LVGL on the Qualia ESP32-S3 with 2.1" Round RGB Display.
 
-**Creating Custom Display Interfaces for JNKR Gauge System (Legacy)**
-
-This guide explains how to design and customize the Nextion HMI touchscreen display for the legacy Arduino Mega version of the JNKR Gauge System. Whether you want to modify the existing design or create something completely custom, this guide covers everything you need to know.
+> **Note**: For the complete SquareLine Studio guide, see [SQUARELINE_LVGL_GUIDE.md](SQUARELINE_LVGL_GUIDE.md)
 
 ---
 

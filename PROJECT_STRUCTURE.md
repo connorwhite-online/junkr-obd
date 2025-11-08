@@ -2,12 +2,9 @@
 
 **Complete Repository Layout and File Guide**
 
-> 📢 **Platform Update**: This project now uses **Qualia ESP32-S3** + **2.1" Round RGB Display**
-> 
-> Some documentation marked as "Legacy" refers to the previous Arduino Mega platform.
-> See [MIGRATION_SUMMARY.md](MIGRATION_SUMMARY.md) for details.
-
 This document explains the organization of the JNKR Gauge System repository and describes each file's purpose.
+
+**Platform**: Qualia ESP32-S3 + 2.1" Round RGB Display (480x480)
 
 ---
 
@@ -33,24 +30,20 @@ jnkr-gauge/
 ├── alerts.cpp                   ← Alert system implementation
 │
 └── docs/                        ← Documentation folder
-    │
-    ├── ⭐ CURRENT PLATFORM DOCS (ESP32-S3):
-    ├── COMPLETE_BOM.md          ← ⭐ Parts list for ESP32-S3 build
+    ├── COMPLETE_BOM.md          ← ⭐ Complete parts list with links
     ├── ESP32_SETUP.md           ← ⭐ Arduino IDE setup for ESP32-S3
-    ├── BREADBOARD_WIRING.md     ← ⭐ Wiring guide for ESP32-S3
+    ├── BREADBOARD_WIRING.md     ← ⭐ Wiring guide for prototyping
     ├── SQUARELINE_LVGL_GUIDE.md ← ⭐ GUI design with LVGL
-    ├── CALIBRATION.md           ← Sensor calibration (platform-agnostic)
+    ├── CALIBRATION.md           ← Sensor calibration procedures
+    ├── WIRING.md                ← Detailed wiring guide
+    ├── ASSEMBLY.md              ← Assembly instructions
+    ├── BOM.md                   ← Bill of materials
+    ├── NEXTION.md               ← Display design notes
+    ├── SHIELD.md                ← PCB design notes
+    ├── PCB_SCHEMATIC.md         ← PCB schematic reference
     │
-    ├── 📦 LEGACY DOCS (Arduino Mega - Reference Only):
-    ├── BOM.md                   ← [Legacy] Arduino Mega parts list
-    ├── WIRING.md                ← [Legacy] Arduino Mega wiring
-    ├── ASSEMBLY.md              ← [Legacy] Arduino Mega assembly
-    ├── NEXTION.md               ← [Legacy] Nextion display guide
-    ├── SHIELD.md                ← [Legacy] Arduino shield design
-    ├── PCB_SCHEMATIC.md         ← [Legacy] Arduino shield PCB
-    │
-    └── shield/                  ← [Legacy] Shield design files
-        └── schematic-description.md  ← [Legacy] Circuit explanations
+    └── shield/                  ← Circuit design files
+        └── schematic-description.md  ← Circuit design notes
 ```
 
 ---
@@ -545,5 +538,5 @@ This project is maintained by the community. Contributions, feedback, and succes
 ---
 
 **Last Updated:** 2025-11-08  
-**Project Version:** 2.0.0 (ESP32-S3)  
-**Previous Version:** 1.0.0 (Arduino Mega - Legacy)
+**Project Version:** 2.0.0  
+**Platform:** Qualia ESP32-S3
