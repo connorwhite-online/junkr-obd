@@ -64,22 +64,35 @@ Right now, you need to run **multiple individual wires** through the firewall:
 
 The module contains **active components** (ADS1115 and MCP9600 chips) that require power:
 - **Power needed**: 5V @ 15-20mA (very low!)
-- **Source**: Buck converter that also powers ESP32 and display
+- **Source**: Same buck converter that powers ESP32 and display (NOT powered by ESP32!)
 
-**Recommended Setup:**
+**Power Flow - All Three Devices in Parallel:**
 
 ```
 Vehicle 12V (switched) ──→ Cigarette lighter tap or fuse box
         ↓
    [3A Fuse]
         ↓
-   Buck Converter (in cabin) ──→ 5V output
+   Buck Converter (in cabin)
+        ↓
+   5V Output (ONE source for all devices)
         │
-        ├──→ ESP32-S3
-        ├──→ Display  
-        └──→ 4-wire harness to engine bay I2C module
-            (5V, GND, SCL, SDA)
+        ├──→ ESP32-S3 (150-300mA)
+        │
+        ├──→ Display (200-400mA)
+        │
+        └──→ 4-wire harness to engine bay I2C module (15-20mA)
+             (5V, GND, SCL, SDA)
+
+Total Current: 365-720mA @ 5V
 ```
+
+**Key Points:**
+- ✅ ONE buck converter powers everything
+- ✅ All devices connected in parallel (not series)
+- ✅ ESP32 does NOT power the I2C module
+- ✅ All three devices see the same 5V simultaneously
+- ✅ Buck converter needs 1A minimum output (3A recommended)
 
 **Key Points:**
 - ✅ Use **switched 12V** (turns on/off with ignition)

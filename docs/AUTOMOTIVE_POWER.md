@@ -985,6 +985,51 @@ Vehicle 12V (switched) ──[3A Fuse]── Buck Converter in engine bay
 4. Don't need weatherproof buck converter enclosure
 5. Can adjust voltage easily if needed
 
+**How Power Distribution Works:**
+
+ONE buck converter powers ALL devices in parallel:
+
+```
+                    Buck Converter (in cabin)
+                           ↓
+                      5V Output
+                           │
+         ┌─────────────────┼─────────────────┐
+         ↓                 ↓                  ↓
+    ESP32-S3          Display          I2C Module
+    150-300mA         200-400mA        15-20mA
+                                       (in engine bay)
+```
+
+**Important**: 
+- ❌ ESP32 does NOT power the I2C module
+- ❌ They don't have separate buck converters
+- ✅ ONE buck converter powers all three in parallel
+- ✅ Buck converter must supply TOTAL current (365-720mA @ 5V)
+
+**Physical Wiring in Cabin:**
+
+You'll need to split the buck converter's 5V output three ways:
+
+**Method 1: Terminal Block (Recommended)**
+```
+Buck Converter
+    ↓
+Terminal Block (5V and GND rails)
+    ├─→ ESP32 (red + black wires)
+    ├─→ Display (red + black wires)
+    └─→ 4-wire harness to engine bay
+```
+
+**Method 2: Splice Connectors**
+```
+Buck Converter Output
+    ↓
+Use crimp splice connectors or solder to split:
+    - 5V wire into 3 branches
+    - GND wire into 3 branches
+```
+
 **Wire Requirements for 5V to Engine Bay:**
 - **Distance**: 6-10 feet typical (cabin to engine bay)
 - **Current**: 15-20 mA (very low!)
