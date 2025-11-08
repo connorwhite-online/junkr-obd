@@ -4,6 +4,8 @@
 
 This guide provides step-by-step instructions for wiring the JNKR Gauge System with the Qualia ESP32-S3. Even if you're new to electronics, this guide will walk you through every connection with detailed explanations.
 
+> **Important**: Before starting, read [AUTOMOTIVE_POWER.md](AUTOMOTIVE_POWER.md) to understand how to power your gauge from the vehicle!
+
 > **Note**: For breadboard prototyping, see [BREADBOARD_WIRING.md](BREADBOARD_WIRING.md)
 
 ---
@@ -113,6 +115,13 @@ Resistance restricts current flow. We use resistors to create voltage dividers.
 
 ## 🔋 Power Supply Wiring
 
+> **📖 FIRST**: Read [AUTOMOTIVE_POWER.md](AUTOMOTIVE_POWER.md) for complete details on:
+> - Where to tap 12V power in your vehicle
+> - Switched vs constant power (and why it matters)
+> - Proper grounding techniques
+> - Fuse selection and placement
+> - Toyota 1KZTE-specific guidance
+
 ### Step 1: Understanding Power Flow
 
 ```
@@ -159,13 +168,14 @@ The buck converter steps down 12V vehicle power to 5V for the Arduino and sensor
 
 ### Step 3: Vehicle 12V Connection
 
-**Finding Switched 12V:**
+> **⚠️ Critical**: See [AUTOMOTIVE_POWER.md](AUTOMOTIVE_POWER.md) for detailed instructions!
 
-1. Locate your vehicle's fuse box (usually under dashboard)
-2. Use multimeter to find a switched circuit:
-   - Test voltage with ignition OFF (should read 0V)
-   - Test voltage with ignition ON (should read 12-14V)
-3. Good sources: Accessory circuit, radio circuit, cigarette lighter
+**Quick Summary for 1KZTE:**
+
+1. **Power Source**: Interior fuse box, radio/accessory circuit (15A fuse)
+2. **Method**: Add-A-Circuit fuse tap with 3A fuse
+3. **Wire**: 20 AWG red (+12V) and black (GND)
+4. **Ground**: Chassis ground bolt near fuse box (clean bare metal)
 
 **Connection Method:**
 
@@ -181,15 +191,13 @@ Vehicle Fuse Box
             └── Black wire (20 AWG) ──→ Buck Converter 12V-
 ```
 
-**Installation Steps:**
+**Why Switched Power?**
+- ✅ Turns on/off with ignition automatically
+- ✅ No battery drain when vehicle is off
+- ✅ No separate power switch needed
+- ✅ Professional installation
 
-1. Remove existing fuse from chosen circuit
-2. Insert Add-a-circuit fuse tap
-3. Install original fuse in lower position
-4. Install 3A fuse in upper position (for gauge system)
-5. Connect red wire to fuse tap wire
-6. Route wire to gauge enclosure
-7. Connect black wire to nearest chassis ground bolt
+For complete step-by-step with photos and troubleshooting, see [AUTOMOTIVE_POWER.md](AUTOMOTIVE_POWER.md).
 
 ### Step 4: Arduino Power
 
