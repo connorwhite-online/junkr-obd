@@ -65,13 +65,15 @@ A comprehensive, Arduino-based engine monitoring system that displays critical p
 | Component | Part Number | Quantity | Purpose |
 |-----------|-------------|----------|---------|
 | Arduino Mega 2560 | ATmega2560 | 1 | Main controller |
-| Nextion Display | NX4832T035 | 1 | 3.5" touchscreen HMI (remotely mounted) |
+| TFT Display | Adafruit 2.8-3.5" | 1 | Color touchscreen (with LVGL support) |
 | MAX31855 Module | MAX31855 | 1 | K-type thermocouple amplifier |
 | K-Type Thermocouple | M6 thread | 1 | EGT sensor (0-1000°C) |
 | MAP Sensor | 0-3 bar | 1 | Boost pressure sensor |
 | NTC Thermistors | 2.2kΩ @ 25°C | 3 | Temperature sensors (2x IAT, 1x coolant) |
 | Piezo Buzzer | 2kHz active | 1 | Audio alerts |
 | Enclosure | IP65 rated | 1 | Arduino enclosure (display mounted remotely) |
+
+**Display Options:** See [SquareLine + LVGL Guide](docs/SQUARELINE_LVGL_GUIDE.md) for Mac-compatible visual GUI design, or [Nextion Guide](docs/NEXTION.md) for Windows-based design.
 
 ### Supporting Components
 
@@ -101,7 +103,7 @@ A comprehensive, Arduino-based engine monitoring system that displays critical p
          │                              ├─ ADC ──→ NTC (IAT Post-IC)
          │                              ├─ ADC ──→ NTC (Coolant)
          │                              ├─ PWM ──→ Buzzer (Alerts)
-         │                              └─ UART ─→ Nextion Display (remotely mounted)
+         │                              └─ SPI/UART ─→ TFT Display (LVGL/Nextion)
          │
 ```
 
@@ -405,7 +407,9 @@ For a professional, plug-and-play solution, we've designed a custom Arduino Mega
 - [Bill of Materials](docs/BOM.md) - Complete parts list with suppliers
 - [Shield Guide](docs/SHIELD.md) - PCB shield assembly and ordering
 - [Calibration Guide](docs/CALIBRATION.md) - Sensor calibration procedures
-- [Nextion HMI Guide](docs/NEXTION.md) - Display design and customization
+- **[SquareLine + LVGL Guide](docs/SQUARELINE_LVGL_GUIDE.md) - Mac-compatible visual GUI design** ⭐ Recommended for Mac users
+- [Nextion HMI Guide](docs/NEXTION.md) - Display design and customization (Windows)
+- [Adafruit TFT Migration Guide](docs/ADAFRUIT_TFT_MIGRATION.md) - Comparison of display options
 
 ---
 
