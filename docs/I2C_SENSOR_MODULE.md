@@ -56,6 +56,57 @@ Right now, you need to run **multiple individual wires** through the firewall:
 
 ## 🔧 Recommended Implementation
 
+### Power Source for I2C Module
+
+> **📖 IMPORTANT**: See [AUTOMOTIVE_POWER.md](AUTOMOTIVE_POWER.md) for complete vehicle power integration guide!
+
+**The I2C module needs 5V power - where does it come from?**
+
+The module contains **active components** (ADS1115 and MCP9600 chips) that require power:
+- **Power needed**: 5V @ 15-20mA (very low!)
+- **Source**: Same buck converter that powers ESP32 and display (NOT powered by ESP32!)
+
+**Power Flow - Two Power Connections:**
+
+```
+Vehicle 12V (switched) ──→ Cigarette lighter tap or fuse box
+        ↓
+   [3A Fuse]
+        ↓
+   Buck Converter (in cabin)
+        ↓
+   5V Output (ONE source for system)
+        │
+        ├──→ ESP32-S3 board (350-700mA)
+        │       │
+        │       └──→ Display (powered via 40-pin ribbon cable)
+        │
+        └──→ 4-wire harness to engine bay I2C module (15-20mA)
+             (5V, GND, SCL, SDA)
+
+Total Current: 365-720mA @ 5V
+```
+
+**Key Points:**
+- ✅ ONE buck converter powers entire system
+- ✅ Display is powered BY the ESP32 board (via ribbon cable)
+- ✅ Only TWO power connections needed from buck converter
+- ✅ ESP32 does NOT power the I2C module (separate connection)
+- ✅ Buck converter needs 1A minimum output (3A recommended)
+
+**Key Points:**
+- ✅ Use **switched 12V** (turns on/off with ignition)
+- ✅ Buck converter in cabin (protected from weather)
+- ✅ Only 4 wires through firewall
+- ✅ I2C module draws <20mA (negligible)
+- ✅ Total system: <1A @ 12V
+
+See [AUTOMOTIVE_POWER.md](AUTOMOTIVE_POWER.md) for:
+- Where to tap 12V in your vehicle
+- Cigarette lighter splice method (easiest!)
+- Fuse box Add-A-Circuit method
+- Grounding best practices
+
 ### Option 1: Pre-Built Modules (Easiest)
 
 **Hardware Required:**
@@ -70,7 +121,7 @@ Right now, you need to run **multiple individual wires** through the firewall:
 | Protoboard | Perforated PCB for mounting | 1 | $3-5 | Amazon |
 | Wire & Connectors | Automotive wire, heat shrink | - | $10-15 | Amazon |
 
-**Total Cost: ~$57-86**
+**Total Cost: ~$57-86** (plus buck converter and power wiring - see AUTOMOTIVE_POWER.md)
 
 ### Option 2: Custom PCB (Most Professional)
 

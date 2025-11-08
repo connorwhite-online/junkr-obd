@@ -291,7 +291,7 @@ All sensors connect to a module in the engine bay. Single 4-wire harness with on
    - **Coolant**: Use existing coolant temp sensor port or T-adapter
 
 4. **Power Connection**
-   - Connect to switched 12V (ignition)
+   - Connect to switched 12V (ignition) - **See [AUTOMOTIVE_POWER.md](docs/AUTOMOTIVE_POWER.md)**
    - Use 3A fuse for protection
    - Connect ground to chassis
 
@@ -513,6 +513,7 @@ For a professional, plug-and-play solution, we've designed a custom Arduino Mega
 - [Nextion HMI Guide](docs/NEXTION.md) - Alternative display option (Windows only)
 
 ### Additional Guides
+- **[Automotive Power Guide](docs/AUTOMOTIVE_POWER.md) - How to power from vehicle** ⭐ **Essential!**
 - [Complete Wiring Guide](docs/WIRING.md) - Detailed automotive connections (traditional)
 - [Assembly Guide](docs/ASSEMBLY.md) - Step-by-step build instructions
 - [Shield Guide](docs/SHIELD.md) - PCB shield assembly and ordering
