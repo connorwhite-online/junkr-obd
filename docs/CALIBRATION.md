@@ -8,6 +8,7 @@ This guide explains how to calibrate each sensor for maximum accuracy. While the
 
 ## 📋 Table of Contents
 
+- [Quick Start: Using calibration.h](#quick-start-using-calibrationh)
 - [When to Calibrate](#when-to-calibrate)
 - [Required Tools](#required-tools)
 - [Temperature Sensor Calibration](#temperature-sensor-calibration)
@@ -15,6 +16,29 @@ This guide explains how to calibrate each sensor for maximum accuracy. While the
 - [Battery Voltage Calibration](#battery-voltage-calibration)
 - [EGT Calibration](#egt-calibration)
 - [Saving Calibration](#saving-calibration)
+
+---
+
+## 🚀 Quick Start: Using calibration.h
+
+**NEW:** A dedicated calibration file has been added to simplify sensor calibration!
+
+The `calibration.h` file in the project root contains:
+- ✅ All sensor calibration values in one place
+- ✅ Reference data for popular OEM sensors (GM, Ford, Cummins, CAT, AEM, Bosch)
+- ✅ Complete instructions and resistance tables
+- ✅ Temperature offset values
+
+**Quick Setup:**
+
+1. **Order sensors** - See [BOM.md](BOM.md) for heavy-duty automotive sensor recommendations
+2. **Measure resistance** - Use a multimeter at room temperature (~25°C)
+3. **Identify sensor type** - Compare to reference data in `calibration.h`
+4. **Update values** - Edit `calibration.h` with your sensor specifications
+5. **Upload code** - Flash updated firmware to your device
+6. **Test and tune** - Fine-tune offset values using ice water test
+
+**Important:** See [AUTOMOTIVE_SENSORS.md](AUTOMOTIVE_SENSORS.md) for guidance on selecting heavy-duty sensors vs. hobbyist sensors.
 
 ---
 
@@ -359,7 +383,44 @@ float Sensors_GetExhaustTemp() {
 
 ## 💾 Saving Calibration
 
-### Option 1: Hard-Code in Setup
+### ⭐ RECOMMENDED: Use `calibration.h` Configuration File
+
+**The easiest method - all calibration values in one place!**
+
+A dedicated `calibration.h` file has been created in the project root for easy sensor calibration. This file contains:
+- Thermistor specifications (nominal resistance, Beta coefficient)
+- Reference resistor values
+- Temperature offsets
+- MAP sensor calibration values
+- Reference data for common OEM sensors (GM, Ford, Cummins, CAT, Bosch, AEM)
+
+**To use:**
+
+1. **Measure your sensor resistance** at room temperature (25°C recommended)
+2. **Open `calibration.h`** in your editor
+3. **Update the values** for your specific sensors:
+
+```cpp
+// Example: If your IAT sensor measures 2450Ω at 25°C (GM sensor)
+#define IAT_PRE_THERMISTOR_NOMINAL_R    2450.0   // Was 2252.0
+#define IAT_PRE_THERMISTOR_BETA         3500     // GM Beta coefficient
+#define IAT_PRE_REF_RESISTOR            2200.0   // Your reference resistor
+#define IAT_PRE_OFFSET                  -1.5     // Fine-tune offset after testing
+```
+
+4. **Upload the code** to your Arduino/ESP32
+5. **Test and fine-tune** the offset values if needed
+
+**Benefits:**
+- ✅ All calibration values in one file (easy to find)
+- ✅ Includes reference data for popular OEM sensors
+- ✅ Well-documented with instructions
+- ✅ No need to dig through config.h or setup code
+- ✅ Separate from hardware configuration
+
+**Note:** The code will be updated in a future version to automatically load values from `calibration.h`.
+
+### Option 1: Hard-Code in Setup (Current Method)
 
 Simplest method - offsets applied every boot:
 
@@ -368,28 +429,31 @@ void setup() {
   // ...
   Sensors_Init();
   
-  // Your calibration values
-  Sensors_SetIATOffset(-2.5);
-  Sensors_SetBoostOffset(0.05);
+  // Your calibration values (apply after measuring sensors)
+  Sensors_SetIATPreOffset(-2.5);   // IAT Pre-IC reads 2.5°C high
+  Sensors_SetIATPostOffset(-1.8);  // IAT Post-IC reads 1.8°C high
+  Sensors_SetBoostOffset(0.05);    // Boost reads 0.05 bar low
   
   // ...
 }
 ```
 
-### Option 2: Store in Config File
+### Option 2: Store in Config File (Legacy)
 
 For easy modification without uploading:
 
 In `config.h`, add:
 ```cpp
 // Calibration offsets
-#define IAT_CALIBRATION_OFFSET    -2.5
-#define BOOST_CALIBRATION_OFFSET   0.05
+#define IAT_PRE_CALIBRATION_OFFSET     -2.5
+#define IAT_POST_CALIBRATION_OFFSET    -1.8
+#define BOOST_CALIBRATION_OFFSET        0.05
 ```
 
 Then in `setup()`:
 ```cpp
-Sensors_SetIATOffset(IAT_CALIBRATION_OFFSET);
+Sensors_SetIATPreOffset(IAT_PRE_CALIBRATION_OFFSET);
+Sensors_SetIATPostOffset(IAT_POST_CALIBRATION_OFFSET);
 Sensors_SetBoostOffset(BOOST_CALIBRATION_OFFSET);
 ```
 
