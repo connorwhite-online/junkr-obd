@@ -73,8 +73,8 @@ This is the complete parts list with exact product links, part numbers, and pric
 
 | Item | Part Number | Qty | Price | Link |
 |------|-------------|-----|-------|------|
-| **12V to 5V DC-DC Buck Converter (3A)** | LM2596 Module | 1 | $8.99 | [Amazon](https://www.amazon.com/dp/B08CDMXGFX) |
-| **USB-C Cable (for programming/testing)** | 6ft USB-C | 1 | $7.99 | [Amazon](https://www.amazon.com/dp/B07D7S97JD) |
+| **12V to 5V DC-DC Buck Converter (3A)** | LM2596 Module | 1 | $8.99 | Search: "LM2596 DC-DC Buck Converter 12V to 5V 3A" |
+| **USB-C Cable (for programming/testing)** | 6ft USB-C | 1 | $7.99 | Search: "USB C Cable 6 feet USB 2.0" |
 
 **Note:** 
 - Buck converter provides 5V to ESP32-S3 via USB-C or VIN pin
@@ -89,10 +89,10 @@ This is the complete parts list with exact product links, part numbers, and pric
 
 | Item | Specs | Qty | Price | Link |
 |------|-------|-----|-------|------|
-| **K-Type Thermocouple (EGT)** | M6 x 1.0 Thread, 0-1000°C | 1 | $24.99 | [Amazon](https://www.amazon.com/dp/B07QGQND5V) |
+| **K-Type Thermocouple (EGT)** | M6 x 1.0 Thread, 0-1000°C | 1 | $24.99 | Search: "K-Type Thermocouple EGT M6 x 1.0 thread 1000C exhaust gas temperature sensor" |
 | **MAX31855 Thermocouple Amplifier** | SPI Interface, K-Type | 1 | $14.95 | [Adafruit #269](https://www.adafruit.com/product/269) |
-| **NTC Thermistor (Intake Air Temp)** | 2.2kΩ @ 25°C, M8 Sensor | 2 | $12.99/ea | [Amazon](https://www.amazon.com/dp/B07PFYXZWG) |
-| **NTC Thermistor (Coolant Temp)** | 2.2kΩ @ 25°C, 1/8" NPT | 1 | $14.99 | [Amazon](https://www.amazon.com/dp/B07L3QNWRJ) |
+| **NTC Thermistor (Intake Air Temp)** | 2.2kΩ @ 25°C, M8 Sensor | 2 | $12.99/ea | Search: "M8 NTC Thermistor Temperature Sensor 2.2K ohm 25C automotive" |
+| **NTC Thermistor (Coolant Temp)** | 2.2kΩ @ 25°C, 1/8" NPT | 1 | $14.99 | Search: "1/8 NPT NTC Thermistor Temperature Sensor 2.2K ohm coolant" |
 
 **EGT Sensor Details:**
 - **Probe Length:** 50-100mm (choose based on exhaust pipe size)
@@ -102,7 +102,7 @@ This is the complete parts list with exact product links, part numbers, and pric
 **Alternative Budget EGT:**
 | Item | Specs | Qty | Price | Link |
 |------|-------|-----|-------|------|
-| **EGT Sensor Kit (Thermocouple + Amplifier)** | Complete Kit | 1 | $15.99 | [Amazon](https://www.amazon.com/dp/B07ZPBTMM4) |
+| **EGT Sensor Kit (Thermocouple + Amplifier)** | Complete Kit | 1 | $15.99 | Search: "K-Type Thermocouple EGT Kit MAX6675 MAX31855 exhaust gas temperature module" |
 
 ---
 
@@ -110,7 +110,7 @@ This is the complete parts list with exact product links, part numbers, and pric
 
 | Item | Specs | Qty | Price | Link |
 |------|-------|-----|-------|------|
-| **3-Bar MAP Sensor** | 0-3 bar absolute, 0.5-4.5V output | 1 | $18.99 | [Amazon](https://www.amazon.com/dp/B07DWGRYXW) |
+| **3-Bar MAP Sensor** | 0-3 bar absolute, 0.5-4.5V output | 1 | $18.99 | Search: "3 Bar MAP Sensor 0.5-4.5V output manifold absolute pressure 1/8 NPT automotive" |
 
 **Specifications:**
 - **Range:** 0-3 bar absolute (0-29 PSI gauge)
@@ -124,7 +124,7 @@ This is the complete parts list with exact product links, part numbers, and pric
 
 | Item | Specs | Qty | Price | Link |
 |------|-------|-----|-------|------|
-| **Piezo Buzzer** | Active, 3-5V, 2kHz | 1 | $6.99 (5-pack) | [Amazon](https://www.amazon.com/dp/B07DBYF4ND) |
+| **Piezo Buzzer** | Active, 3-5V, 2kHz | 1 | $6.99 (5-pack) | Search: "Active Piezo Buzzer 5V 2kHz Arduino electronic alarm beeper" |
 
 ---
 
@@ -134,27 +134,27 @@ This is the complete parts list with exact product links, part numbers, and pric
 
 | Item | Specs | Qty | Price | Link |
 |------|-------|-----|-------|------|
-| **22 AWG Stranded Wire Spool** | 6 colors, 25ft each | 1 | $15.99 | [Amazon](https://www.amazon.com/dp/B01LH1FUE8) |
-| **20 AWG Automotive Wire** | For power, 25ft | 1 | $9.99 | [Amazon](https://www.amazon.com/dp/B071D6JQM3) |
+| **22 AWG Stranded Wire Spool** | 6 colors, 25ft each | 1 | $15.99 | Search: "22 AWG Stranded Hook Up Wire Kit 6 colors 25ft silicone flexible" |
+| **20 AWG Automotive Wire** | For power, 25ft | 1 | $9.99 | Search: "20 AWG Automotive Primary Wire stranded copper 25 feet" |
 
 ### Connectors & Hardware
 
 | Item | Specs | Qty | Price | Link |
 |------|-------|-----|-------|------|
-| **Screw Terminal Blocks** | 5mm pitch, 2-12 pos | 1 set | $11.99 | [Amazon](https://www.amazon.com/dp/B07C7VTLFH) |
-| **DuPont Jumper Wires** | Male-Male, 40-pin | 1 | $6.99 | [Amazon](https://www.amazon.com/dp/B01EV70C78) |
-| **DuPont Jumper Wires** | Male-Female, 40-pin | 1 | $6.99 | [Amazon](https://www.amazon.com/dp/B01EV70C78) |
-| **Heat Shrink Tubing Kit** | Assorted sizes | 1 | $8.99 | [Amazon](https://www.amazon.com/dp/B084GDLSCK) |
-| **Weatherpack Connectors** | 2/3/4-pin automotive | 1 kit | $16.99 | [Amazon](https://www.amazon.com/dp/B07PPLGZ6D) |
-| **Inline Fuse Holder** | ATC/ATO blade fuse | 2 | $8.99 | [Amazon](https://www.amazon.com/dp/B07L3QNWRJ) |
-| **3A Blade Fuses** | ATC, 10-pack | 1 | $5.99 | [Amazon](https://www.amazon.com/dp/B07L9QXJJ4) |
+| **Screw Terminal Blocks** | 5mm pitch, 2-12 pos | 1 set | $11.99 | Search: "5mm Pitch Screw Terminal Block Connector 2-12 position PCB mount" |
+| **DuPont Jumper Wires** | Male-Male, 40-pin | 1 | $6.99 | Search: "DuPont Jumper Wire Male to Male 40pin 20cm breadboard cables" |
+| **DuPont Jumper Wires** | Male-Female, 40-pin | 1 | $6.99 | Search: "DuPont Jumper Wire Male to Female 40pin 20cm Arduino cables" |
+| **Heat Shrink Tubing Kit** | Assorted sizes | 1 | $8.99 | Search: "Heat Shrink Tubing Kit Assorted Sizes Wire Wrap 2:1 ratio" |
+| **Weatherpack Connectors** | 2/3/4-pin automotive | 1 kit | $16.99 | Search: "Weatherpack Connector Kit 2 3 4 pin automotive waterproof sealed" |
+| **Inline Fuse Holder** | ATC/ATO blade fuse | 2 | $8.99 | Search: "Inline ATC ATO Blade Fuse Holder 12V 14 AWG automotive waterproof" |
+| **3A Blade Fuses** | ATC, 10-pack | 1 | $5.99 | Search: "ATC 3 Amp Blade Fuses Automotive 10 pack standard" |
 
 ### Prototyping Supplies
 
 | Item | Specs | Qty | Price | Link |
 |------|-------|-----|-------|------|
-| **Breadboard (830-point)** | For prototyping | 1 | $6.99 | [Amazon](https://www.amazon.com/dp/B082KBF7MM) |
-| **Breadboard Jumper Wire Kit** | Pre-cut wires | 1 | $6.99 | [Amazon](https://www.amazon.com/dp/B01EV70C78) |
+| **Breadboard (830-point)** | For prototyping | 1 | $6.99 | Search: "830 Point Solderless Breadboard MB-102 Prototyping" |
+| **Breadboard Jumper Wire Kit** | Pre-cut wires | 1 | $6.99 | Search: "Breadboard Jumper Wire Kit Pre-cut Pre-formed Arduino" |
 
 ---
 
@@ -164,10 +164,10 @@ This is the complete parts list with exact product links, part numbers, and pric
 
 | Item | Specs | Qty | Price | Link |
 |------|-------|-----|-------|------|
-| **Resistor Kit** | 1/4W, assorted values | 1 | $10.99 | [Amazon](https://www.amazon.com/dp/B08FD1XVL6) |
+| **Resistor Kit** | 1/4W, assorted values | 1 | $10.99 | Search: "Resistor Kit 1/4W Assorted Values 1 ohm - 1M ohm Carbon Film 600pcs" |
 | **2.2kΩ Resistors** | 1/4W (for NTC dividers) | 10 | Included in kit above |
 | **10kΩ Resistors** | 1/4W (pull-ups) | 10 | Included in kit above |
-| **Ceramic Capacitors (0.1µF)** | 50V, power filtering | 10 | $5.99 (100-pack) | [Amazon](https://www.amazon.com/dp/B07PBQXQNQ) |
+| **Ceramic Capacitors (0.1µF)** | 50V, power filtering | 10 | $5.99 (100-pack) | Search: "Ceramic Capacitor 0.1uF 104 50V 100 pieces multilayer MLCC" |
 
 ---
 
@@ -177,16 +177,16 @@ This is the complete parts list with exact product links, part numbers, and pric
 
 | Item | Specs | Qty | Price | Link |
 |------|-------|-----|-------|------|
-| **Arduino Mega Enclosure** | IP65 rated, clear lid | 1 | $16.99 | [Amazon](https://www.amazon.com/dp/B07WJM2YCM) |
+| **Arduino Mega Enclosure** | IP65 rated, clear lid | 1 | $16.99 | Search: "Arduino Mega Enclosure Box IP65 Waterproof Clear Lid Project Case" |
 | **Display Mounting** | 3D printed or custom | 1 | DIY | - |
 
 ### Mounting Hardware
 
 | Item | Specs | Qty | Price | Link |
 |------|-------|-----|-------|------|
-| **M3 Standoffs Kit** | Brass, M-F, assorted | 1 | $12.99 | [Amazon](https://www.amazon.com/dp/B07D7828LC) |
-| **Cable Glands** | PG7, waterproof | 5 | $9.99 | [Amazon](https://www.amazon.com/dp/B07X3J8XHG) |
-| **Velcro Strips** | Industrial strength | 1 | $8.99 | [Amazon](https://www.amazon.com/dp/B00006RSWT) |
+| **M3 Standoffs Kit** | Brass, M-F, assorted | 1 | $12.99 | Search: "M3 Brass Standoff Kit Male Female Assorted Hex Spacer PCB" |
+| **Cable Glands** | PG7, waterproof | 5 | $9.99 | Search: "PG7 Cable Gland Waterproof IP68 Nylon Wire Connector 3-6.5mm" |
+| **Velcro Strips** | Industrial strength | 1 | $8.99 | Search: "Industrial Strength Velcro Strips Heavy Duty Adhesive Black" |
 
 ---
 
@@ -194,11 +194,11 @@ This is the complete parts list with exact product links, part numbers, and pric
 
 | Item | Purpose | Price | Link |
 |------|---------|-------|------|
-| **Soldering Iron Kit** | 60W adjustable | $22.99 | [Amazon](https://www.amazon.com/dp/B06XZ31W3M) |
-| **Wire Strippers** | 10-22 AWG | $12.99 | [Amazon](https://www.amazon.com/dp/B000JNNWQ2) |
-| **Crimping Tool** | For DuPont/JST | $15.99 | [Amazon](https://www.amazon.com/dp/B078WPT5M1) |
-| **Multimeter** | Digital, with continuity | $19.99 | [Amazon](https://www.amazon.com/dp/B01ISAMUA6) |
-| **Heat Gun** | For heat shrink | $16.99 | [Amazon](https://www.amazon.com/dp/B078S5QMFG) |
+| **Soldering Iron Kit** | 60W adjustable | $22.99 | Search: "Soldering Iron Kit 60W Adjustable Temperature Welding Tool Stand" |
+| **Wire Strippers** | 10-22 AWG | $12.99 | Search: "Wire Strippers Klein Tools 10-22 AWG Self Adjusting Automatic" |
+| **Crimping Tool** | For DuPont/JST | $15.99 | Search: "Crimping Tool Dupont JST Molex 2.54mm Terminals Ratcheting SN-28B" |
+| **Multimeter** | Digital, with continuity | $19.99 | Search: "Digital Multimeter Auto Ranging Voltage Current Resistance Continuity" |
+| **Heat Gun** | For heat shrink | $16.99 | Search: "Heat Gun 1500W Dual Temperature Hot Air Gun Shrink Wrap" |
 
 ---
 
@@ -218,11 +218,11 @@ You'll need these for installing sensors in your vehicle:
 
 | Item | Specs | Purpose | Link |
 |------|-------|---------|------|
-| **M6 Exhaust Bung** | Weld-on, stainless | EGT sensor mount | [Amazon](https://www.amazon.com/dp/B07VWXMXLQ) |
-| **1/8" NPT to Barb Fitting** | Brass, 4mm barb | MAP sensor connection | [Amazon](https://www.amazon.com/dp/B07DWXQCNP) |
-| **Vacuum Hose** | 4mm silicone, 6ft | MAP sensor line | [Amazon](https://www.amazon.com/dp/B07XQXZLQM) |
-| **Coolant Temp Adapter** | 1/8" NPT T-fitting | Coolant sensor tap | [Amazon](https://www.amazon.com/dp/B01N5OZVXV) |
-| **Intercooler Pipe Bosses** | M8 weld-on bungs | IAT sensor mounts | [Amazon](https://www.amazon.com/dp/B07PWRN8S9) |
+| **M6 Exhaust Bung** | Weld-on, stainless | EGT sensor mount | Search: "M6 x 1.0 Exhaust Bung Weld-on Stainless Steel O2 Sensor EGT Bung" |
+| **1/8" NPT to Barb Fitting** | Brass, 4mm barb | MAP sensor connection | Search: "1/8 NPT to 4mm Barb Fitting Brass Hose Adapter Vacuum Fuel" |
+| **Vacuum Hose** | 4mm silicone, 6ft | MAP sensor line | Search: "4mm Silicone Vacuum Hose 6 feet High Temp Boost Pressure Line" |
+| **Coolant Temp Adapter** | 1/8" NPT T-fitting | Coolant sensor tap | Search: "1/8 NPT T-Fitting Tee Adapter Brass Coolant Temperature Sensor Port" |
+| **Intercooler Pipe Bosses** | M8 weld-on bungs | IAT sensor mounts | Search: "M8 x 1.25 Weld-On Bung Aluminum Intercooler Pipe Boss Sensor Mount" |
 
 ---
 
