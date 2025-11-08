@@ -508,6 +508,7 @@ For a professional, plug-and-play solution, we've designed a custom Arduino Mega
 - **[I2C Sensor Module Overview](docs/I2C_SENSOR_MODULE.md) - Design and specifications**
 - **[I2C Shopping List](docs/I2C_SHOPPING_LIST.md) - Parts with Amazon/Adafruit links**
 - **[I2C Assembly Guide](docs/I2C_ASSEMBLY_GUIDE.md) - Step-by-step build instructions**
+- **[Bench Testing Guide](docs/BENCH_TESTING.md) - Power supply options and temporary wiring** ⭐ **Essential!**
 - **[Custom PCB Design](docs/CUSTOM_PCB_DESIGN.md) - Professional PCB option**
 
 ### Display Options
