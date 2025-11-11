@@ -504,7 +504,15 @@ For a professional, plug-and-play solution, we've designed a custom Arduino Mega
 - **[Breadboard Wiring Guide](docs/BREADBOARD_WIRING.md) - Prototyping with jumper wires** ⭐ **Build Guide**
 - [PCB Schematic](docs/PCB_SCHEMATIC.md) - Custom shield design for permanent installation
 
-### I2C Sensor Module (Professional Installation) ⭐ **NEW!**
+### OEM ECU Data Access ⭐ **NEW!**
+- **[OEM ECU Data Access Guide](docs/OEM_ECU_DATA_ACCESS.md) - Read factory sensors from your 1KZ-TE ECU** ⭐ **Alternative to separate sensors!**
+  - OBD-II protocol access
+  - CAN bus direct tap
+  - Analog signal intercept (Unichip-style) - **RECOMMENDED**
+  - K-Line diagnostics
+  - Code examples included
+
+### I2C Sensor Module (Professional Installation)
 - **[I2C Sensor Module Overview](docs/I2C_SENSOR_MODULE.md) - Design and specifications**
 - **[I2C Shopping List](docs/I2C_SHOPPING_LIST.md) - Parts with Amazon/Adafruit links**
 - **[I2C Assembly Guide](docs/I2C_ASSEMBLY_GUIDE.md) - Step-by-step build instructions**
