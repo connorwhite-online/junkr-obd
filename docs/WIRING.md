@@ -861,3 +861,34 @@ After completing wiring, proceed to:
 ---
 
 *Remember: Take your time, double-check everything, and when in doubt, ask for help!*
+
+## 🚦 System Architecture Update (1KZ-TE Retrofit)
+
+The wiring now revolves around **three dedicated PCBs** that sit between the Toyota 1KZ-TE ECU and your Adafruit Qualia ESP32-S3 gauge cluster:
+
+| Board | Mount point | Key connectors | What it does |
+|-------|-------------|----------------|--------------|
+| **ECU-Intercept** | Behind factory ECU | Twin 34-pin Toyota plugs | High-impedance taps on OEM signals, 8-ch ADC, isolated SPI link to dash |
+| **Dash I/O + Qualia** | In gauge cluster | 40-pin RGB-666 ribbon, SPI in, RS-485 out | Hosts ESP32-S3, drives TFT, fuses data, optional boost-control output |
+| **Engine-bay Sensor Node** | LH inner fender | RS-485 in, thermocouple, LSU4.9, BMP388 | Converts EGT, AFR, baro/thermo to packets back to dash |
+
+All legacy Arduino-Mega references in this file remain for historical context but will be phased out.  New pin mappings are documented in [`ECU_PINOUT_1KZTE.md`](ECU_PINOUT_1KZTE.md).
+
+> **Quick-tap table** – critical wires you’ll splice at the ECU-Intercept board:
+>
+> | ECU Pin | Wire colour | Signal | Board net |
+> |---------|-------------|--------|-----------|
+> | 9 (VTA) | B-Y | Throttle angle | ADC CH2 |
+> | 10 (PIM) | B-Y | MAP / Boost | ADC CH3 |
+> | 13 (THA) | LG | Intake air temp | ADC CH4 |
+> | 14 (THW) | G-R | Coolant temp | ADC CH5 |
+> | 11 (VRP) | LG | Pump sensor | OPTO IN4 |
+> | 12 (VRT) | G-B | Pump sensor | OPTO IN5 |
+> | 15 (TE2) | — | Diagnostic | GPIO spare |
+> | 16 (VF1) | — | Mixture voltage | ADC CH6 |
+> | 20 (STA) | L-B | Starter | DI CH1 |
+> | 19 (BATT S) | B-R | Battery sense | ADC CH7 |
+>
+> All other wires are passed straight-through.
+
+---

@@ -6,6 +6,77 @@ This document provides the complete schematic, PCB layout, and Gerber file speci
 
 ---
 
+> **2025 Hardware Refresh** — This document is now organised around **three dedicated PCBs** that interface with the Toyota 1KZ-TE ECU and the Adafruit **Qualia ESP32-S3** display driver.
+>
+> | ID | Board | KiCad project | Main silicon | Purpose |
+> |----|-------|---------------|--------------|---------|
+> | A | ECU-Intercept | `hardware/intercept-board/` | ADS131M08 + ISO7842 | High-Z analogue taps & isolated SPI out |
+> | B | Dash I/O + Qualia Carrier | `hardware/dash-io-board/` | ESP32-S3 (Qualia) + RS-485 | Collects data, drives RGB-666 TFT, outputs user control |
+> | C | Engine-bay Sensor Node | `hardware/engine-bay-node/` | STM32C0 + MAX31856 + LSU4.9 | Converts EGT, AFR, baro → RS-485 packets |
+>
+> The legacy single-board Arduino Mega design is archived in `docs/CUSTOM_PCB_DESIGN_legacy.md`.
+
+---
+
+## Board A – ECU-Intercept (Inline Tap)
+
+### Electrical Goals
+* Zero-impact pass-through on every OEM wire.
+* Tap **VC, VTA, PIM, THA, THW, VF1, VRP, VRT, STA, BATT, NSW**.
+* 8-ch simultaneous Σ-Δ ADC (±2.5 V range) with >100 kΩ dividers.
+* ISO7842 digital isolator → 6-pin JST-PA to Dash I/O.
+* TVS & RC on all lines for ISO-7637-2 transients.
+
+### KiCad Notes
+* Connector footprints: Tyco 2-0963363-1 (male) & 2-0963364-1 (female) edge mount.
+* 4-layer, 1 oz, 1.6 mm FR-4; keep-out for ECU bolt posts.
+* Board outline: 110 mm × 35 mm max.
+
+---
+
+## Board B – Dash I/O + Qualia Carrier
+
+### Mechanical Stack
+* Qualia ESP32-S3 (#5800) plugs via 2×20 2.54 mm header.
+* Board B provides: isolated SPI header, RS-485 transceiver, boost-control MOSFET, buzzer driver, button matrix.
+* 40-pin RGB-666 FFC to round/square TFT.
+
+### Power
+* GAUGE-fused +12 V → MP1584EN buck 5 V → RT9080-33 LDO 3.3 V.
+* Backlight boost (TPS61169) handled on Qualia PCB itself.
+
+---
+
+## Board C – Engine-bay Sensor Node
+
+### Sensors
+* **EGT**: MAX31856 (K-type), cold-junction on board edge.
+* **Wideband**: LSU4.9 with CJ125 shield daughter module.
+* **Baro/Thermo**: Bosch BMP388 via I²C.
+
+### Housing
+* Hammond 1555F (IP66) + Gore vent.
+* Conformal coat; all connectors JST JWPF or Deutsch DT04.
+
+---
+
+## Inter-board Harnessing
+
+* Board A ↔ B: 6-pin JST-PA, twisted pair for CLK/MISO/MOSI, shield to chassis.
+* Board B ↔ C: 4-pin sealed (A, B, Vbat, GND). Terminate RS-485 at both ends.
+
+---
+
+## Manufacturing Checklist
+
+1. Run ERC/DRC in KiCad 7 – zero errors.
+2. Export Gerbers with JLCPCB 2-layer stackup (Board A may need 4-layer, use JLC-4L-7628).
+3. Include positional CSV for SMT assembly where applicable.
+4. Add ECONNECT footers for harness test-plug.
+5. Verify Toyota connector orientation in 3D viewer.
+
+---
+
 ## 📋 PCB Overview
 
 ### Specifications
