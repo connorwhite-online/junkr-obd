@@ -1,8 +1,14 @@
-# JNKR Gauge System
+# JNKR Adaptive ECU System
 
-**Read-Only Engine Monitoring Gauge for 1KZTE Turbodiesel**
+**Professional Piggyback ECU with Adaptive Learning for Turbodiesel Engines**
 
-A comprehensive engine monitoring system powered by ESP32-S3 with a beautiful 2.1" round display. Features real-time sensor data, color-coded warnings, audio alerts, and smooth 60 FPS graphics. Perfect for enthusiasts who want to monitor their turbocharged diesel engine without modifying ECU signals.
+A complete adaptive engine management system powered by ESP32-S3 with dual operating modes: **Gauge Mode** for safe monitoring and **ECU Mode** for active tuning with wideband O2 feedback. Features 2.1" round RGB display, electronic boost control, data logging, and self-learning fuel maps.
+
+**🎯 Two Modes - Your Choice:**
+- **Gauge Mode** 📊 - Safe monitoring, no ECU modifications (perfect for daily driving)
+- **ECU Mode** ⚡ - Active tuning with adaptive learning (for performance optimization)
+
+Perfect for enthusiasts who want professional-grade engine management without the professional price tag!
 
 ![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
