@@ -22,6 +22,33 @@ Reads engine parameters via OBD-II protocol using an ELM327 Bluetooth adapter.
 
 **Note:** Most 1KZ-TE vehicles (especially pre-1996 or non-US) do NOT support OBD-II. Try the analog intercept method instead.
 
+### `ecu_dlc3_wireless.ino` ⭐ NEW - DLC3 K-Line Wireless Module
+Reads engine parameters from DLC3 diagnostic connector via K-Line (ISO 9141-2) protocol. This code runs on a **small ESP32 module** near the DLC3 connector and sends data wirelessly to the main ESP32.
+
+**Works on:** All 1KZ-TE vehicles with DLC3 connector (JDM vehicles, pre-OBD-II)  
+**Hardware:** Small ESP32 module + MC33290 K-Line transceiver  
+**Difficulty:** Medium (requires K-Line transceiver circuit)  
+**Speed:** Medium (10-20Hz refresh rate)  
+**Communication:** WiFi UDP (wireless to main ESP32)
+
+**Features:**
+- ✅ Comprehensive diagnostics (codes, status, calculated values)
+- ✅ Wireless communication (no long wires to dash)
+- ✅ Can use alongside analog intercept as backup
+
+### `ecu_dlc3_receiver.ino` ⭐ NEW - DLC3 Wireless Receiver
+Receives DLC3 data wirelessly from the K-Line module. This code runs on the **main ESP32 (Qualia)** in the dash.
+
+**Works with:** `ecu_dlc3_wireless.ino` (K-Line module)  
+**Hardware:** Main ESP32 (Qualia) - no additional hardware needed  
+**Difficulty:** Easy (just receives data)  
+**Communication:** WiFi UDP (receives from K-Line module)
+
+**Features:**
+- ✅ Receives DLC3 data wirelessly
+- ✅ Integrates with existing gauge system
+- ✅ Can fallback to analog intercept if DLC3 fails
+
 ## 🚀 Quick Start
 
 ### Method 1: Analog Signal Intercept (Recommended)
@@ -62,6 +89,8 @@ Reads engine parameters via OBD-II protocol using an ELM327 Bluetooth adapter.
 
 For complete details on ECU data access methods, see:
 - **[OEM_ECU_DATA_ACCESS.md](../docs/OEM_ECU_DATA_ACCESS.md)** - Comprehensive guide covering all methods
+- **[DLC3_WIRELESS_IMPLEMENTATION.md](../docs/DLC3_WIRELESS_IMPLEMENTATION.md)** - DLC3 wireless setup guide
+- **[DLC3_LIBRARY_RESEARCH_COMPLETE.md](../docs/DLC3_LIBRARY_RESEARCH_COMPLETE.md)** - Library research findings
 
 ## ⚠️ Important Notes
 
