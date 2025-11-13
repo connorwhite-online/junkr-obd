@@ -185,36 +185,80 @@ MC33290 Pin 7 (GND) ──► ESP32 GND
 
 ## Code Integration Example
 
-### In Your Main Gauge Code
+### Keep Code Separate
+
+**Important:** Keep DLC3 and analog intercept code in **separate files**. Don't mix them together.
+
+### Option 1: Use DLC3 Only
 
 ```cpp
-// Include DLC3 receiver
-#include "ecu_dlc3_receiver.h"  // Your receiver code
+// In your main gauge code
+#include "ecu_dlc3_receiver.h"  // DLC3 receiver
 
-// In your sensor update function
 void Sensors_Update() {
-  // Try DLC3 first (if available and recent)
-  if (dlc3Data.valid && (millis() - dlc3Data.lastUpdate < 1000)) {
-    // Use DLC3 data
-    coolantTemp = dlc3Data.coolantTemp;
-    intakeTempPost = dlc3Data.intakeAirTemp;
-    boostPressureBar = dlc3Data.boostPressurePSI / 14.5038;  // PSI to bar
-  } else {
-    // Fallback to analog intercept
-    float coolantVoltage = readECUSignal(PIN_ECU_COOLANT);
-    coolantTemp = voltageToTemperature(coolantVoltage);
-    
-    float iatVoltage = readECUSignal(PIN_ECU_IAT);
-    intakeTempPost = voltageToTemperature(iatVoltage);
-    
-    float mapVoltage = readECUSignal(PIN_ECU_MAP);
-    boostPressureBar = voltageToPressure(mapVoltage);
+  // Get data from DLC3
+  if (isDLC3Available()) {
+    coolantTemp = getDLC3CoolantTemp();
+    intakeTempPost = getDLC3IntakeAirTemp();
+    boostPressureBar = getDLC3BoostBar();
+    engineRPM = getDLC3RPM();
   }
   
   // EGT always from separate sensor
   exhaustTemp = readEGT(prevExhaustTemp);
 }
 ```
+
+### Option 2: Use Analog Intercept Only
+
+```cpp
+// In your main gauge code
+// Include analog intercept functions (from ecu_analog_intercept.ino)
+
+void Sensors_Update() {
+  // Get data from analog intercept
+  float coolantVoltage = readECUSignal(PIN_ECU_COOLANT);
+  coolantTemp = voltageToTemperature(coolantVoltage);
+  
+  float iatVoltage = readECUSignal(PIN_ECU_IAT);
+  intakeTempPost = voltageToTemperature(iatVoltage);
+  
+  float mapVoltage = readECUSignal(PIN_ECU_MAP);
+  boostPressureBar = voltageToPressure(mapVoltage);
+  
+  // EGT always from separate sensor
+  exhaustTemp = readEGT(prevExhaustTemp);
+}
+```
+
+### Option 3: Use Both (Separate, with Fallback)
+
+```cpp
+// In your main gauge code
+#include "ecu_dlc3_receiver.h"  // DLC3 receiver
+// Analog intercept functions in separate file
+
+void Sensors_Update() {
+  // Try DLC3 first
+  if (isDLC3Available()) {
+    coolantTemp = getDLC3CoolantTemp();
+    intakeTempPost = getDLC3IntakeAirTemp();
+    boostPressureBar = getDLC3BoostBar();
+  } else {
+    // Fallback to analog intercept (separate function)
+    readAnalogSensors();  // Function from ecu_analog_intercept.ino
+  }
+  
+  // EGT always from separate sensor
+  exhaustTemp = readEGT(prevExhaustTemp);
+}
+```
+
+### See Integration Example
+
+**File:** `examples/ecu_dlc3_integration_example.ino`
+
+This shows the pattern for integrating DLC3 while keeping analog intercept separate.
 
 ---
 

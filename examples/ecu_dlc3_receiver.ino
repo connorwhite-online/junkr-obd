@@ -159,30 +159,88 @@ void receiveDLC3Data() {
 }
 
 // ============================================================================
-// DATA USAGE EXAMPLES
+// DATA ACCESS FUNCTIONS
 // ============================================================================
 
-// Example: Get coolant temperature (prefer DLC3, fallback to analog)
-float getCoolantTemperature() {
-  // Check if DLC3 data is recent (within 1 second)
-  if (dlc3Data.valid && (millis() - dlc3Data.lastUpdate < 1000)) {
-    return dlc3Data.coolantTemp;  // Use DLC3 data
-  } else {
-    // Fallback to analog intercept reading
-    // return readAnalogCoolantTemp();
-    return 0.0;  // Placeholder
+// These functions provide clean access to DLC3 data
+// Use these in your main gauge code - keep analog intercept separate
+
+/**
+ * Get coolant temperature from DLC3
+ * Returns 0.0 if data is not available or stale
+ */
+float getDLC3CoolantTemp() {
+  if (dlc3Data.valid && (millis() - dlc3Data.lastUpdate < 2000)) {
+    return dlc3Data.coolantTemp;
   }
+  return 0.0;  // Indicates no valid data
 }
 
-// Example: Get boost pressure
-float getBoostPressure() {
-  if (dlc3Data.valid && (millis() - dlc3Data.lastUpdate < 1000)) {
-    return dlc3Data.boostPressurePSI;
-  } else {
-    // Fallback to analog intercept
-    // return readAnalogBoost();
-    return 0.0;
+/**
+ * Get intake air temperature from DLC3
+ */
+float getDLC3IntakeAirTemp() {
+  if (dlc3Data.valid && (millis() - dlc3Data.lastUpdate < 2000)) {
+    return dlc3Data.intakeAirTemp;
   }
+  return 0.0;
+}
+
+/**
+ * Get boost pressure from DLC3 (in PSI)
+ */
+float getDLC3BoostPSI() {
+  if (dlc3Data.valid && (millis() - dlc3Data.lastUpdate < 2000)) {
+    return dlc3Data.boostPressurePSI;
+  }
+  return 0.0;
+}
+
+/**
+ * Get boost pressure from DLC3 (in bar)
+ */
+float getDLC3BoostBar() {
+  if (dlc3Data.valid && (millis() - dlc3Data.lastUpdate < 2000)) {
+    return dlc3Data.boostPressurePSI / 14.5038;
+  }
+  return 0.0;
+}
+
+/**
+ * Get engine RPM from DLC3
+ */
+uint16_t getDLC3RPM() {
+  if (dlc3Data.valid && (millis() - dlc3Data.lastUpdate < 2000)) {
+    return dlc3Data.engineRPM;
+  }
+  return 0;
+}
+
+/**
+ * Get vehicle speed from DLC3 (km/h)
+ */
+uint8_t getDLC3Speed() {
+  if (dlc3Data.valid && (millis() - dlc3Data.lastUpdate < 2000)) {
+    return dlc3Data.vehicleSpeed;
+  }
+  return 0;
+}
+
+/**
+ * Get throttle position from DLC3 (0-100%)
+ */
+uint8_t getDLC3Throttle() {
+  if (dlc3Data.valid && (millis() - dlc3Data.lastUpdate < 2000)) {
+    return dlc3Data.throttlePosition;
+  }
+  return 0;
+}
+
+/**
+ * Check if DLC3 data is currently available
+ */
+bool isDLC3Available() {
+  return dlc3Data.valid && (millis() - dlc3Data.lastUpdate < 2000);
 }
 
 // ============================================================================

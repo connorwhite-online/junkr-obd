@@ -47,7 +47,17 @@ Receives DLC3 data wirelessly from the K-Line module. This code runs on the **ma
 **Features:**
 - ✅ Receives DLC3 data wirelessly
 - ✅ Integrates with existing gauge system
-- ✅ Can fallback to analog intercept if DLC3 fails
+- ✅ Clean separation from analog intercept code
+- ✅ Can be used alongside analog intercept (separate files)
+
+### `ecu_dlc3_integration_example.ino` ⭐ NEW - Integration Pattern
+Example showing how to integrate DLC3 data into your main gauge code while keeping analog intercept code completely separate.
+
+**Shows:**
+- How to use DLC3 only
+- How to use analog intercept only  
+- How to use both (with fallback)
+- Clean code separation pattern
 
 ## 🚀 Quick Start
 
