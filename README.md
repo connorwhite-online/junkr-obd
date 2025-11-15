@@ -1,94 +1,71 @@
-# JNKR Gauge / ECU-Intercept System  **(1KZ-TE Land Cruiser)**
+# Simple Gauge for Qualia ESP32-S3
 
-> **2025 architecture refresh – ESP32-S3 + three custom PCBs + round RGB display**
->
-> *Old Arduino-Mega / Nextion material has moved to [`docs/legacy/`](docs/legacy/).*
+This repository contains a minimal three-parameter automotive gauge running on an Adafruit **Qualia ESP32-S3** and its built-in IPS display.
 
-The project now consists of:
+## Parameters Displayed
 
-1. **ECU-Intercept Board** – inline with Toyota 34-pin ECU harness, taps analogue signals via ADS131M08 and streams isolated SPI.
-2. **Dash I/O Board** – carries the Adafruit *Qualia ESP32-S3* (#5800), drives a 2.1" 480 × 480 RGB-666 TFT, receives data from the intercept board, speaks RS-485 to the engine bay.
-3. **Engine-bay Sensor Node** – sealed module that measures EGT (MAX31856), wideband AFR (LSU4.9), and baro/thermo; sends `SensorFrame` packets over RS-485.
+| Sensor | Range | Notes |
+| ------ | ----- | ----- |
+| EGT (thermocouple) | up to 1800 °F | MAX31855 SPI amplifier |
+| Coolant Temperature | –40 °F – 300 °F | 10 kΩ NTC thermistor, Steinhart–Hart |
+| Boost / MAP | 0 – 29 psi | MPX2200GP analog pressure |
 
-Key documentation:
+## Engine-Bay PCB Block Diagram
 
-* [`docs/BOARD_ARCHITECTURE.md`](docs/BOARD_ARCHITECTURE.md) – block diagram & connectors
-* [`docs/ECU_PINOUT_1KZTE.md`](docs/ECU_PINOUT_1KZTE.md) – 34-pin ECU cheat-sheet
-* [`docs/RS485_PROTOCOL.md`](docs/RS485_PROTOCOL.md) – packet spec between boards
-* [`docs/CUSTOM_PCB_DESIGN.md`](docs/CUSTOM_PCB_DESIGN.md) – PCB details for all three boards
-* [`docs/WIRING.md`](docs/WIRING.md) – updated harness guidance
+```text
++---------------------+
+| 12 V In             |
+|  ↓  Buck Regulator  |
+| 3.3 V Out           |
++-----------+---------+
+            |
+            |-- MAX31855 (SPI) ← EGT probe
+            |
+            |-- ADS1115 (I²C)
+            |      ├─ CH0 ← Coolant thermistor
+            |      └─ CH1 ← MPX2200GP pressure
+            |
+            +-- Deutsch DT04-08 connector → harness
+```
 
-Firmware examples:
+## Harness Pinout (DT04-08)
 
-* `examples/ecu_analog_intercept_v2.ino` – **Dash Master** (ESP32-S3) – SPI ingest, RS-485 parse, TFT output
-* `examples/engine_node_v0.1.ino` – **Engine-bay Node** (ESP32-C3) – sends dummy `SensorFrame`
+| Pin | Signal | Dir | Notes |
+| --- | ------ | --- | ----- |
+| A | 3.3 V | → | Power rail |
+| B | GND | — | Common ground |
+| C | SPI_MISO | ← | MAX31855 data |
+| D | SPI_CLK | → | Shared SCK |
+| E | SPI_CS_EGT | → | GPIO34 |
+| F | I²C_SDA | ↔︎ | GPIO3 |
+| G | I²C_SCL | ↔︎ | GPIO4 |
+| H | (reserved) | — | Future |
 
-Hardware source lives in `hardware/` – KiCad 7 projects (intercept-board, dash-io-board, engine-bay-node).
+## ESP32-S3 Pin Map
 
----
+| Function | Pin |
+| -------- | --- |
+| SPI SCK | GPIO36 |
+| SPI MOSI (unused) | GPIO35 |
+| SPI MISO | GPIO33 |
+| EGT CS | GPIO34 |
+| TFT DC | GPIO37 |
+| TFT RST | GPIO38 |
+| I²C SDA | GPIO3 |
+| I²C SCL | GPIO4 |
 
-## Quick Start (developers)
+## Calibration Constants
+
+Thermistor β: **3950 K**  |  Series resistor: **10 kΩ @ 25 °C**  |  MAP: 0.2 V → 0 psi, 4.7 V → 29 psi
+
+## Power Supply
+
+Feed both boards from a switched **12 V** source (cigarette-lighter or add-a-fuse). Use a 12 V→3.3 V buck on the engine-bay PCB, common ground, and a TVS diode for load-dump protection.
+
+## Build / Flash
 
 ```bash
-# clone repo
-$ git clone https://github.com/connorwhite/junkr-obd.git && cd junkr-obd
-
-# open docs
-$ open docs/BOARD_ARCHITECTURE.md
-
-# compile dash firmware
-$ arduino-cli compile --fqbn esp32:esp32:adafruit_qs3 examples/ecu_analog_intercept_v2.ino
+pio run -t upload
 ```
 
----
-
-## Legacy material
-
-The previous single-board Arduino Mega + Nextion implementation is still available for reference but is **no longer maintained**.  Find it under:
-
-```
-docs/legacy/
-examples/legacy/
-```
-
----
-
-## Licence
-
-MIT – © 2025 JNKR Project
-
----
-
-## ⚠️ Disclaimer
-
-**IMPORTANT**: This system is for monitoring purposes only. It does not modify any engine control signals.
-
-- Use at your own risk
-- Improper installation can damage sensors or vehicle systems
-- Always verify readings against known good gauges
-- Do not rely solely on this system for critical safety decisions
-- Author assumes no liability for damage or injury
-
----
-
-## 💡 Credits
-
-- Inspired by the [jnkr-ecu](https://github.com/connorwhite-online/jnkr-ecu) project
-- Based on Arduino Mega 2560 platform
-- Nextion HMI display for visualization
-- Thanks to the automotive Arduino community
-
----
-
-## 📞 Support
-
-For questions, issues, or support:
-- Open an [Issue](https://github.com/connorwhite-online/jnkr-gauge/issues)
-- Check the [Wiki](https://github.com/connorwhite-online/jnkr-gauge/wiki)
-- Join discussions in Issues
-
----
-
-**Built with ❤️ for the turbodiesel community**
-
-**Version 1.0.0** | Last Updated: 2025-11-07
+Reboot the device — numeric display should appear instantly.
