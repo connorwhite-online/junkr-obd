@@ -8,7 +8,7 @@ stay valid as SKUs move — pick the in-stock variant that matches the spec.
 
 ---
 
-## Compute + Display
+## Cabin compute + display
 
 | Item | Spec | Qty | Approx. $ | Link |
 | --- | --- | --- | --- | --- |
@@ -17,6 +17,23 @@ stay valid as SKUs move — pick the in-stock variant that matches the spec.
 > Note: `src/main.cpp:50` currently calls `tft.init(320, 240)` against an ST7789
 > driver — confirm this matches the panel variant you actually buy. The
 > `project.xml` declares 480×480.
+
+## Engine-bay MCU
+
+| Item | Spec | Qty | Approx. $ | Link |
+| --- | --- | --- | --- | --- |
+| ESP32-C3 SuperMini (or ESP32-S3 Mini) | RISC-V or Xtensa, built-in TWAI/CAN controller, small footprint, USB-C for flashing | 1 | $3–8 | [Amazon US (C3 SuperMini)](https://www.amazon.com/s?k=esp32-c3+supermini) · [Adafruit (ESP32-S3 Mini)](https://www.adafruit.com/?q=esp32-s3+mini) · [Digi-Key](https://www.digikey.com/en/products/result?keywords=esp32-c3+mini) |
+
+> Industrial-temp parts (`-I` / 105 °C ambient) are worth the small premium
+> if the board mounts inside the engine bay rather than behind the firewall.
+
+## CAN link
+
+| Item | Spec | Qty | Approx. $ | Link |
+| --- | --- | --- | --- | --- |
+| NXP TJA1051T/3 CAN transceiver (3.3 V I/O) | Or SN65HVD230 / MCP2562FD — high-speed CAN, 3.3 V logic | 2 | $1–3 ea | [Digi-Key](https://www.digikey.com/en/products/result?keywords=TJA1051T%2F3) · [Mouser](https://www.mouser.com/c/?q=TJA1051T%2F3) |
+| CAN transceiver breakout (alt., for prototyping) | SN65HVD230 module or similar | 2 | $4–8 ea | [Amazon US](https://www.amazon.com/s?k=sn65hvd230+can+module) · [SparkFun](https://www.sparkfun.com/search/results?term=can+transceiver) |
+| 120 Ω, 1 %, 1/4 W resistor | bus termination, one at each end | 2 | <$1 | [Digi-Key](https://www.digikey.com/en/products/result?keywords=120+ohm+1%25+resistor) |
 
 ---
 
@@ -84,15 +101,16 @@ Source any of the above from [Digi-Key](https://www.digikey.com/) or
 
 ---
 
-## Harness / Connector (DT04-08)
+## Harness / Connector (DT04-4P)
 
 | Item | Spec | Qty | Approx. $ | Link |
 | --- | --- | --- | --- | --- |
-| Deutsch DT04-08PA (receptacle, PCB-side, 8-pin) | TE Connectivity | 1 | $5–8 | [TE.com](https://www.te.com/en/search.html?q=DT04-08PA) · [Digi-Key](https://www.digikey.com/en/products/result?keywords=DT04-08PA) · [Mouser](https://www.mouser.com/c/?q=DT04-08PA) |
-| Deutsch DT06-08SA (plug, harness-side, 8-pin) | TE Connectivity | 1 | $5–8 | [TE.com](https://www.te.com/en/search.html?q=DT06-08SA) · [Digi-Key](https://www.digikey.com/en/products/result?keywords=DT06-08SA) · [Mouser](https://www.mouser.com/c/?q=DT06-08SA) |
-| Deutsch DT-series solid contacts (size 16) + wedgelocks | match pin/socket per side | 1 set | $10–15 | [Ladd Industries](https://www.laddinc.com/) · [Digi-Key](https://www.digikey.com/en/products/result?keywords=deutsch+DT+size+16+contacts) |
+| Deutsch DT04-4P (receptacle, PCB-side, 4-pin) | TE Connectivity | 1 | $3–6 | [TE.com](https://www.te.com/en/search.html?q=DT04-4P) · [Digi-Key](https://www.digikey.com/en/products/result?keywords=DT04-4P) · [Mouser](https://www.mouser.com/c/?q=DT04-4P) |
+| Deutsch DT06-4S (plug, harness-side, 4-pin) | TE Connectivity | 1 | $3–6 | [TE.com](https://www.te.com/en/search.html?q=DT06-4S) · [Digi-Key](https://www.digikey.com/en/products/result?keywords=DT06-4S) · [Mouser](https://www.mouser.com/c/?q=DT06-4S) |
+| Deutsch DT-series solid contacts (size 16) + wedgelocks | match pin/socket per side | 1 set | $5–10 | [Ladd Industries](https://www.laddinc.com/) · [Digi-Key](https://www.digikey.com/en/products/result?keywords=deutsch+DT+size+16+contacts) |
 | Deutsch crimp tool (size 16, open-barrel) | DTT-16-00 or equivalent | 1 | $30–80 | [Amazon US](https://www.amazon.com/s?k=deutsch+dt+crimp+tool+size+16) · [Ladd Industries](https://www.laddinc.com/) |
-| Automotive hookup wire, 18–22 AWG, TXL | shielded run recommended for thermocouple + I²C | ~20 ft | $15–25 | [Wirebarn](https://www.wirebarn.com/) · [Del City](https://www.delcity.net/) · [Amazon US](https://www.amazon.com/s?k=18awg+TXL+automotive+wire) |
+| Twisted-pair automotive wire, 20 AWG | CAN_H / CAN_L pair — CAN spec calls for twisted pair | ~10 ft | $8–15 | [Wirebarn](https://www.wirebarn.com/) · [Del City](https://www.delcity.net/) · [Amazon US](https://www.amazon.com/s?k=20awg+twisted+pair+automotive) |
+| Automotive hookup wire, 18 AWG TXL | +12 V switched + GND legs | ~10 ft | $8–15 | [Wirebarn](https://www.wirebarn.com/) · [Amazon US](https://www.amazon.com/s?k=18awg+TXL+automotive+wire) |
 | Convoluted loom + heat-shrink | bundle + strain relief | ~6 ft | $5–10 | [Amazon US](https://www.amazon.com/s?k=automotive+wire+loom+1%2F4+inch) |
 
 ---
@@ -108,16 +126,18 @@ Source any of the above from [Digi-Key](https://www.digikey.com/) or
 
 ## Known issues to fix before ordering
 
+- **Firmware split is not done yet.** Current `src/sensors.cpp` reads
+  MAX31855 + ADS1115 directly on the cabin MCU; the new architecture
+  requires moving that code into a separate `engine-bay/` PlatformIO env
+  and reworking `src/` to be a TWAI listener. Follow-up PR.
 - **`platformio.ini` does not list `Adafruit MAX31855`** even though
   `src/sensors.cpp:3` includes it. Add `adafruit/Adafruit MAX31855 library` to
-  `lib_deps` or the build will fail.
-- **MAX31855 CS pin disagreement:** `src/sensors.cpp:6` uses GPIO10; the README
-  pin map (line 51) says GPIO34. GPIO34 is also assigned to the TFT CS in
-  `src/main.cpp:17` — these can't both be right. Reconcile before laying out
-  the PCB.
-- **MAP sensor part vs. calibration mismatch** (see Boost / MAP note above).
-- **Display init size** (`320×240`) does not match the declared 480×480 panel
-  in `project.xml`.
+  the engine-bay env's `lib_deps` when the split happens.
+- **MAP sensor part vs. calibration mismatch:** README lists MPX2200GP
+  (0–40 mV unamplified) but `src/sensors.cpp:27–28` expects a 0.2–4.7 V
+  amplified output. Swap to MPX4250AP / GM 3-bar / similar before ordering.
+- **Display init size** (`320×240` in `src/main.cpp:50`) does not match the
+  declared 480×480 panel in `project.xml`.
 
 ---
 
@@ -125,9 +145,11 @@ Source any of the above from [Digi-Key](https://www.digikey.com/) or
 
 | Bucket | Estimated cost |
 | --- | --- |
-| Qualia + breakouts (Qualia, MAX31855, ADS1115) | $70–85 |
+| Cabin (Qualia) | $40–55 |
+| Engine-bay MCU + CAN transceivers + termination | $10–25 |
+| Breakouts (MAX31855, ADS1115) | $25–35 |
 | Sensors (EGT probe + bung, thermistor, MAP) | $40–110 |
 | Power + protection | $15–35 |
-| Harness + Deutsch connectors + tooling | $60–130 (one-time tooling dominates) |
+| Harness + Deutsch 4-pin + tooling | $50–125 (one-time tooling dominates) |
 | Passives + enclosure | $15–40 |
-| **Total** | **≈ $200–400** |
+| **Total** | **≈ $200–425** |
