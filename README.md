@@ -18,29 +18,25 @@ does cold-junction comp at its own die, so co-locating with the connector
 is more accurate than running extension wire to the cabin). The cabin
 Qualia is a CAN listener that updates the display.
 
-```text
-+--------------------- ENGINE BAY ----------------------+        +---------------- CABIN ----------------+
-| 12 V (switched) ── fuse ──┐                          |        |                                       |
-|                           ↓                          |        |  Adafruit Qualia ESP32-S3 + IPS       |
-|                    12 V → 3.3 V buck                 |        |                                       |
-|                           │                          |        |   ┌── TJA1051 / SN65HVD230 (CAN xcvr)│
-|                           │  3.3 V rail              |        |   │       │                          │
-|                  ┌────────┼────────┐                 |        |   │      120 Ω termination           │
-|                  │        │        │                 |        |   │       │                          │
-|              ESP32-C3 ─ SPI ─ MAX31855 ← K-type EGT  |        |   │   TWAI_TX / TWAI_RX → ESP32-S3  │
-|                  │        │        │                 |        |   │                                  │
-|                  │        └─ I²C ─ ADS1115           |        |                                       |
-|                  │                  ├─ CH0 ← NTC     |        |                                       |
-|                  │                  └─ CH1 ← MAP     |        |                                       |
-|                  │                                   |        |                                       |
-|              TJA1051 / SN65HVD230 (CAN xcvr)         |        |                                       |
-|                  │                                   |        |                                       |
-|              120 Ω termination                       |        |                                       |
-|                  │                                   |        |                                       |
-|              Deutsch DT04-4P ─── twisted pair ───────┼────────┼─── Deutsch DT06-4S                    |
-+──────────────────────────────────────────────────────+        +───────────────────────────────────────+
-                                  CAN_H / CAN_L
-                                  +12 V switched / GND
+```mermaid
+flowchart LR
+    subgraph EB["Engine Bay PCB"]
+        direction TB
+        S1["K-type EGT probe"] --> M1["MAX31855"]
+        S2["Coolant NTC<br/>10 kΩ, β=3950"] --> A1["ADS1115<br/>16-bit ADC"]
+        S3["MAP sensor<br/>0.2–4.7 V"] --> A1
+        M1 -- "SPI" --> C3["ESP32-C3"]
+        A1 -- "I²C" --> C3
+        C3 -- "TWAI" --> X1["TJA1051<br/>(CAN xcvr)"]
+        T1["120 Ω term"] -.- X1
+    end
+    subgraph CB["Cabin"]
+        direction TB
+        X2["TJA1051<br/>(CAN xcvr)"] -- "TWAI" --> Q["Qualia ESP32-S3"]
+        T2["120 Ω term"] -.- X2
+        Q --> D["IPS display<br/>EGT · Coolant · Boost"]
+    end
+    X1 <-->|"4-pin Deutsch<br/>CAN_H / CAN_L<br/>+12 V / GND"| X2
 ```
 
 ## Harness Pinout (DT04-4P)
@@ -89,6 +85,21 @@ harness, fused at ~3 A upstream, and steps it down locally with a 12 V→3.3 V
 buck. Single-point ground at the battery; TVS diode on the engine-bay 12 V
 input for load-dump protection.
 
+```mermaid
+flowchart LR
+    BAT["12 V battery<br/>switched + 3 A fuse"] --> P1["Pin 1: +12 V"]
+    GND_BAT["Chassis GND<br/>single-point @ battery"] --> P2["Pin 2: GND"]
+    P1 --> TVS["TVS diode<br/>SMBJ24A"]
+    TVS --> BUCK["12 V → 3.3 V<br/>buck regulator"]
+    BUCK --> RAIL["3.3 V rail"]
+    RAIL --> C3["ESP32-C3"]
+    RAIL --> MAX["MAX31855"]
+    RAIL --> ADS["ADS1115"]
+    RAIL --> XCVR["TJA1051"]
+    P2 --> CGND["Common GND<br/>(engine-bay board)"]
+    USB["USB-C 5 V"] --> QUA["Qualia ESP32-S3<br/>(cabin)"]
+```
+
 ## Firmware Layout
 
 Two PlatformIO environments (current `src/` is the cabin-side firmware and
@@ -98,6 +109,35 @@ needs to be refactored to drop the direct sensor reads):
   frame per parameter on a fixed cadence (~20 Hz).
 - **`src/`** (Qualia ESP32-S3) — TWAI listener that updates the three LVGL
   labels from incoming frames; no direct sensor access.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant S as Sensors
+    participant C3 as ESP32-C3 (bay)
+    participant Bus as CAN @ 500 kbps
+    participant Q as Qualia (cabin)
+    participant LV as LVGL labels
+
+    loop every 50 ms (20 Hz)
+        S->>C3: SPI read MAX31855 (EGT °C)
+        S->>C3: I²C read ADS1115 CH0 (NTC)
+        S->>C3: I²C read ADS1115 CH1 (MAP)
+        C3->>Bus: TX 0x100 — EGT °F (int16)
+        C3->>Bus: TX 0x101 — Coolant °F (int16)
+        C3->>Bus: TX 0x102 — MAP psi×10 (int16)
+        Bus-->>Q: RX frames
+        Q->>LV: lv_label_set_text_fmt × 3
+    end
+```
+
+Proposed CAN frame layout (1 byte priority, 2 bytes value, big-endian):
+
+| ID | Field | Units | Type | Range |
+| --- | --- | --- | --- | --- |
+| `0x100` | EGT | °F | `int16` | 0 – 1800 |
+| `0x101` | Coolant | °F | `int16` | -40 – 300 |
+| `0x102` | MAP | psi × 10 | `int16` | 0 – 290 |
 
 ## Build / Flash
 
