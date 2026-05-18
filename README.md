@@ -63,13 +63,16 @@ flowchart LR
 
 ## Engine-Bay ESP32-C3 Pin Map
 
+(Pins chosen to avoid the SuperMini's onboard LED on GPIO8 and the boot
+button on GPIO9, and the USB-Serial pins GPIO20/21.)
+
 | Function | Pin |
 | -------- | --- |
 | MAX31855 SCK | GPIO4 |
 | MAX31855 MISO | GPIO5 |
-| MAX31855 CS | GPIO6 |
-| ADS1115 SDA | GPIO8 |
-| ADS1115 SCL | GPIO9 |
+| MAX31855 CS | GPIO10 |
+| ADS1115 SDA | GPIO6 |
+| ADS1115 SCL | GPIO7 |
 | CAN TX (TWAI) | GPIO0 |
 | CAN RX (TWAI) | GPIO1 |
 
@@ -102,13 +105,22 @@ flowchart LR
 
 ## Firmware Layout
 
-Two PlatformIO environments (current `src/` is the cabin-side firmware and
-needs to be refactored to drop the direct sensor reads):
+Single PlatformIO project, two environments selected via `build_src_filter`:
 
-- **`engine-bay/`** (ESP32-C3) — reads MAX31855 + ADS1115, publishes one CAN
-  frame per parameter on a fixed cadence (~20 Hz).
-- **`src/`** (Qualia ESP32-S3) — TWAI listener that updates the three LVGL
-  labels from incoming frames; no direct sensor access.
+```
+shared/can_protocol.h          # frame IDs + payload conventions
+src/cabin/                     # env: cabin (Qualia ESP32-S3)
+  main.cpp · ui.{cpp,h} · can_rx.{cpp,h}
+src/engine_bay/                # env: engine-bay (ESP32-C3 SuperMini)
+  main.cpp · sensors.{cpp,h} · can_tx.{cpp,h}
+```
+
+- **`engine-bay`** reads MAX31855 + ADS1115 and publishes three CAN frames
+  every 50 ms (`0x100` EGT, `0x101` Coolant, `0x102` MAP×10) at 500 kbps.
+- **`cabin`** is a TWAI listener that drives an LVGL UI: a boost arc gauge
+  at the top with EGT and coolant numerics below. Values turn amber at
+  warning thresholds (EGT 1300 °F, coolant 220 °F, boost 20 psi) and red
+  at danger (1500 / 240 / 27 psi).
 
 ```mermaid
 sequenceDiagram
@@ -142,7 +154,16 @@ Proposed CAN frame layout (1 byte priority, 2 bytes value, big-endian):
 ## Build / Flash
 
 ```bash
-pio run -t upload
+# Cabin (Qualia ESP32-S3) — display + CAN listener
+pio run -e cabin -t upload
+
+# Engine bay (ESP32-C3 SuperMini) — sensor reads + CAN publisher
+pio run -e engine-bay -t upload
+
+# Serial monitor
+pio device monitor -e cabin            # or -e engine-bay
 ```
 
-Reboot the device — numeric display should appear instantly.
+The cabin's display init in `src/cabin/main.cpp` currently calls
+`tft.init(240, 240)` — adjust to match the Qualia panel variant in hand
+(480×480 round IPS vs. 320×240 ST7789 vs. 240×240).
