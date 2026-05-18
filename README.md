@@ -103,6 +103,13 @@ flowchart LR
     USB["USB-C 5 V"] --> QUA["Qualia ESP32-S3<br/>(cabin)"]
 ```
 
+## Hardware
+
+KiCad-ready specs for both PCBs live in [`kicad/`](kicad/) —
+schematic netlists, BOMs with footprint references, design rules, and
+placement/routing notes. See [`kicad/README.md`](kicad/README.md) for
+the workflow.
+
 ## Firmware Layout
 
 Single PlatformIO project, two environments selected via `build_src_filter`:

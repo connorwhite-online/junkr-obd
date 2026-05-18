@@ -1,0 +1,33 @@
+ref,value,part_number,qty,kicad_symbol,kicad_footprint,supplier,supplier_link,notes
+J1,DT04-4P,DT04-4P,1,Connector_Generic:Conn_01x04,Connector_Wuerth:Wuerth_61300411121_1x04_P2.50mm_Vertical,Digi-Key,https://www.digikey.com/en/products/result?keywords=DT04-4P,4-pin Deutsch receptacle. KiCad has no native DT footprint; use TE drawing PDF + custom footprint or treat as a 4-pin 2.5 mm header for prototyping.
+D1,SS34,SS34,1,Diode:SS34,Diode_SMD:D_SMA,Digi-Key,https://www.digikey.com/en/products/result?keywords=SS34,Schottky reverse-polarity protection on +12V.
+F1,1A polyfuse,1812L100,1,Device:Polyfuse,Fuse:Fuse_1812_4532Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=1812L100,Resettable PTC. 1 A hold current.
+D2,SMBJ24A,SMBJ24A,1,Diode:SMBJ-A,Diode_SMD:D_SMB,Digi-Key,https://www.digikey.com/en/products/result?keywords=SMBJ24A,24 V TVS for load-dump.
+C1,100µF/35V,EEE-FK1V101P,1,Device:CP,Capacitor_SMD:CP_Elec_8x10,Digi-Key,https://www.digikey.com/en/products/result?keywords=EEE-FK1V101P,Bulk input cap. Through-hole electrolytic acceptable instead.
+C2,100nF/50V,Generic 0805 X7R,1,Device:C,Capacitor_SMD:C_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+100nF+X7R,12 V rail HF bypass.
+U1,D24V5F3,Pololu 2842,1,Regulator_Switching:LM2675-3.3,Module:Pololu_Breakout-8_15.2x10.2mm,Pololu,https://www.pololu.com/product/2842,Use a custom 1x4 0.1" SIP footprint per Pololu drawing (VIN/GND/SHDN/VOUT).
+U2,D24V5F5,Pololu 2843,1,Regulator_Switching:LM2675-5.0,Module:Pololu_Breakout-8_15.2x10.2mm,Pololu,https://www.pololu.com/product/2843,Custom 1x4 0.1" SIP footprint (same family as U1).
+C3,10µF/16V,Generic 1206 X5R,1,Device:C,Capacitor_SMD:C_1206_3216Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=1206+10uF+X5R,3.3 V bulk.
+C4,10µF/16V,Generic 1206 X5R,1,Device:C,Capacitor_SMD:C_1206_3216Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=1206+10uF+X5R,5 V bulk.
+C5,100nF/50V,Generic 0805 X7R,1,Device:C,Capacitor_SMD:C_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+100nF+X7R,U3 decoupling.
+C6,100nF/50V,Generic 0805 X7R,1,Device:C,Capacitor_SMD:C_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+100nF+X7R,U4 decoupling.
+C7,100nF/50V,Generic 0805 X7R,1,Device:C,Capacitor_SMD:C_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+100nF+X7R,U6 decoupling.
+U3,ESP32-C3 SuperMini,ESP32-C3 SuperMini,1,Connector_Generic:Conn_02x09_Counter_Clockwise,Connector_PinSocket_2.54mm:PinSocket_2x09_P2.54mm_Vertical,Amazon US,https://www.amazon.com/s?k=esp32-c3+supermini,Mounts on 2× 1×9 female socket strips (or 1× 2×9). Adjust pin count to your specific SuperMini PCB.
+U4,MAX31855 breakout,Adafruit 269,1,Connector_Generic:Conn_01x06,Connector_PinSocket_2.54mm:PinSocket_1x06_P2.54mm_Vertical,Adafruit,https://www.adafruit.com/product/269,On 1× 1×6 female socket strip.
+U5,ADS1115 breakout,Adafruit 1085,1,Connector_Generic:Conn_01x10,Connector_PinSocket_2.54mm:PinSocket_1x10_P2.54mm_Vertical,Adafruit,https://www.adafruit.com/product/1085,On 1× 1×10 female socket strip.
+U6,TJA1051 breakout,HW-194 or similar,1,Connector_Generic:Conn_01x06,Connector_PinSocket_2.54mm:PinSocket_1x06_P2.54mm_Vertical,Amazon US,https://www.amazon.com/s?k=tja1051+module,Verify pinout against the exact module ordered.
+R1,120Ω 1%,Generic 0805 1%,1,Device:R,Resistor_SMD:R_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+120+1%25,CAN termination.
+R2,10kΩ 1%,Generic 0805 1%,1,Device:R,Resistor_SMD:R_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+10k+1%25,NTC divider bottom leg.
+R3,10kΩ 1%,Generic 0805 1%,1,Device:R,Resistor_SMD:R_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+10k+1%25,MAP divider top.
+R4,10kΩ 1%,Generic 0805 1%,1,Device:R,Resistor_SMD:R_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+10k+1%25,MAP divider bottom.
+C8,100nF/50V,Generic 0805 X7R,1,Device:C,Capacitor_SMD:C_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+100nF+X7R,NTC signal filter.
+C9,100nF/50V,Generic 0805 X7R,1,Device:C,Capacitor_SMD:C_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+100nF+X7R,MAP signal filter.
+J2,NTC connector,JST-XH 2-pin,1,Connector_Generic:Conn_01x02,Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical,Digi-Key,https://www.digikey.com/en/products/result?keywords=B2B-XH-A,Coolant NTC input. Screw terminal acceptable substitute.
+J3,MAP connector,JST-XH 3-pin,1,Connector_Generic:Conn_01x03,Connector_JST:JST_XH_B3B-XH-A_1x03_P2.50mm_Vertical,Digi-Key,https://www.digikey.com/en/products/result?keywords=B3B-XH-A,MAP sensor (V+/SIG/GND).
+JP1,Term jumper,1x2 header + shunt,1,Connector_Generic:Conn_01x02,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,Digi-Key,https://www.digikey.com/en/products/result?keywords=0.1+jumper+shunt,Closes the 120 Ω termination network.
+LED1,Power LED green,LTST-C170GKT,1,Device:LED,LED_SMD:LED_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=LTST-C170GKT,Power-good indicator.
+R5,470Ω,Generic 0805 5%,1,Device:R,Resistor_SMD:R_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+470+5%25,LED1 current limit.
+H1,Mounting hole,M3 non-plated,1,Mechanical:MountingHole,MountingHole:MountingHole_3.2mm_M3,—,—,Corner mount.
+H2,Mounting hole,M3 non-plated,1,Mechanical:MountingHole,MountingHole:MountingHole_3.2mm_M3,—,—,Corner mount.
+H3,Mounting hole,M3 non-plated,1,Mechanical:MountingHole,MountingHole:MountingHole_3.2mm_M3,—,—,Corner mount.
+H4,Mounting hole,M3 non-plated,1,Mechanical:MountingHole,MountingHole:MountingHole_3.2mm_M3,—,—,Corner mount.
