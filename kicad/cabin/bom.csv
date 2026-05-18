@@ -1,0 +1,10 @@
+ref,value,part_number,qty,kicad_symbol,kicad_footprint,supplier,supplier_link,notes
+J1,Qualia 4-pin,Generic 1x4 header,1,Connector_Generic:Conn_01x04,Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical,Digi-Key,https://www.digikey.com/en/products/result?keywords=1x4+pin+header,Mate to whatever 4-pin connector your Qualia variant exposes.
+J2,DT06-4S,DT06-4S,1,Connector_Generic:Conn_01x04,Connector_Wuerth:Wuerth_61300411121_1x04_P2.50mm_Vertical,Digi-Key,https://www.digikey.com/en/products/result?keywords=DT06-4S,4-pin Deutsch plug (mates to engine-bay's DT04-4P).
+U1,TJA1051 breakout,HW-194 or similar,1,Connector_Generic:Conn_01x06,Connector_PinSocket_2.54mm:PinSocket_1x06_P2.54mm_Vertical,Amazon US,https://www.amazon.com/s?k=tja1051+module,On 1x6 female socket strip. Same family as engine-bay U6.
+R1,120Ω 1%,Generic 0805 1%,1,Device:R,Resistor_SMD:R_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+120+1%25,CAN termination.
+JP1,Term jumper,1x2 header + shunt,1,Connector_Generic:Conn_01x02,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,Digi-Key,https://www.digikey.com/en/products/result?keywords=0.1+jumper+shunt,Closes the 120 Ω termination network.
+C1,100nF/50V,Generic 0805 X7R,1,Device:C,Capacitor_SMD:C_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+100nF+X7R,U1 decoupling.
+C2,10µF/16V,Generic 1206 X5R,1,Device:C,Capacitor_SMD:C_1206_3216Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=1206+10uF+X5R,3.3 V bulk near U1.
+H1,Mounting hole,M3 non-plated,1,Mechanical:MountingHole,MountingHole:MountingHole_3.2mm_M3,—,—,Corner mount.
+H2,Mounting hole,M3 non-plated,1,Mechanical:MountingHole,MountingHole:MountingHole_3.2mm_M3,—,—,Corner mount.

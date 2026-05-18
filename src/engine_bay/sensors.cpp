@@ -22,8 +22,8 @@ constexpr float B_COEFFICIENT      = 3950.0f;
 constexpr float VREF               = 3.3f;
 constexpr float ADS_LSB_V          = 4.096f / 32767.0f;  // GAIN_ONE = ±4.096 V FS
 
-constexpr float MAP_V_ZERO   = 0.2f;
-constexpr float MAP_V_MAX    = 4.7f;
+constexpr float MAP_V_ZERO   = 0.1f;   // sensor 0.2 V after on-board 2:1 divider
+constexpr float MAP_V_MAX    = 2.35f;  // sensor 4.7 V after on-board 2:1 divider
 constexpr float MAP_PSI_MAX  = 29.0f;
 
 Adafruit_MAX31855 max_amp(PIN_MAX_SCK, PIN_MAX_CS, PIN_MAX_MISO);
