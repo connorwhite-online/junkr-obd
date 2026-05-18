@@ -103,6 +103,12 @@ flowchart LR
     USB["USB-C 5 V"] --> QUA["Qualia ESP32-S3<br/>(cabin)"]
 ```
 
+## Bench Testing
+
+Step-by-step bring-up guide — compile, then UI alone, then sensors alone,
+then CAN loopback, then real sensors, **then** fab PCBs. See
+[`docs/BENCH_TESTING.md`](docs/BENCH_TESTING.md).
+
 ## Hardware
 
 KiCad-ready specs for both PCBs live in [`kicad/`](kicad/) —
