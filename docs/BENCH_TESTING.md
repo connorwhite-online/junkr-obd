@@ -6,6 +6,9 @@ until the previous one's pass criteria are met.
 
 ## What you'll need
 
+For a US-supplier shopping list with links + costs, see
+[`BENCH_BOM.md`](BENCH_BOM.md). The quick version:
+
 **Hardware**
 
 | Item | Used in stage |

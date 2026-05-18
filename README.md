@@ -107,7 +107,8 @@ flowchart LR
 
 Step-by-step bring-up guide — compile, then UI alone, then sensors alone,
 then CAN loopback, then real sensors, **then** fab PCBs. See
-[`docs/BENCH_TESTING.md`](docs/BENCH_TESTING.md).
+[`docs/BENCH_TESTING.md`](docs/BENCH_TESTING.md). Bench-rig shopping
+list with US suppliers: [`docs/BENCH_BOM.md`](docs/BENCH_BOM.md).
 
 ## Hardware
 
