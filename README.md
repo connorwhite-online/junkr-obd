@@ -117,6 +117,10 @@ schematic netlists, BOMs with footprint references, design rules, and
 placement/routing notes. See [`kicad/README.md`](kicad/README.md) for
 the workflow.
 
+3D models for enclosure design: [`docs/3D_MODELS.md`](docs/3D_MODELS.md)
+(sourcing table + KiCad STEP-export workflow). The Qualia and ADS1115
+STEP files are vendored under [`hardware/3d_models/`](hardware/3d_models/).
+
 ## Firmware Layout
 
 Single PlatformIO project, two environments selected via `build_src_filter`:
