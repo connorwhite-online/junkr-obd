@@ -180,15 +180,21 @@ safest to riskiest:
    trims. Useful for experiments, but it confuses cold-start and warm-up
    logic.
 4. **VA scaling.** Changes pedal feel and response, not maximum power.
-5. **TCV takeover (timing).** We would drive the timing valve ourselves.
-   The ECU watches NE/TDC phase and expects it to match its target, so a
-   mismatch sets **code 14 (timing control)** and can put it in limp mode.
-   This only works if we also spoof what the ECU sees, which is a full
-   piggyback. Possible, but a later phase.
-6. **SPV takeover (fuel quantity). ⚠ Don't.** The SPV is a high-current
-   inductive solenoid switching once per injection. If our circuit fails
-   with the SPV *closed*, the pump injects for the full stroke: maximum
-   fuel, overheating, possible runaway. Read it, don't drive it.
+5. **TCV takeover (timing): out of scope.** We would drive the timing
+   valve ourselves. The ECU watches NE/TDC phase and expects it to match
+   its target, so a mismatch sets **code 14 (timing control)** and can put
+   it in limp mode.
+6. **SPV takeover (fuel quantity): out of scope. ⚠ Don't.** The SPV is a
+   high-current inductive solenoid switching once per injection. If our
+   circuit fails with the SPV *closed*, the pump injects for the full
+   stroke: maximum fuel, overheating, possible runaway. Read it, don't
+   drive it.
+
+> **Decision (Connor, 2026-10-22): piggyback only.** The stock ECU stays
+> in charge of fuel and timing. The interposer logs everything and reshapes
+> only the low-current *inputs* in levers 1–4 (PIM, VRP/VRT, temperatures,
+> VA). Timing changes come only from what the ECU itself does with those
+> inputs. SPV and TCV are tap-only and never intercepted.
 
 What we **can't** do from the connector: rewrite the ECU's maps. The
 mid-90s Denso diesel ECUs keep calibration in on-board ROM. Changing

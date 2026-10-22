@@ -94,11 +94,16 @@ flowchart LR
 This puts the tap box on the same bus as the engine-bay EGT/boost node, and
 the cabin display gains RPM, timing and fuelling at no extra cost.
 
-## Phase 2: interception (not built yet)
+## Phase 2: piggyback interception (not built yet)
 
 For PIM, VRP/VRT, THF and VA, the chamber gets a three-wire pigtail: ECU
 side, harness side, and the tap. A **normally-closed** signal relay
 (Panasonic TQ2) or an analog switch whose unpowered state is ON connects
 ECU to harness. When the tap board is powered and armed, it switches the ECU
 side over to a DAC or digital-pot output. Lose power, crash, or brown out,
-and the line goes back to stock. SPV is never intercepted (see research §4).
+and the line goes back to stock.
+
+The project is **piggyback-only**: SPV and TCV are tap-only and are never
+intercepted or driven (see research §4). The piggyback "maps" are
+correction tables (e.g. PIM out = f(PIM in, RPM)) applied to sensor inputs.
+The ECU's own maps still decide fuel and timing.
