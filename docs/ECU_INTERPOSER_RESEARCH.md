@@ -40,9 +40,12 @@ EU "Colorado", or AU KZJ95R).
 
 ## 2. ECU location and connectors
 
-- **Location:** behind the glovebox, on the passenger side. RM790E's
-  knock-sensor check tells you to remove the glove compartment to reach the
-  ECU connector **[VERIFY on RHD vs LHD]**.
+- **Location:** behind the glovebox, on the passenger side. Connor's truck
+  is a Japanese **RHD**, so that is the **left** side. EWD269F "Position of
+  Parts in Instrument Panel [RHD]" (printed p. 104, PDF p. 87) shows E5, E6
+  and E8 side by side high behind the glovebox, near the passenger airbag
+  (A25). RM790E's knock-sensor check also says to remove the glove
+  compartment to reach the ECU connector.
 - **Connectors:** three harness plugs, **E5 = 26 pin, E6 = 16 pin,
   E8 = 22 pin, 64 pins in total** (KZJ95 EWD269F p.210; the A/T ECU is the
   "Engine and ECT ECU"). Pin functions are in §3.
