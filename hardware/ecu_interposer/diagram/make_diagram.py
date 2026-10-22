@@ -164,8 +164,8 @@ def main():
     fig = plt.figure(figsize=(22, 27), dpi=110, facecolor="white")
     fig.text(0.04, 0.975, "1KZ-TE ECU interposer: E5 (26-pin) section, exploded view and cross-section analysis",
              fontsize=22, weight="bold", color=INK)
-    fig.text(0.04, 0.962, "Header TE 176122-6 (geometry measured from TE's 3D model). Terminal bodies and the "
-             "harness latch are estimates [MEASURE]. All dimensions in mm.", fontsize=12, color="#566573")
+    fig.text(0.04, 0.962, "Header TE 176122-6 (geometry measured from TE's 3D model). Terminal bodies are "
+             "estimates [MEASURE]; the latch is from TE's 175110-6 model. All dimensions in mm.", fontsize=12, color="#566573")
 
     # ---- 1. exploded view
     ax = fig.add_axes([0.02, 0.62, 0.96, 0.32])
@@ -272,7 +272,7 @@ def main():
         ("", "Fits and engages as designed. Walls under 0.6 mm need resin or MJF."),
         ("", "Lower 040 lance reliefs break 0.1 mm through the underside: they"),
         ("", "become open windows, which is harmless but visible."),
-        ("", "Not checked yet: latch retention and terminal body sizes [MEASURE]."),
+        ("", "Latch from TE's 175110-6 STEP. Still [MEASURE]: terminal body sizes."),
     ]
     y = 0.97
     for k, v in lines:

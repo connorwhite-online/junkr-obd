@@ -3,8 +3,9 @@
 //
 //  Header geometry (pitch, rows, cavity, ribs, rails) comes from the
 //  TE 176122-6 model and lives in sections.scad. What is still an ESTIMATE
-//  [MEASURE] is the receptacle/tab terminal body envelope and the plug
-//  latch. Print fit_coupon.scad first with real terminals, then tune here.
+//  [MEASURE] is the receptacle/tab terminal body envelope. The plug latch
+//  comes from TE's 175110-6 STEP model. Print fit_coupon.scad first with
+//  real terminals, then tune here.
 //  All units mm.
 // =====================================================================
 
@@ -45,16 +46,35 @@ plug_tail      = 6.0;   // female plug length behind the header mouth (finger gr
 shroud_floor   = 9.0;   // male shroud back wall that holds the tab terminals
 key_clr        = 0.20;  // per-side clearance of the plug's key ridges in the header slots
 
-// Retention. The 176122-6 model shows no lock ramp, so the OEM lock geometry is
-// unknown [MEASURE on the truck]. The printed plug relies on its key ridges plus
-// a zip-tie saddle; the shroud gets a window the OEM lock arm can click into
-// once its position is known.
-ziptie_w       = 4.0;
-lock_window    = false;
-lock_window_x  = 0;     // from section centre
-lock_window_z  = 3.0;   // from the mouth
-lock_window_w  = 2.4;
-lock_window_l  = 2.0;
+// Retention: the OEM lock, measured from TE's 175110-6 STEP model (see
+// docs/ECU_INTERPOSER_RESEARCH.md §2.4). All three plugs share one latch on
+// the section centre line, between the two slots either side of the 2 mm
+// centre rib. The plug has two flexible tines (|x| = 1.3..4.1) rooted at its
+// front, each with a 45° hook whose lock face sits 11.45 mm behind the plug
+// front. The header holds a lock bar at its mouth between the tines; the
+// hooks ride under it and snap up behind it.
+//
+// Lock bar inside the male shroud (the OEM plug clicks onto it):
+lock_bar       = true;
+lock_bar_hw    = 2.55;   // half width; the OEM tines' outer parts start at |x| = 2.8
+lock_bar_y0    = 13.91;  // underside, cavity frame (OEM arm top 13.61, hook top 14.86)
+lock_bar_depth = 2.9;    // mouth to the bar's inner face (OEM lock face: 3.05..3.55 in)
+// Lock tines on the printed female plug (they click onto the ECU header's bar).
+// Kept below 13.45 everywhere the real bar could be, hook up to 14.8.
+plug_latch     = true;
+latch_x        = [1.4, 2.6];  // tine span either side of the centre line
+latch_top      = 13.45;  // tine top (cavity frame)
+latch_t        = 1.0;    // tine thickness
+latch_root     = 1.5;    // tines are solid to the body for z < latch_root
+latch_hook_top = 14.8;   // 0.22 under the header slot ceiling
+latch_lock_z   = 11.1;   // hook lock face from the plug front = 3.2 inside the mouth (OEM: 3.05)
+latch_ramp     = 1.35;   // 45° lead ramp
+latch_flat     = 0.45;
+latch_end      = 18.0;   // free end: crossbar + press tab (outside the header mouth)
+latch_tab_l    = 2.5;
+latch_pocket   = 0.6;    // body relief under the tines so they can deflect 1.4 mm
+latch_guard_x  = 3.0;    // key ridges in the centre slots start at |x| = this
+ziptie_w       = 4.0;    // backup tie to the ECU bracket
 
 // Chamber between the two ends (wire pass-through + tap pick-off)
 chamber_len    = 26.0;  // room for pigtail loops + tap splices

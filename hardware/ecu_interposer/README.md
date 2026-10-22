@@ -31,13 +31,19 @@ details and all the TE part numbers are in
 header cavity with its key slots and end rails. Bottom: `female_plug`,
 with key ridges that ride in the header's slots and a cavity per pin.*
 
-Two things are still estimates, marked **[MEASURE]** in `params.scad`:
+The **latch** comes from TE's STEP model of the 22-pin harness plug
+(175110-6). The OEM plug has two flexible tines with hooks that snap behind
+a bar at the header mouth. So `male_shroud` now has that bar (the OEM plug
+clicks in and holds), and `female_plug` has its own tines and press tab to
+click into the ECU's header. A virtual test fit of TE's model in the
+printed shroud shows no interference. Details in
+[research §2.1a](../../docs/ECU_INTERPOSER_RESEARCH.md#21a-the-plug-latch-from-tes-175110-6-step).
 
-- the receptacle and tab **body sizes** inside the printed parts (`T040`,
-  `T070`), which only matter for how the metal terminals seat;
-- the OEM plug's **latch**. The header model has no lock ramp, so the
-  shroud has an optional `lock_window` you can switch on once it's measured.
-  Until then the chamber clamp and a zip-tie hold everything together.
+![E8 latch, lengthwise section](preview_E8_latch.png)
+
+One thing is still an estimate, marked **[MEASURE]** in `params.scad`: the
+receptacle and tab **body sizes** inside the printed parts (`T040`,
+`T070`), which only matter for how the metal terminals seat.
 
 ## Exploded view and cross-section analysis
 
@@ -61,20 +67,24 @@ a 070 and a 040 column (how far each tab engages). Rebuild it with
   meets a 040 column (OpenSCAD echoes a warning). That's the same as OEM
   but too fine for 0.4 mm-nozzle FDM. Print them in **resin
   (tough/ABS-like)** or order **MJF PA12**. Orientation is already set:
-  the plug prints front face down, the shroud prints flange down.
+  the plug prints front face down, the shroud prints flange down. The
+  plug's lock tines then stand vertically, so in FDM they would bend
+  across layer lines and snap: another reason for resin or MJF. Press the
+  tab outside the header mouth to release.
 - **Chamber halves and tap box:** FDM is fine, in PETG or ASA. The ECU sits
   behind the glovebox, so these see cabin temperatures, not engine-bay.
   The chamber halves export split face down.
 - **Hardware:** 4 × M2 × 10 self-tappers per section, 4 × M2.5 × 5 for the
-  tap PCB, and one 4 mm zip-tie per section to the ECU bracket.
+  tap PCB, and one 4 mm zip-tie per section to the ECU bracket (backup to the
+  latch).
 
 ## Files
 
 | Path | What |
 | --- | --- |
 | `pinout_kzj95_at.csv` | ECU pinout for the automatic, from the KZJ95 wiring manual (EWD269F) |
-| `cad/sections.scad` | The measured 176122-6 geometry: per-section cavity length, columns (040/070), key slots, rails |
-| `cad/params.scad` | Process clearances, terminal body envelopes **[MEASURE]**, chamber and tap box |
+| `cad/sections.scad` | The measured 176122-6 geometry: per-section cavity length, columns (040/070), key slots, rails, floor grooves |
+| `cad/params.scad` | Process clearances, terminal body envelopes **[MEASURE]**, latch (lock bar and tines), chamber and tap box |
 | `cad/interposer.scad` | Library: `female_plug`, `male_shroud`, `chamber_half`, `tapbox_base/lid`, `section_assembly` |
 | `cad/main.scad` | Top level. Choose with `-D part=... -D sec_i=...` (0 = E5 26-pin, 1 = E6 16-pin, 2 = E8 22-pin) |
 | `cad/fit_coupon.scad` | Fit test slice |

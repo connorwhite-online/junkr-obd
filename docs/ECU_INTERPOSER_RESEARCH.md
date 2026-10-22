@@ -74,6 +74,7 @@ measured the mesh (±0.05 mm) and cross-checked it against TE's published
 | 070 → 040 column step | 3.1 mm |
 | Polarising rails | on both end walls of each cavity, mid-height (C/A: 5.26–5.94 mm, 0.8 proud; B: 6.12–7.08 mm, 0.5 proud) |
 | Keying | a different rib/slot pattern on the top wall of each section (listed in `sections.scad`) |
+| Floor grooves | two per section, 1.5 wide × 1.0 deep, full depth, symmetric about the centre: E5 ±11.35–12.85, E6 ±6.25–7.75, E8 ±9.25–10.75 mm (added after the STEP test fit below) |
 
 Column layout, header seen from its mouth: **E5** = 070 ×3 | 040 ×8 | 070 ×2.
 **E6** = 040 ×8. **E8** = 070 ×1 | 040 ×8 | 070 ×2. (The manual's plug-face
@@ -81,10 +82,42 @@ drawings show the mirror image of this.)
 
 ![E5 (26-pin) cross-section: printed male shroud (top) and female plug (bottom)](../hardware/ecu_interposer/preview_E5_section.png)
 
-**Not in the model, still [MEASURE]:** the harness plug's latch and the
-header's lock ramp (the CAD has an optional `lock_window` for it), and
-the exact receptacle body sizes inside the plug (`T040` / `T070` in
-`params.scad`).
+**Still [MEASURE]:** the exact receptacle body sizes inside the plug
+(`T040` / `T070` in `params.scad`).
+
+### 2.1a The plug latch (from TE's 175110-6 STEP)
+
+TE's customer-view STEP of the 22-pin plug (`C-175110-6`, Pro/E, 2011,
+on Connor's Desktop; not committed, TE copyright) settles the latch. We
+sectioned it with OpenCascade's point classifier at 0.1 mm steps. In the
+plug's own frame (front face z = 0, body ±5.8 mm tall, centred):
+
+| Feature | Value |
+| --- | --- |
+| Where | on the section centre line, on the slotted (rib) side, in the two slots either side of the header's 2 mm centre rib. E5 and E6 have the same centre slot pair, so the same latch fits all three. |
+| Lock arm | two tines at \|x\| = 1.3–4.1 mm, rooted in a solid block at the front (z 0 to −3.5), free towards the back, joined by a crossbar with a press button at z −15.5 to −18.5 (outside the header) |
+| Tine | about 1.1 mm thick, top 7.7 mm above the plug centre at the hook (8.75 on the outer part, \|x\| ≥ 2.8); 0.5–1.25 mm gap under it for deflection |
+| Hook | on the inner part of each tine (\|x\| = 1.4–2.8): 45° ramp facing the front from z −9.25 to −10.45, flat top at 8.95, square lock face at **z = −11.45** facing the back. Hook height 1.25 mm. |
+| Header lock (inferred) | a bar at the header mouth between the tines (\|x\| < 2.8), underside between 7.7 and 8.95 above the plug centre, inner face no deeper than **3.05 mm** inside the mouth. The rusEFI header model leaves it out. |
+| Other plug features the header model was missing | two bottom keys at \|x\| = 9.4–10.6, 0.9 mm deep (they ride in the floor grooves, which the rusEFI model *does* have; our first pass missed them) and root fillets on the top ribs (0.35 chamfers on the slot edges) |
+| TE spec 108-5280 | locking strength ≥ 98 N; 22-pin unmating force ≤ 118 N; 26-pin ≤ 137 N |
+
+What the CAD does with it:
+
+- **`male_shroud`** gets a lock bar at the mouth (\|x\| ≤ 2.55, underside
+  13.91 mm above the cavity floor, 2.9 mm deep with a 0.5 mm lead-in), plus
+  the floor grooves and slot chamfers. A virtual test fit of TE's STEP in
+  the E8 shroud shows **zero interference** when seated, and the hook's lock
+  face lands 0.15 mm behind the bar.
+- **`female_plug`** gets its own copy of the lock: 1.0 mm tines kept below
+  13.45 mm (under any position the real bar could be), hooks to 14.8 mm,
+  lock face 11.1 mm from the plug front (3.2 mm inside the mouth, vs
+  3.05 for the OEM), a press tab outside the mouth, and a 0.6 mm relief in
+  the body under the tines so they can drop 1.4 mm. Bottom keys for the
+  floor grooves too. The tines bend about 2 % at full deflection, which
+  wants tough resin or MJF PA12; the zip-tie stays as a backup.
+
+![E8 latch: OEM plug in the printed shroud (left), printed plug in a header copy (right)](../hardware/ecu_interposer/preview_E8_latch.png)
 
 ### 2.2 Part numbers
 
@@ -145,8 +178,9 @@ The CAD frame looks at the ECU header from its mouth, which is the mirror
 image, so manual column 1 is the rightmost column in `sections.scad`
 (`pin_no()` does the mapping). The terminal sizes this implies line up
 with the circuits: grounds, SPV, TCV, the A/T solenoids, +B and BATT all
-land on 070 terminals. **[VERIFY]** that the manual's top row is the latch
-side.
+land on 070 terminals. The STEP model puts the latch on the slotted side,
+which is the CAD's upper row; **[VERIFY]** that the manual's top row is the
+latch side too (Toyota face views normally draw the lock at the top).
 
 **E5, 26 pin**
 
@@ -319,5 +353,5 @@ handful of pins in levers 1–4.
 2. ~~Which manual?~~ Done: the KZJ95 EWD (EWD269F) is on Connor's Desktop and
    the pinout above comes from it.
 3. Photos of the three plug faces next to a ruler (mating side and wire
-   side). The header geometry is now measured from the TE model, so these
-   mainly confirm the latch and the 26-pin plug's part number.
+   side). Header and latch now come from TE's models, so these would only
+   confirm the 26-pin plug's part number. Not needed.

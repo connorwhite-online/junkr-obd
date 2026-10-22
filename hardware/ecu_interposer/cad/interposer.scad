@@ -32,7 +32,7 @@ function plug_len(s)   = insert_len(s) + plug_tail;
 
 // male shroud = header copy
 function sh_w(s)  = s_len(s) + 2 * HDR_WALL;
-function sh_y0(s) = -HDR_WALL;
+function sh_y0(s) = -HDR_WALL - HDR_GROOVE_D;                // floor wall stays HDR_WALL under the grooves
 function sh_y1(s) = HDR_SLOT_TOP + HDR_WALL;
 function sh_len(s) = shroud_floor + HDR_DEPTH;
 
@@ -116,9 +116,16 @@ module plug_envelope(s, z0, z1) {
         union() {
             box_xy(-L / 2 + slide_clr, L / 2 - slide_clr, slide_clr, HDR_CAV_H - slide_clr, z0, z1);
             // key ridges that ride in the header's top-wall slots
+            // (the two centre slots keep only their outer part: the lock tines use the rest)
             for (sl = s_slots(s))
-                box_xy(cx(s, sl[0]) + key_clr, cx(s, sl[1]) - key_clr,
-                       HDR_CAV_H - slide_clr - 0.01, HDR_SLOT_TOP - key_clr, z0, z1);
+                let (x0 = cx(s, sl[0]) + key_clr, x1 = cx(s, sl[1]) - key_clr,
+                     a = plug_latch && x1 > -latch_guard_x && x1 <= 0 ? -latch_guard_x : x1,
+                     b = plug_latch && x0 < latch_guard_x && x0 >= 0 ? latch_guard_x : x0)
+                    if (b < a)
+                        box_xy(b, a, HDR_CAV_H - slide_clr - 0.01, HDR_SLOT_TOP - key_clr, z0, z1);
+            // bottom keys that ride in the header's floor grooves
+            for (g = s_grooves(s))
+                box_xy(cx(s, g[0]) + key_clr, cx(s, g[1]) - key_clr, -HDR_GROOVE_D + key_clr, slide_clr + 0.01, z0, z1);
         }
         // grooves for the polarising rails on both end walls
         rl = s_rail(s);
@@ -137,11 +144,34 @@ module female_plug(s, with_flange = true) {
             if (with_flange) box_xy(-fl_w(s) / 2, fl_w(s) / 2, fl_y0(s), fl_y1(s), Lp, Lp + flange_t);
         }
         for_pins(s) receptacle_cavity($t, $out, Lp + flange_t + 2);
+        if (plug_latch && len(s_slots(s)) > 0)       // relief under the tines (not on the fit coupon)
+            box_xy(-latch_x[1] - 0.2, latch_x[1] + 0.2, HDR_CAV_H - slide_clr - latch_pocket,
+                   HDR_CAV_H, latch_root, latch_end + 0.5);
         // pin-1 marker: on the +X, upper-row corner, which is Toyota pin 1
         // (see pin_no in sections.scad); top-right seen from the wire side
         if (with_flange)
             translate([fl_w(s) / 2 - 1.5, fl_y1(s) - 1.5, Lp + flange_t - 0.4]) cylinder(d = 1.2, h = 1);
     }
+    if (plug_latch && len(s_slots(s)) > 0) plug_latch_arm();
+}
+
+// Lock tines copied from the OEM 175110-6: rooted at the front, free at the
+// back, joined by a crossbar with a press tab outside the header mouth.
+// Press the tab to drop the hooks and pull the plug.
+module plug_latch_arm() {
+    yb = latch_top - latch_t;
+    zl = latch_lock_z;
+    for (sx = [-1, 1]) mirror([sx < 0 ? 1 : 0, 0, 0]) {
+        box_xy(latch_x[0], latch_x[1], HDR_CAV_H - slide_clr - latch_pocket - 0.01, latch_top, 0, latch_root);
+        box_xy(latch_x[0], latch_x[1], yb, latch_top, latch_root - 0.01, latch_end);
+        // hook: 45° ramp facing the front, square lock face facing the back
+        translate([latch_x[0], 0, 0]) multmatrix([[0, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]])   // 2D (z, y) -> 3D, extruded along x
+            linear_extrude(latch_x[1] - latch_x[0])
+                polygon([[zl - latch_flat - latch_ramp, latch_top - 0.01], [zl - latch_flat, latch_hook_top],
+                         [zl, latch_hook_top], [zl, latch_top - 0.01]]);
+    }
+    box_xy(-latch_x[1], latch_x[1], yb, latch_top, latch_end - latch_tab_l, latch_end);
+    box_xy(-latch_x[1] + 0.4, latch_x[1] - 0.4, latch_top - 0.01, latch_hook_top - 0.2, latch_end - latch_tab_l, latch_end);
 }
 
 // ---------------------------------------------------------------------
@@ -160,12 +190,17 @@ module male_shroud(s, with_flange = true) {
                 if (with_flange) box_xy(-fl_w(s) / 2, fl_w(s) / 2, fl_y0(s), fl_y1(s), -flange_t, 0);
             }
             box_xy(-L / 2, L / 2, 0, HDR_CAV_H, zf, zt + 1);
-            for (sl = s_slots(s))
+            for (sl = s_slots(s)) {
                 box_xy(cx(s, sl[0]), cx(s, sl[1]), HDR_CAV_H - 0.01, HDR_SLOT_TOP, zf, zt + 1);
+                hull() {                                    // 45° chamfer on the slot edges
+                    box_xy(cx(s, sl[0]), cx(s, sl[1]), HDR_CAV_H + HDR_SLOT_CHAMF, HDR_CAV_H + HDR_SLOT_CHAMF + 0.01, zf, zt + 1);
+                    box_xy(cx(s, sl[0]) - HDR_SLOT_CHAMF, cx(s, sl[1]) + HDR_SLOT_CHAMF,
+                           HDR_CAV_H - 0.01, HDR_CAV_H, zf, zt + 1);
+                }
+            }
+            for (g = s_grooves(s))
+                box_xy(cx(s, g[0]), cx(s, g[1]), -HDR_GROOVE_D, 0.01, zf, zt + 1);
             translate([0, 0, zt]) mouth_chamfer(s);
-            if (lock_window)
-                translate([lock_window_x - lock_window_w / 2, HDR_SLOT_TOP - 0.01, zt - lock_window_z - lock_window_l])
-                    cube([lock_window_w, HDR_WALL + 1, lock_window_l]);
             for_pins(s) tab_cavity($t, $out, zf, with_flange ? -flange_t : 0);
             if (with_flange)
                 translate([fl_w(s) / 2 - 1.5, fl_y1(s) - 1.5, -flange_t - 0.6]) cylinder(d = 1.2, h = 1);   // pin 1 corner
@@ -174,6 +209,12 @@ module male_shroud(s, with_flange = true) {
         for (sx = [-1, 1])
             translate([sx > 0 ? L / 2 - rl[2] : -L / 2, rl[0], zf])
                 cube([rl[2] + 0.01, rl[1] - rl[0], HDR_DEPTH - 1.0]);
+        // lock bar at the mouth across the centre rib: the OEM plug's hooks snap behind it
+        if (lock_bar)
+            hull() {
+                box_xy(-lock_bar_hw, lock_bar_hw, lock_bar_y0, HDR_SLOT_TOP + 0.01, zt - lock_bar_depth, zt - 0.5);
+                box_xy(-lock_bar_hw, lock_bar_hw, lock_bar_y0 + 0.5, HDR_SLOT_TOP + 0.01, zt - lock_bar_depth, zt);
+            }
     }
 }
 
