@@ -185,3 +185,11 @@ pio device monitor -e cabin            # or -e engine-bay
 The cabin's display init in `src/cabin/main.cpp` currently calls
 `tft.init(240, 240)` — adjust to match the Qualia panel variant in hand
 (480×480 round IPS vs. 320×240 ST7789 vs. 240×240).
+## ECU Interposer (in progress)
+
+A zero-cut, printable pass-through between the KZJ95's 1KZ-TE ECU and its
+harness, with an ESP32-S3 tap board that logs RPM, actual injection timing,
+spill-valve fuelling, boost and temperatures. See
+[`hardware/ecu_interposer/`](hardware/ecu_interposer/),
+[`docs/ECU_INTERPOSER_RESEARCH.md`](docs/ECU_INTERPOSER_RESEARCH.md) and
+[`docs/ECU_TAP_ARCHITECTURE.md`](docs/ECU_TAP_ARCHITECTURE.md).
