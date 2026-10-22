@@ -38,6 +38,14 @@ Two things are still estimates, marked **[MEASURE]** in `params.scad`:
   shroud has an optional `lock_window` you can switch on once it's measured.
   Until then the chamber clamp and a zip-tie hold everything together.
 
+## Exploded view and cross-section analysis
+
+[`diagram/connector_diagram.pdf`](diagram/connector_diagram.pdf) ([PNG](diagram/connector_diagram.png))
+shows the C26 section exploded with every terminal, then two true-scale
+sections: across the pins (pitch, rows, keys, webs) and lengthwise through
+a 070 and a 040 column (how far each tab engages). Rebuild it with
+`python3 diagram/make_diagram.py` (needs OpenSCAD, xvfb-run, matplotlib).
+
 ## Printing
 
 1. Print **`stl/fit_coupon.stl`** first: a 4-column slice (070, 040, 040,
@@ -68,6 +76,7 @@ Two things are still estimates, marked **[MEASURE]** in `params.scad`:
 | `cad/interposer.scad` | Library: `female_plug`, `male_shroud`, `chamber_half`, `tapbox_base/lid`, `section_assembly` |
 | `cad/main.scad` | Top level. Choose with `-D part=... -D sec_i=...` (0 = A22, 1 = B16, 2 = C26) |
 | `cad/fit_coupon.scad` | Fit test slice |
+| `cad/diagram.scad` | Diagram scene: terminals, pigtails, exploded / cut views (not for printing) |
 | `cad/export_all.sh` | Regenerates every STL into `stl/` |
 | `stl/` | Pre-exported STLs, print-oriented |
 
