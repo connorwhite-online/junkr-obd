@@ -1,9 +1,10 @@
 // =====================================================================
 //  ECU interposer — shared parameters
 //
-//  EVERY dimension marked [MEASURE] is an estimate from TE/AMP Multilock
-//  catalogue data, not from the actual KZJ95 connector. Print
-//  fit_coupon.scad first, compare against the real plug, then edit here.
+//  Header geometry (pitch, rows, cavity, ribs, rails) comes from the
+//  TE 176122-6 model and lives in sections.scad. What is still an ESTIMATE
+//  [MEASURE] is the receptacle/tab terminal body envelope and the plug
+//  latch. Print fit_coupon.scad first with real terminals, then tune here.
 //  All units mm.
 // =====================================================================
 
@@ -15,17 +16,17 @@ slide_clr  = 0.25;   // per-side clearance for sliding fits (plug-in-shroud, ten
 min_wall   = 0.6;    // thinnest wall the process can hold (resin 0.5, 0.4-nozzle FDM 0.8)
 
 // ---- Terminal families ---------------------------------------------------
-// Toyota mid-90s Denso ECUs use TE/AMP "Multilock" hybrid headers:
-//   040 series: 1.0 x 0.64 mm tab, 2.5 mm pitch  (signal)
-//   070 series: 1.8 x 0.64 mm tab                (power / solenoid drive)
-// Receptacle body sizes below are [MEASURE] — catalogue tab sizes are firm,
-// the stamped body envelope is not published.
+// The 176122-6 hybrid header carries two TE Multilock families:
+//   040: 1.0 x 0.64 mm tab, 3.0 mm pitch here  (receptacle 175061-1/175062-1/173681-6, tab 173682-1)
+//   070: 1.8 x 0.64 mm tab, 3.5 mm pitch here  (receptacle 173631-1/-8, tab 173645-1)
+// Tab sizes are catalogue values. Body envelopes and lance positions are
+// [MEASURE]: TE does not publish them openly.
 //
 // index:            0        1       2        3       4         5          6          7
-//                  tab_w   tab_t   body_w   body_h  body_len  lance_h   lance_from  tab_len
-//                                                             (spring)  _front      (male, exposed)
-T040 = [            1.00,   0.64,   1.90,    2.10,   14.2,     0.45,     5.0,        6.5 ];
-T070 = [            1.80,   0.64,   2.80,    2.70,   16.0,     0.55,     6.0,        7.5 ];
+//                  tab_w   tab_t   body_w   body_h  body_len  lance_h   lance_from  male_body_len
+//                                                             (spring)  _front      (behind the floor)
+T040 = [            1.00,   0.64,   2.00,    2.20,   16.0,     0.45,     5.0,        8.0 ];
+T070 = [            1.80,   0.64,   2.85,    2.80,   16.0,     0.55,     6.0,        9.0 ];
 
 function tab_w(t)      = t[0];
 function tab_t(t)      = t[1];
@@ -34,23 +35,26 @@ function body_h(t)     = t[3];
 function body_len(t)   = t[4];
 function lance_h(t)    = t[5];
 function lance_ff(t)   = t[6];
-function tab_len(t)    = t[7];
+function male_body_len(t) = t[7];
 
 function term(code) = code == 2 ? T070 : T040;
 
 // ---- Housing geometry ----------------------------------------------------
-face_wall      = 1.0;   // front wall of female plug (tab entry holes go through it)
-shell_wall     = 1.6;   // outer wall of plugs / shrouds
-plug_len_extra = 2.0;   // female plug length beyond terminal body length
-shroud_depth   = 11.0;  // [MEASURE] how deep the OEM plug sits in the ECU header
-shroud_floor   = 6.0;   // floor thickness that holds male tabs (needs > lance step)
+face_wall      = 1.0;   // front wall of the female plug (tab entry holes go through it)
+plug_tail      = 6.0;   // female plug length behind the header mouth (finger grip + terminal length)
+shroud_floor   = 9.0;   // male shroud back wall that holds the tab terminals
+key_clr        = 0.20;  // per-side clearance of the plug's key ridges in the header slots
 
-// Latch (cantilever on the plug, ramp in the shroud) — [MEASURE] all
-latch_w        = 5.0;
-latch_len      = 9.0;
-latch_t        = 1.2;
-latch_hook     = 0.9;   // hook height
-latch_gap      = 0.6;   // flex gap under the arm
+// Retention. The 176122-6 model shows no lock ramp, so the OEM lock geometry is
+// unknown [MEASURE on the truck]. The printed plug relies on its key ridges plus
+// a zip-tie saddle; the shroud gets a window the OEM lock arm can click into
+// once its position is known.
+ziptie_w       = 4.0;
+lock_window    = false;
+lock_window_x  = 0;     // from section centre
+lock_window_z  = 3.0;   // from the mouth
+lock_window_w  = 2.4;
+lock_window_l  = 2.0;
 
 // Chamber between the two ends (wire pass-through + tap pick-off)
 chamber_len    = 26.0;  // room for pigtail loops + tap splices

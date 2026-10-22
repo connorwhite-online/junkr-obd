@@ -49,40 +49,71 @@ EU "Colorado", or AU KZJ95R).
   ([hiluxsurf.co.uk](https://hiluxsurf.co.uk/filedata/fetch?id=1295023)).
   The KZN130 is the same engine and ECU generation. The A/T table fills all
   64 positions, and the M/T table leaves some empty.
-- **Connector family:** a 64-way **TE/AMP Multilock hybrid** header. The
-  board-side part is **TE 176122-6**, also used on 1994 Camry and MR2 Turbo
-  ECUs ([rusEFI forum](https://rusefi.com/forum/viewtopic.php?p=33084);
+- **Connector family:** a 64-way **TE/AMP Multilock hybrid** header,
+  **TE 176122-6** ("hybrid cap assy 64P"). It is also used on 1994 Camry
+  and MR2 Turbo ECUs ([rusEFI forum](https://rusefi.com/forum/viewtopic.php?p=33084);
   [rusEFI OEM connectors wiki](https://github.com/rusefi/rusefi/wiki/OEM-connectors)).
-  The same thread lists the harness-side terminals:
-  | Terminal | Series | Mating tab | Wire | Use |
-  | --- | --- | --- | --- | --- |
-  | **TE 175061-1** (and the 175062-1 sibling) | Multilock **040** | 1.0 mm wide | 24–20 AWG | most signal pins |
-  | **TE 173631-1** | Multilock **070** | 1.8 × 0.64 mm | 20–16 AWG (0.5–1.25 mm²), insulation Ø 2.0–2.6 mm | power / ground / solenoid pins |
 
-  Sources: [TE 173631-1 datasheet](https://www.te.com.cn/chn-zh/product-173631-1.datasheet.pdf),
-  [TE Multilock receptacle family](https://www.te.com/en/product-CAT-M9194-T273.html).
-- **Pitch:** Multilock 040 has a **2.5 mm** pitch
-  ([RS: Multilock 040 housings](https://uk.rs-online.com/web/p/wire-housings-plugs/1614146)).
-  The Toyota 54-way sibling header (TE 175448-6) lists a **~3.0 mm** pitch
-  ([Octopart](https://octopart.com/ko/part/te-connectivity/175448-6)). The
-  row-to-row pitch and the outer dimensions of the housing are **not
-  published**. **[VERIFY]** with calipers.
-- **Keying:** each of A, B and C is shaped or keyed differently so the plugs
-  can't be swapped. The CAD gives every section its own key rib positions
-  as placeholders **[VERIFY]**.
+### 2.1 Header dimensions (measured)
+
+rusEFI publishes a KiCad footprint and a 3D model of 176122-6
+([rusefi/kicad-libraries](https://github.com/rusefi/kicad-libraries)). We
+measured the mesh (±0.05 mm) and cross-checked it against TE's published
+5.2 mm row spacing on the mating plug 175110-6. Every number in
+`hardware/ecu_interposer/cad/sections.scad` comes from this.
+
+| Feature | Value |
+| --- | --- |
+| Overall length (with mounting ears) | 117.8 mm |
+| Body | 108.96 × 18.5 mm |
+| Section order (left to right, from the mating face) | C26, B16, A22 |
+| Cavity lengths | C26 **42.44**, B16 **25.20**, A22 **35.42** mm |
+| Wall between sections | 5.95 mm (centre gap); outer walls 1.48 mm |
+| Cavity height | 11.82 mm (floor to rib undersides); slots between ribs reach **15.02 mm** |
+| Cavity depth (mouth to floor) | 14.5 mm |
+| Row spacing | **5.2 mm** (two rows per section) |
+| 040 rows | 1.85 / 7.05 mm above the floor; **3.0 mm** column pitch; tab 0.98 × 0.62 mm, tip 7.09 mm proud of the floor |
+| 070 rows | 1.0 mm higher (2.85 / 8.05 mm); **3.5 mm** column pitch; tab 1.78 × 0.62 mm, tip 7.99 mm proud |
+| 070 → 040 column step | 3.1 mm |
+| Polarising rails | on both end walls of each cavity, mid-height (C/A: 5.26–5.94 mm, 0.8 proud; B: 6.12–7.08 mm, 0.5 proud) |
+| Keying | a different rib/slot pattern on the top wall of each section (listed in `sections.scad`) |
+
+Column layout: **C26** = 070 ×3 | 040 ×8 | 070 ×2. **B16** = 040 ×8.
+**A22** = 070 ×1 | 040 ×8 | 070 ×2.
+
+![C26 cross-section: printed male shroud (top) and female plug (bottom)](../hardware/ecu_interposer/preview_C26_section.png)
+
+**Not in the model, still [MEASURE]:** the harness plug's latch and the
+header's lock ramp (the CAD has an optional `lock_window` for it), and
+the exact receptacle body sizes inside the plug (`T040` / `T070` in
+`params.scad`).
+
+### 2.2 Part numbers
+
+| Part | TE number | Notes |
+| --- | --- | --- |
+| ECU header (on the board) | **176122-6** | what we copy for `male_shroud` |
+| Harness plug, 22 pin (A) | **175110-6** | 31.4 × 36.1 × 21.0 mm |
+| Harness plug, 16 pin (B) | **175109-6** | |
+| Harness plug, 26 pin (C) | **175111-x** (inferred from the series); 175567-1 is a possible alternative | [VERIFY] from the plug's moulding |
+| 040 receptacle (goes in our `female_plug`) | **175061-1**, 175062-1, 173681-6 | 24–20 AWG |
+| 070 receptacle | **173631-1** (or -8) | 20–16 AWG, insulation Ø 2.0–2.6 mm |
+| 040 tab (goes in our `male_shroud`) | **173682-1** (175206-1 is the older, not-for-new-designs part) | |
+| 070 tab | **173645-1** | |
+| Application spec | 114-8005 | crimp heights and pull-out forces |
+| Hand crimp tool | 58521-1 / 58521-2 | a generic open-barrel crimper works with care |
+
+Sources: [TE 173631-1 datasheet](https://www.te.com.cn/chn-zh/product-173631-1.datasheet.pdf),
+[TE Multilock receptacle family](https://www.te.com/en/product-CAT-M9194-T273.html),
+TE product pages for each number above.
 
 ### Buying terminals rather than printing them
 
-The printed housings hold real metal terminals. The plan is to buy:
-
-- **ECU side** (our plug → ECU header): Multilock receptacles,
-  175061-1 / 173631-1.
-- **Harness side** (OEM plug → our shroud): the matching Multilock **tab**
-  terminals in 040 and 070 sizes **[VERIFY part numbers against the
-  receptacles once in hand]**.
-- A **sacrificial donor:** a used 1KZ-TE / 3S-GTE / 1994 Camry ECU from a
-  wrecker (about US$30–60) gives us the real 176122-6 header to measure. Its
-  board can even be cut down into a proper male side later.
+The printed housings hold real metal terminals: receptacles in the part
+that plugs into the ECU, tabs in the part the OEM plug goes into. A
+sacrificial donor ECU (1KZ-TE, 3S-GTE or 1994 Camry, about US$30–60 at a
+wrecker) is still worth having. It gives a real 176122-6 header to test
+the printed plug against before going near the truck.
 
 ## 3. Pinout (1KZ-TE engine ECU)
 
@@ -221,5 +252,6 @@ handful of pins in levers 1–4.
 1. A/T or M/T? And the `89661-` / `175800-` numbers from the ECU sticker.
 2. Is the iCloud manual the RM790E or a KZJ95 EWD? Either fills in the
    **[VERIFY]** items.
-3. Photos of the three plug faces next to a ruler (from the mating side and
-   the wire side) are enough to set `pitch_y`, the outer dims, and the keys.
+3. Photos of the three plug faces next to a ruler (mating side and wire
+   side). The header geometry is now measured from the TE model, so these
+   mainly confirm the latch and the 26-pin plug's part number.
