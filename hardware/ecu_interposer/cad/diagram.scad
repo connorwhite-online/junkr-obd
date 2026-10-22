@@ -12,7 +12,7 @@
 include <interposer.scad>
 
 view   = "exploded";
-sec_i  = 2;
+sec_i  = 0;
 comp   = "";
 cut    = "x";
 cut_at = 4.0;

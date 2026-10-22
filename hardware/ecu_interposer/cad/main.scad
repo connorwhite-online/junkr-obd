@@ -1,18 +1,18 @@
 // =====================================================================
 //  ECU interposer — top level. Pick what to render with `part` / `sec`.
 //
-//  openscad -o ../stl/C26_female_plug.stl -D 'part="female_plug"' -D 'sec_i=2' main.scad
+//  openscad -o ../stl/E5_26P_female_plug.stl -D 'part="female_plug"' -D 'sec_i=0' main.scad
 //  (or just run ./export_all.sh)
 //
 //  part: "assembly" | "female_plug" | "male_shroud" | "chamber_bottom"
 //        | "chamber_top" | "tapbox_base" | "tapbox_lid"
-//  sec_i: 0 = A22, 1 = B16, 2 = C26
+//  sec_i: 0 = E5 (26 pin), 1 = E6 (16 pin), 2 = E8 (22 pin)
 // =====================================================================
 
 include <interposer.scad>
 
 part    = "assembly";
-sec_i   = 2;
+sec_i   = 0;
 explode = 12;
 
 s = SECTIONS[sec_i];

@@ -2,10 +2,11 @@
 
 A printable, modular pass-through that plugs in between the 1KZ-TE engine
 ECU and its harness. Nothing on the truck gets cut. Each of the ECU's three
-plugs (A22 / B16 / C26) gets its own independent section, so you can
+plugs (E5 26-pin / E6 16-pin / E8 22-pin, as the KZJ95 wiring manual names
+them) gets its own independent section, so you can
 install only the ones carrying the signals you want.
 
-![C26 section, exploded](preview_C26_exploded.png)
+![E5 (26-pin) section, exploded](preview_E5_exploded.png)
 
 ```
  ECU header ◀── female_plug ─┬─ chamber (2 halves) ─┬─ male_shroud ◀── OEM harness plug
@@ -24,9 +25,9 @@ and every cavity, rib, slot, rail, row and column position in
 details and all the TE part numbers are in
 [research §2](../../docs/ECU_INTERPOSER_RESEARCH.md#2-ecu-location-and-connectors).
 
-![C26 cross-section](preview_C26_section.png)
+![E5 (26-pin) cross-section](preview_E5_section.png)
 
-*C26 cut across the mating axis. Top: `male_shroud`, a copy of the
+*E5 (26-pin) cut across the mating axis. Top: `male_shroud`, a copy of the
 header cavity with its key slots and end rails. Bottom: `female_plug`,
 with key ridges that ride in the header's slots and a cavity per pin.*
 
@@ -41,7 +42,7 @@ Two things are still estimates, marked **[MEASURE]** in `params.scad`:
 ## Exploded view and cross-section analysis
 
 [`diagram/connector_diagram.pdf`](diagram/connector_diagram.pdf) ([PNG](diagram/connector_diagram.png))
-shows the C26 section exploded with every terminal, then two true-scale
+shows the E5 (26-pin) section exploded with every terminal, then two true-scale
 sections: across the pins (pitch, rows, keys, webs) and lengthwise through
 a 070 and a 040 column (how far each tab engages). Rebuild it with
 `python3 diagram/make_diagram.py` (needs OpenSCAD, xvfb-run, matplotlib).
@@ -71,10 +72,11 @@ a 070 and a 040 column (how far each tab engages). Rebuild it with
 
 | Path | What |
 | --- | --- |
+| `pinout_kzj95_at.csv` | ECU pinout for the automatic, from the KZJ95 wiring manual (EWD269F) |
 | `cad/sections.scad` | The measured 176122-6 geometry: per-section cavity length, columns (040/070), key slots, rails |
 | `cad/params.scad` | Process clearances, terminal body envelopes **[MEASURE]**, chamber and tap box |
 | `cad/interposer.scad` | Library: `female_plug`, `male_shroud`, `chamber_half`, `tapbox_base/lid`, `section_assembly` |
-| `cad/main.scad` | Top level. Choose with `-D part=... -D sec_i=...` (0 = A22, 1 = B16, 2 = C26) |
+| `cad/main.scad` | Top level. Choose with `-D part=... -D sec_i=...` (0 = E5 26-pin, 1 = E6 16-pin, 2 = E8 22-pin) |
 | `cad/fit_coupon.scad` | Fit test slice |
 | `cad/diagram.scad` | Diagram scene: terminals, pigtails, exploded / cut views (not for printing) |
 | `cad/export_all.sh` | Regenerates every STL into `stl/` |
@@ -86,9 +88,10 @@ a 070 and a 040 column (how far each tab engages). Rebuild it with
    the other, using the same wire gauge as OEM (terminal part numbers in research §2.2) (0.3–0.5 mm² signal, 0.85 mm²
    for 070 pins).
 2. Load the receptacles into `female_plug` and the tabs into `male_shroud`.
-   **Keep pin positions mirrored correctly:** A-1 on the plug must connect
-   to A-1 on the shroud. The pin-1 dots on both flanges sit on the same
-   corner.
+   **Every pigtail runs straight through:** pin N on the plug connects to
+   pin N on the shroud, which is the position directly opposite it. The
+   pin-1 dots on both flanges mark the same corner (Toyota pin 1, upper
+   row). Pin functions are in `pinout_kzj95_at.csv`.
 3. For each tapped pin, solder a **47 kΩ+ series resistor** at the pigtail
    (see the architecture doc), then add ribbon to the tap box.
 4. Close the chamber halves over both flanges, screw them together, and

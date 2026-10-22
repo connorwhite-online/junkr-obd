@@ -43,12 +43,9 @@ EU "Colorado", or AU KZJ95R).
 - **Location:** behind the glovebox, on the passenger side. RM790E's
   knock-sensor check tells you to remove the glove compartment to reach the
   ECU connector **[VERIFY on RHD vs LHD]**.
-- **Connectors:** three harness plugs, **A = 22 pin, B = 16 pin,
-  C = 26 pin, 64 pins in total.** This comes from the 1KZ-TE
-  engine-control-computer terminal tables for the KZN130
-  ([hiluxsurf.co.uk](https://hiluxsurf.co.uk/filedata/fetch?id=1295023)).
-  The KZN130 is the same engine and ECU generation. The A/T table fills all
-  64 positions, and the M/T table leaves some empty.
+- **Connectors:** three harness plugs, **E5 = 26 pin, E6 = 16 pin,
+  E8 = 22 pin, 64 pins in total** (KZJ95 EWD269F p.210; the A/T ECU is the
+  "Engine and ECT ECU"). Pin functions are in §3.
 - **Connector family:** a 64-way **TE/AMP Multilock hybrid** header,
   **TE 176122-6** ("hybrid cap assy 64P"). It is also used on 1994 Camry
   and MR2 Turbo ECUs ([rusEFI forum](https://rusefi.com/forum/viewtopic.php?p=33084);
@@ -66,8 +63,8 @@ measured the mesh (±0.05 mm) and cross-checked it against TE's published
 | --- | --- |
 | Overall length (with mounting ears) | 117.8 mm |
 | Body | 108.96 × 18.5 mm |
-| Section order (left to right, from the mating face) | C26, B16, A22 |
-| Cavity lengths | C26 **42.44**, B16 **25.20**, A22 **35.42** mm |
+| Section order (left to right, header seen from its mouth) | E5 (26), E6 (16), E8 (22) |
+| Cavity lengths | E5 **42.44**, E6 **25.20**, E8 **35.42** mm |
 | Wall between sections | 5.95 mm (centre gap); outer walls 1.48 mm |
 | Cavity height | 11.82 mm (floor to rib undersides); slots between ribs reach **15.02 mm** |
 | Cavity depth (mouth to floor) | 14.5 mm |
@@ -78,10 +75,11 @@ measured the mesh (±0.05 mm) and cross-checked it against TE's published
 | Polarising rails | on both end walls of each cavity, mid-height (C/A: 5.26–5.94 mm, 0.8 proud; B: 6.12–7.08 mm, 0.5 proud) |
 | Keying | a different rib/slot pattern on the top wall of each section (listed in `sections.scad`) |
 
-Column layout: **C26** = 070 ×3 | 040 ×8 | 070 ×2. **B16** = 040 ×8.
-**A22** = 070 ×1 | 040 ×8 | 070 ×2.
+Column layout, header seen from its mouth: **E5** = 070 ×3 | 040 ×8 | 070 ×2.
+**E6** = 040 ×8. **E8** = 070 ×1 | 040 ×8 | 070 ×2. (The manual's plug-face
+drawings show the mirror image of this.)
 
-![C26 cross-section: printed male shroud (top) and female plug (bottom)](../hardware/ecu_interposer/preview_C26_section.png)
+![E5 (26-pin) cross-section: printed male shroud (top) and female plug (bottom)](../hardware/ecu_interposer/preview_E5_section.png)
 
 **Not in the model, still [MEASURE]:** the harness plug's latch and the
 header's lock ramp (the CAD has an optional `lock_window` for it), and
@@ -93,9 +91,9 @@ the exact receptacle body sizes inside the plug (`T040` / `T070` in
 | Part | TE number | Notes |
 | --- | --- | --- |
 | ECU header (on the board) | **176122-6** | what we copy for `male_shroud` |
-| Harness plug, 22 pin (A) | **175110-6** | 31.4 × 36.1 × 21.0 mm |
-| Harness plug, 16 pin (B) | **175109-6** | |
-| Harness plug, 26 pin (C) | **175111-x** (inferred from the series); 175567-1 is a possible alternative | [VERIFY] from the plug's moulding |
+| Harness plug, 22 pin (E8) | **175110-6** | 31.4 × 36.1 × 21.0 mm |
+| Harness plug, 16 pin (E6) | **175109-6** | |
+| Harness plug, 26 pin (E5) | **175111-x** (inferred from the series); 175567-1 is a possible alternative | [VERIFY] from the plug's moulding |
 | 040 receptacle (goes in our `female_plug`) | **175061-1**, 175062-1, 173681-6 | 24–20 AWG |
 | 070 receptacle | **173631-1** (or -8) | 20–16 AWG, insulation Ø 2.0–2.6 mm |
 | 040 tab (goes in our `male_shroud`) | **173682-1** (175206-1 is the older, not-for-new-designs part) | |
@@ -115,56 +113,123 @@ sacrificial donor ECU (1KZ-TE, 3S-GTE or 1994 Camry, about US$30–60 at a
 wrecker) is still worth having. It gives a real 176122-6 header to test
 the printed plug against before going near the truck.
 
-## 3. Pinout (1KZ-TE engine ECU)
+## 3. Pinout (1KZ-TE engine and ECT ECU, automatic)
 
-This table comes from the KZN130 1KZ-TE M/T table
-([hiluxsurf.co.uk](https://hiluxsurf.co.uk/filedata/fetch?id=1295023)). The
-"function" column uses standard Toyota terminal naming. The A/T ECU adds
-**SP2, NSW, STP** and a few switch inputs. **[VERIFY every pin against
-RM790E DI-18..23 for the KZJ95]**, because pin positions can move between
-chassis.
+**Source: Connor's 1996 Land Cruiser Prado wiring manual, EWD269F**
+(RZJ/VZJ/KZJ/LJ90-95), pages 206–209 (Engine Control, 1KZ-TE),
+220–223 (ECT and A/T Indicator, 1KZ-TE) and 210 (connector face views).
+Connor's truck is an automatic, so this is the "Engine and ECT ECU (A/T)".
+The machine-readable copy is
+[`hardware/ecu_interposer/pinout_kzj95_at.csv`](../hardware/ecu_interposer/pinout_kzj95_at.csv).
 
-| Pin | Name | Function | Signal type | Tap class |
-| --- | --- | --- | --- | --- |
-| A-1 | +BF | Fuel-system power feed | 12 V supply | V-mon |
-| A-2 | BATT | Constant battery (keep-alive) | 12 V | V-mon |
-| A-3 | +BG | Glow-system power feed | 12 V | V-mon |
-| A-4 | ACT | A/C cut output | ECU low-side out | DIG |
-| A-6 | G-IND | Glow indicator lamp | low-side out | DIG |
-| A-7 | +B | ECU main power (via EFI main relay) | 12 V | V-mon, **tap power source** |
-| A-8 | W | Check-engine lamp | low-side out | DIG |
-| A-9 | IGSW | Ignition switch | 12 V in | DIG |
-| A-10 | A/C | A/C request | switch in | DIG |
-| A-11 | SP1 | Vehicle speed sensor | pulse | **CAP** |
-| A-12 | TAC | Tachometer output | pulse | **CAP** |
-| B-1 | THF | Fuel temperature (NTC in pump) | 0–5 V analog | **ANA** |
-| B-2 | PIM | Boost / manifold pressure | 0–5 V analog | **ANA** |
-| B-3 | THA | Intake air temperature | 0–5 V analog | ANA |
-| B-4 | THW | Coolant temperature | 0–5 V analog | ANA |
-| B-6 | VRP | Pump correction resistor (quantity) | analog, key-on | ANA |
-| B-7 | TE1 | Diagnostic request (DLC) | in | — |
-| B-8 | VF | Diagnostic / feedback output | out | DIG |
-| B-9 | E2 | Sensor ground | ground | analog ref |
-| B-10 | VA | Accelerator position | 0–5 V analog | **ANA** |
-| B-11 | VC | 5 V sensor reference | 5 V | ANA |
-| B-12 | IDL | Idle switch | switch in | DIG |
-| B-14 | VRT | Pump correction resistor (timing) | analog, key-on | ANA |
-| B-15 | TE2 | Diagnostic (test mode) | in | — |
-| C-1 | EGR | EGR VSV | low-side out | DIG |
-| C-2 | STA | Starter signal | 12 V in | DIG |
-| C-3 | H-IND | Heater / glow indicator | out | DIG |
-| C-4 / C-17 | NE+ / NE− | Pump-speed sensor (VR pickup in pump) | AC, differential | **VR** |
-| C-5 / C-18 | TDC+ / TDC− | Crank TDC sensor (VR) | AC, differential | **VR** |
-| C-7 | SVR | Spill-valve relay | low-side out | DIG |
-| C-8 | M-REL | Main relay control | out | DIG |
-| C-9 / C-10 | S/TH2 / S/TH1 | Intake-throttle VSVs | low-side out | DIG |
-| C-11 | **SPV** | **Spill control valve drive (fuel quantity)** | inductive, low-side | **CAP-HV** |
-| C-12 | **TCV** | **Timing control valve drive (injection timing)** | PWM, low-side | **CAP-HV** |
-| C-13 / C-26 | E01 / E02 | Power grounds | ground | GND |
-| C-14 | S-REL | Starter-related relay | out | DIG |
-| C-16 | HSW | Heater switch | in | DIG |
-| C-23 | FSW | (switch input) | in | DIG |
-| C-24 | E1 | ECU signal ground | ground | GND |
+**Connector names.** The KZJ95 manual calls the plugs **E5 (26 pin)**,
+**E6 (16 pin)** and **E8 (22 pin)**, lettered A, B, C in that order. The
+KZN130 tables used earlier letter them the other way (A = 22, C = 26), so
+the CAD and this doc now go by the manual's codes.
+
+**Numbering.** The manual draws each harness plug from its mating face.
+Top row is 1…n left to right, bottom row continues n+1…2n. The wide 070
+terminals sit at both ends:
+
+```
+E5 (26)   [ 1][ 2] 3  4  5  6  7  8  9 10 [11][12][13]
+          [14][15]16 17 18 19 20 21 22 23 [24][25][26]
+E6 (16)    1  2  3  4  5  6  7  8
+           9 10 11 12 13 14 15 16
+E8 (22)   [ 1][ 2] 3  4  5  6  7  8  9 10 [11]
+          [12][13]14 15 16 17 18 19 20 21 [22]
+                                   [ ] = 070 (power) terminal
+```
+
+The CAD frame looks at the ECU header from its mouth, which is the mirror
+image, so manual column 1 is the rightmost column in `sections.scad`
+(`pin_no()` does the mapping). The terminal sizes this implies line up
+with the circuits: grounds, SPV, TCV, the A/T solenoids, +B and BATT all
+land on 070 terminals. **[VERIFY]** that the manual's top row is the latch
+side.
+
+**E5, 26 pin**
+
+| Pin | Name | Function | Terminal | Wire | Tap class |
+| --- | --- | --- | --- | --- | --- |
+| E5-1 | SL | A/T lock-up solenoid | 070 |  | DIG |
+| E5-2 | S1 | A/T shift solenoid No.1 | 070 |  | DIG |
+| E5-3 | SP2+ | A/T output speed sensor No.2 (+) | 040 | W-R | VR |
+| E5-4 | **NE+** | Pump speed sensor (+) | 040 | B | VR |
+| E5-5 | **TDC+** | Crankshaft (TDC) position sensor (+) | 040 | R | VR |
+| E5-6 | | *not used in the EWD* | 040 | | |
+| E5-7 | L4 | Transfer L4 position switch | 040 | LG | DIG |
+| E5-8 | TFN | Transfer neutral position switch | 040 | L | DIG |
+| E5-9 | S/TH2 | Intake constrictor VSV No.2 | 040 | GR-B | DIG |
+| E5-10 | S/TH1 | Intake constrictor VSV No.1 | 040 | GR | DIG |
+| E5-11 | **SPV** | Magnetic spill valve drive (fuel quantity) | 070 | R | CAP-HV |
+| E5-12 | **TCV** | Timing control valve drive (injection timing) | 070 | G-W | CAP-HV |
+| E5-13 | E01 | Power ground | 070 | BR | GND |
+| E5-14 | E1 | ECU signal ground | 070 | BR | GND |
+| E5-15 | S2 | A/T shift solenoid No.2 | 070 |  | DIG |
+| E5-16 | SP2- | A/T output speed sensor No.2 (-) | 040 | Y-R | VR |
+| E5-17 | **NE-** | Pump speed sensor (-) | 040 | W | VR |
+| E5-18 | **TDC-** | Crankshaft (TDC) position sensor (-) | 040 | G | VR |
+| E5-19 | | *not used in the EWD* | 040 | | |
+| E5-20 | L | Shift lever L position | 040 |  | DIG |
+| E5-21 | 2 | Shift lever 2 position | 040 |  | DIG |
+| E5-22 | SNWL | Snow (2nd start) indicator lamp | 040 | Y-G | DIG |
+| E5-23 | SNW | Snow (2nd start) switch | 040 |  | DIG |
+| E5-24 | EGR | EGR VSV | 070 |  | DIG |
+| E5-25 | | *not used in the EWD* | 070 | | |
+| E5-26 | E02 | Power ground | 070 | BR | GND |
+
+**E6, 16 pin**
+
+| Pin | Name | Function | Terminal | Wire | Tap class |
+| --- | --- | --- | --- | --- | --- |
+| E6-1 | VC | 5 V sensor reference | 040 | G-Y | ANA |
+| E6-2 | **PIM** | Turbo pressure sensor | 040 | B-Y | ANA |
+| E6-3 | THA | Intake air temperature | 040 | L-Y | ANA |
+| E6-4 | THW | Coolant temperature | 040 | G | ANA |
+| E6-5 | THF | Fuel temperature (pump) | 040 | W | ANA |
+| E6-6 | **VRP** | Pump correction resistor No.1 (quantity) | 040 | B-R | ANA |
+| E6-7 | TE2 | Diagnostic test terminal 2 | 040 | W-G |  |
+| E6-8 | VF | Diagnostic output | 040 | B-O | DIG |
+| E6-9 | E2 | Sensor ground | 040 | BR | GND |
+| E6-10 | | *not used in the EWD* | 040 | | |
+| E6-11 | **VA** | Accelerator position | 040 | Y-R | ANA |
+| E6-12 | IDL | Idle switch | 040 | G-W | DIG |
+| E6-13 | THO | A/T fluid temperature | 040 |  | ANA |
+| E6-14 | **VRT** | Pump correction resistor No.2 (timing) | 040 | L-B | ANA |
+| E6-15 | TE1 | Diagnostic test terminal 1 | 040 | R-Y |  |
+| E6-16 | TT | A/T diagnostic terminal | 040 | LG |  |
+
+**E8, 22 pin**
+
+| Pin | Name | Function | Terminal | Wire | Tap class |
+| --- | --- | --- | --- | --- | --- |
+| E8-1 | BATT | Constant battery (keep-alive) | 070 | B-Y | V-mon |
+| E8-2 | S-REL | Sub glow relay | 070 | G-R | DIG |
+| E8-3 | M-REL | ECD main relay control | 040 | L-B | DIG |
+| E8-4 | STP | Stop light switch | 040 | G-W | DIG |
+| E8-5 | W | Check engine lamp | 040 | Y-R | DIG |
+| E8-6 | OIL-W | A/T oil temperature warning lamp | 040 | Y-B | DIG |
+| E8-7 | G-IND | Glow indicator lamp | 040 | R | DIG |
+| E8-8 | IMO | Immobiliser output | 040 | BR-R | DIG |
+| E8-9 | SP1 | Vehicle speed (meter) | 040 | V-W | CAP |
+| E8-10 | A/C | A/C magnetic clutch signal | 040 | B-Y | DIG |
+| E8-11 | STA | Starter signal | 070 | R | DIG |
+| E8-12 | +B | ECU main power (via ECD relay) | 070 | B-R | V-mon |
+| E8-13 | SVR | Spill valve relay | 070 | GR | DIG |
+| E8-14 | IGSW | Ignition switch | 040 | B-O | DIG |
+| E8-15 | P | ECT pattern select (PWR) | 040 | G-Y | DIG |
+| E8-16 | OD2 | Overdrive switch | 040 | V-G | DIG |
+| E8-17 | IMI | Immobiliser input | 040 | P-G | DIG |
+| E8-18 | TAC | Tachometer output | 040 | B | CAP |
+| E8-19 | ACT | A/C cut (from A/C amplifier) | 040 | L-B | DIG |
+| E8-20 | HSW | Idle-up switch | 040 | P-L | DIG |
+| E8-21 | | *not used in the EWD* | 040 | | |
+| E8-22 | NSW | Neutral start switch | 070 | B-W | DIG |
+
+SPV and TCV are driven straight from E5-11 and E5-12 (pages 207-3/207-4),
+and the ECU also switches a separate **spill valve relay** through E8-13
+(SVR). The interposer only ever taps these.
 
 The tap classes (V-mon, ANA, DIG, CAP, CAP-HV, VR) are defined in
 [ECU_TAP_ARCHITECTURE.md](ECU_TAP_ARCHITECTURE.md).
@@ -243,15 +308,16 @@ handful of pins in levers 1–4.
 | Doc | Why | Where |
 | --- | --- | --- |
 | **RM790E 1KZ-TE Engine Supplement** (covers KZJ90/95) | ECU terminal table (DI-18..23), standard voltages, ECD-V3 pump circuits | [pdfcoffee excerpt](https://pdfcoffee.com/1kz-te-engine-sup-rm790e-pdf-free.html), [Scribd](https://www.scribd.com/document/365360972/1KZ-TE-ENGINE-SUP-RM790E-pdf), [ManualsLib](https://www.manualslib.com/manual/1101762/Toyota-1kz-Te.html?page=22) |
-| KZJ90/95 Electrical Wiring Diagram (EWD) | connector face views, wire colours, ECU location | Connor's iCloud? Toyota EPC/TIS |
+| KZJ90/95 Electrical Wiring Diagram (EWD269F) | connector face views, wire colours, ECU pinout | **Have it** (Connor's Desktop); used for §3 |
 | Denso ECD-V3 service doc | SPV/TCV/NE theory, correction-resistor tables | referenced on IH8MUD |
 | Hilux Surf 1KZ-TE terminal tables | already used above | [hiluxsurf.co.uk](https://hiluxsurf.co.uk/filedata/fetch?id=1295023) |
 
 ## 6. Open questions for Connor
 
-1. A/T or M/T? And the `89661-` / `175800-` numbers from the ECU sticker.
-2. Is the iCloud manual the RM790E or a KZJ95 EWD? Either fills in the
-   **[VERIFY]** items.
+1. ~~A/T or M/T?~~ Automatic. The `89661-` / `175800-` ECU numbers would
+   still help when buying a donor ECU.
+2. ~~Which manual?~~ Done: the KZJ95 EWD (EWD269F) is on Connor's Desktop and
+   the pinout above comes from it.
 3. Photos of the three plug faces next to a ruler (mating side and wire
    side). The header geometry is now measured from the TE model, so these
    mainly confirm the latch and the 26-pin plug's part number.

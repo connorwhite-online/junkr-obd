@@ -1,7 +1,7 @@
 // =====================================================================
 //  ECU interposer — parametric library
 //
-//  One "section" (A22 / B16 / C26) = four printed parts:
+//  One "section" (E5 26-pin / E6 16-pin / E8 22-pin) = four printed parts:
 //
 //    ECU header  <==  female_plug  [chamber_half x2]  male_shroud  <==  OEM harness plug
 //    (176122-6)       (receptacles,                   (male tabs; a copy of
@@ -137,9 +137,10 @@ module female_plug(s, with_flange = true) {
             if (with_flange) box_xy(-fl_w(s) / 2, fl_w(s) / 2, fl_y0(s), fl_y1(s), Lp, Lp + flange_t);
         }
         for_pins(s) receptacle_cavity($t, $out, Lp + flange_t + 2);
-        // pin-1 marker (upper-left as seen from the wire side)
+        // pin-1 marker: on the +X, upper-row corner, which is Toyota pin 1
+        // (see pin_no in sections.scad); top-right seen from the wire side
         if (with_flange)
-            translate([-fl_w(s) / 2 + 1.5, fl_y1(s) - 1.5, Lp + flange_t - 0.4]) cylinder(d = 1.2, h = 1);
+            translate([fl_w(s) / 2 - 1.5, fl_y1(s) - 1.5, Lp + flange_t - 0.4]) cylinder(d = 1.2, h = 1);
     }
 }
 
@@ -167,7 +168,7 @@ module male_shroud(s, with_flange = true) {
                     cube([lock_window_w, HDR_WALL + 1, lock_window_l]);
             for_pins(s) tab_cavity($t, $out, zf, with_flange ? -flange_t : 0);
             if (with_flange)
-                translate([-fl_w(s) / 2 + 1.5, fl_y1(s) - 1.5, -flange_t - 0.6]) cylinder(d = 1.2, h = 1);
+                translate([fl_w(s) / 2 - 1.5, fl_y1(s) - 1.5, -flange_t - 0.6]) cylinder(d = 1.2, h = 1);   // pin 1 corner
         }
         // polarising rails on both end walls
         for (sx = [-1, 1])

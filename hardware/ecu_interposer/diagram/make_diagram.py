@@ -1,4 +1,4 @@
-"""Build the C26 connector sheet: exploded view + cross-section analysis.
+"""Build the E5 (26-pin) connector sheet: exploded view + cross-section analysis.
 
 Needs OpenSCAD and xvfb-run (for the 3D render), numpy, matplotlib, Pillow.
     python3 make_diagram.py            -> connector_diagram.png / .pdf
@@ -21,8 +21,8 @@ HERE = Path(__file__).resolve().parent
 CAD = HERE.parent / "cad"
 SCAD = CAD / "diagram.scad"
 
-# ---- geometry (mirrors cad/sections.scad + params.scad for section C26) ----
-L = 42.44                     # C26 cavity length
+# ---- geometry (mirrors cad/sections.scad + params.scad for section E5, 26 pin) ----
+L = 42.44                     # E5 cavity length
 CAV_H, SLOT_TOP, DEPTH, WALL = 11.82, 15.02, 14.50, 1.48
 ROW_040, ROW_070 = (7.05, 1.85), (8.05, 2.85)
 PROUD = {1: 7.09, 2: 7.99}
@@ -45,6 +45,17 @@ COL = dict(header="#5d6d7e", header_pins="#d4ac0d", plug="#2e86c1", receptacles=
            chamber="#e5e8e8", wires="#922b21")
 INK = "#1b2631"
 DIM = "#c0392b"
+
+# pin names (Toyota numbering, KZJ95 A/T, from the EWD) for this section
+import csv
+PINS = {int(r["pin"]): r["name"] or "-" for r in csv.DictReader(open(HERE.parent / "pinout_kzj95_at.csv"))
+        if r["connector"] == "E5"}
+
+
+def pin_no(i, r):
+    """Same as pin_no() in sections.scad: column i from the left in the CAD frame, row r (0 = upper)."""
+    return (len(COLS) - i) + r * len(COLS)
+
 
 CAM = ["--camera=112,0,8,62,0,55,470", "--imgsize=2200,1100", "--projection=o", "--colorscheme=Tomorrow"]
 
@@ -138,7 +149,8 @@ def main():
         f = tmp / f"x_{c}.svg"
         scad(f, 'view="cut"', 'cut="x"', "cut_at=4", f'comp="{c}"')
         xsec[c] = svg_paths(f)
-    lcols = [(COLS[0][0], "070 column (end of C26)"), (COLS[4][0], "040 column")]
+    lcols = [(COLS[0][0], f"070 column: pins 13 / 26 ({PINS[13]} / {PINS[26]})"),
+             (COLS[4][0], f"040 column: pins 9 / 22 ({PINS[9]} / {PINS[22]})")]
     lsec = []
     for x, _ in lcols:
         d = {}
@@ -150,7 +162,7 @@ def main():
 
     # -------------------------------------------------------------- sheet
     fig = plt.figure(figsize=(22, 27), dpi=110, facecolor="white")
-    fig.text(0.04, 0.975, "1KZ-TE ECU interposer: C26 section, exploded view and cross-section analysis",
+    fig.text(0.04, 0.975, "1KZ-TE ECU interposer: E5 (26-pin) section, exploded view and cross-section analysis",
              fontsize=22, weight="bold", color=INK)
     fig.text(0.04, 0.962, "Header TE 176122-6 (geometry measured from TE's 3D model). Terminal bodies and the "
              "harness latch are estimates [MEASURE]. All dimensions in mm.", fontsize=12, color="#566573")
@@ -167,7 +179,7 @@ def main():
     ax.set_title("1  Exploded view (mating axis left to right)", loc="left", fontsize=15, weight="bold",
                  color=INK, x=0.02)
     calls = [   # (anchor in scene coords, text, label position in image px, label side)
-        ((-8, 16.5, OFF["hdr"] - 4), "ECU header (on the ECU board)\nTE 176122-6, C26 cavity", (420, 330), "l"),
+        ((-8, 16.5, OFF["hdr"] - 4), "ECU header (on the ECU board)\nTE 176122-6, E5 (26-pin) cavity", (420, 330), "l"),
         ((-6, 6.0, OFF["hdr"] + 2), "Header pins: 040 tabs 0.98 x 0.62\n070 tabs 1.78 x 0.62", (560, 560), "l"),
         ((-14, 2.0, OFF["plug"] + 8), "female_plug (printed)\nkey ridges ride in the header slots", (720, 700), "l"),
         ((-21, 3.0, OFF["rec"] + 8), "Receptacles\n040: TE 175061-1, 070: TE 173631-1", (880, 830), "l"),
@@ -190,11 +202,19 @@ def main():
 
     # ---- 2. transverse section
     ax = fig.add_axes([0.04, 0.34, 0.60, 0.26])
-    ax.set_title("2  Section A-A: interposer plug seated in the ECU header, cut 4 mm above the header floor",
+    ax.set_title("2  Section A-A: interposer plug seated in the ECU header, cut 4 mm above the floor (pin numbers from the KZJ95 manual)",
                  loc="left", fontsize=15, weight="bold", color=INK, pad=10)
     for c, a in (("header", 1), ("plug", 1), ("receptacles", 1), ("header_pins", 1)):
         draw_rings(ax, xsec[c], COL[c], a, z={"header": 1, "plug": 2, "receptacles": 3, "header_pins": 4}[c])
     xc = lambda x: x - L / 2
+    for i, (x, t) in enumerate(COLS):
+        for r in (0, 1):
+            y = (ROW_070 if t == 2 else ROW_040)[r]
+            n = pin_no(i, r)
+            ax.text(xc(x), y + (2.3 if t == 2 else 2.0), str(n), ha="center", va="center", fontsize=8,
+                    weight="bold", color=INK, zorder=10)
+            ax.text(xc(x), y - (1.95 if t == 2 else 1.65), PINS[n], ha="center", va="center", fontsize=6.5,
+                    color="white", zorder=10, bbox=dict(boxstyle="round,pad=0.12", fc=INK, ec="none", alpha=0.8))
     # cavity outline + overall
     dim_h(ax, -L / 2, L / 2, -4.3, f"cavity {L:.2f}", ext_from=-0.2, above=False)
     xs = [xc(x) for x, _ in COLS]

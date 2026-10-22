@@ -40,7 +40,7 @@ an ECU line.
 | **CAP-HV** (solenoid drives) | SPV, TCV | 220 k / 10 k divider + SMAJ5.0A TVS + Schmitt. Flyback on these lines can exceed 60 V. An optocoupler (6N137) is the more cautious option. |
 | **DIG** (switches, lamps) | IDL, STA, A/C, W, G-IND, EGR, S/TH… | 100 k / 33 k + Schmitt → 74HC165 shift register (polled at 100 Hz) |
 
-**Power** comes from **+B (A-7)** through the interposer itself, with no
+**Power** comes from **+B (E8-12)** through the interposer itself, with no
 new feed to the battery: polyfuse 250 mA → TVS SMBJ24A → 12 V→3.3 V buck.
 +B only goes live with the EFI main relay, so nothing drains with the key
 off. **Ground** is E1 for the analog reference. The board's power return

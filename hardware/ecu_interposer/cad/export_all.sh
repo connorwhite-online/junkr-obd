@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 OUT=../stl
 mkdir -p "$OUT"
-names=(A22 B16 C26)
+names=(E5_26P E6_16P E8_22P)
 for i in 0 1 2; do
   for p in female_plug male_shroud chamber_bottom chamber_top; do
     echo "-> ${names[$i]}_$p"
