@@ -1,0 +1,65 @@
+connector,pin,name,function,wire,tap
+E5,1,SL,A/T lock-up solenoid,,DIG
+E5,2,S1,A/T shift solenoid No.1,,DIG
+E5,3,SP2+,A/T output speed sensor No.2 (+),W-R,VR
+E5,4,NE+,Pump speed sensor (+),B,VR
+E5,5,TDC+,Crankshaft (TDC) position sensor (+),R,VR
+E5,6,,not used in the EWD,,
+E5,7,L4,Transfer L4 position switch,LG,DIG
+E5,8,TFN,Transfer neutral position switch,L,DIG
+E5,9,S/TH2,Intake constrictor VSV No.2,GR-B,DIG
+E5,10,S/TH1,Intake constrictor VSV No.1,GR,DIG
+E5,11,SPV,Magnetic spill valve drive (fuel quantity),R,CAP-HV
+E5,12,TCV,Timing control valve drive (injection timing),G-W,CAP-HV
+E5,13,E01,Power ground,BR,GND
+E5,14,E1,ECU signal ground,BR,GND
+E5,15,S2,A/T shift solenoid No.2,,DIG
+E5,16,SP2-,A/T output speed sensor No.2 (-),Y-R,VR
+E5,17,NE-,Pump speed sensor (-),W,VR
+E5,18,TDC-,Crankshaft (TDC) position sensor (-),G,VR
+E5,19,,not used in the EWD,,
+E5,20,L,Shift lever L position,,DIG
+E5,21,2,Shift lever 2 position,,DIG
+E5,22,SNWL,Snow (2nd start) indicator lamp,Y-G,DIG
+E5,23,SNW,Snow (2nd start) switch,,DIG
+E5,24,EGR,EGR VSV,,DIG
+E5,25,,not used in the EWD,,
+E5,26,E02,Power ground,BR,GND
+E6,1,VC,5 V sensor reference,G-Y,ANA
+E6,2,PIM,Turbo pressure sensor,B-Y,ANA
+E6,3,THA,Intake air temperature,L-Y,ANA
+E6,4,THW,Coolant temperature,G,ANA
+E6,5,THF,Fuel temperature (pump),W,ANA
+E6,6,VRP,Pump correction resistor No.1 (quantity),B-R,ANA
+E6,7,TE2,Diagnostic test terminal 2,W-G,
+E6,8,VF,Diagnostic output,B-O,DIG
+E6,9,E2,Sensor ground,BR,GND
+E6,10,,not used in the EWD,,
+E6,11,VA,Accelerator position,Y-R,ANA
+E6,12,IDL,Idle switch,G-W,DIG
+E6,13,THO,A/T fluid temperature,,ANA
+E6,14,VRT,Pump correction resistor No.2 (timing),L-B,ANA
+E6,15,TE1,Diagnostic test terminal 1,R-Y,
+E6,16,TT,A/T diagnostic terminal,LG,
+E8,1,BATT,Constant battery (keep-alive),B-Y,V-mon
+E8,2,S-REL,Sub glow relay,G-R,DIG
+E8,3,M-REL,ECD main relay control,L-B,DIG
+E8,4,STP,Stop light switch,G-W,DIG
+E8,5,W,Check engine lamp,Y-R,DIG
+E8,6,OIL-W,A/T oil temperature warning lamp,Y-B,DIG
+E8,7,G-IND,Glow indicator lamp,R,DIG
+E8,8,IMO,Immobiliser output,BR-R,DIG
+E8,9,SP1,Vehicle speed (meter),V-W,CAP
+E8,10,A/C,A/C magnetic clutch signal,B-Y,DIG
+E8,11,STA,Starter signal,R,DIG
+E8,12,+B,ECU main power (via ECD relay),B-R,V-mon
+E8,13,SVR,Spill valve relay,GR,DIG
+E8,14,IGSW,Ignition switch,B-O,DIG
+E8,15,P,ECT pattern select (PWR),G-Y,DIG
+E8,16,OD2,Overdrive switch,V-G,DIG
+E8,17,IMI,Immobiliser input,P-G,DIG
+E8,18,TAC,Tachometer output,B,CAP
+E8,19,ACT,A/C cut (from A/C amplifier),L-B,DIG
+E8,20,HSW,Idle-up switch,P-L,DIG
+E8,21,,not used in the EWD,,
+E8,22,NSW,Neutral start switch,B-W,DIG

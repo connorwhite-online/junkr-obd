@@ -185,3 +185,25 @@ pio device monitor -e cabin            # or -e engine-bay
 The cabin's display init in `src/cabin/main.cpp` currently calls
 `tft.init(240, 240)` — adjust to match the Qualia panel variant in hand
 (480×480 round IPS vs. 320×240 ST7789 vs. 240×240).
+## ECU Interposer (in progress)
+
+A zero-cut, printable pass-through between the KZJ95's 1KZ-TE ECU and its
+harness, with an ESP32-S3 tap board that logs RPM, actual injection timing,
+spill-valve fuelling, boost and temperatures. See
+[`hardware/ecu_interposer/`](hardware/ecu_interposer/),
+[`docs/ECU_INTERPOSER_RESEARCH.md`](docs/ECU_INTERPOSER_RESEARCH.md) and
+[`docs/ECU_TAP_ARCHITECTURE.md`](docs/ECU_TAP_ARCHITECTURE.md).
+
+### Learning tuner (simulation stage)
+
+`tuner/` is a Python package that learns piggyback correction maps
+(PIM and coolant-temp offsets over baro × intake temp × rpm × pedal) from
+drive logs, with optional sensor modules (wideband, EGT, baro, GPS, IMU,
+fuel flow) that unlock more authority. `src/tap/piggyback.h` is the
+matching firmware lookup and safety caps. See
+[`docs/LEARNING_TUNER.md`](docs/LEARNING_TUNER.md).
+
+```
+python -m tuner campaign --rounds 15 --drives 4
+python -m unittest discover -s tuner/tests -t .
+```
