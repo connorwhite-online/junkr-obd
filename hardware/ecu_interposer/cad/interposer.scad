@@ -152,7 +152,7 @@ module female_plug(s, with_flange = true) {
         if (with_flange)
             translate([fl_w(s) / 2 - 1.5, fl_y1(s) - 1.5, Lp + flange_t - 0.4]) cylinder(d = 1.2, h = 1);
     }
-    if (plug_latch && len(s_slots(s)) > 0) plug_latch_arm();
+    if (plug_latch && latch_tines && len(s_slots(s)) > 0) plug_latch_arm();
 }
 
 // Lock tines copied from the OEM 175110-6: rooted at the front, free at the

@@ -10,6 +10,9 @@ for i in 0 1 2; do
     echo "-> ${names[$i]}_$p"
     openscad -q -o "$OUT/${names[$i]}_$p.stl" -D "part=\"$p\"" -D "sec_i=$i" main.scad
   done
+  # fit-test plug without lock tines: safe to push into the ECU header in any material
+  echo "-> ${names[$i]}_female_plug_fittest_no_latch"
+  openscad -q -o "$OUT/${names[$i]}_female_plug_fittest_no_latch.stl" -D 'part="female_plug"' -D "sec_i=$i" -D latch_tines=false main.scad
 done
 for p in tapbox_base tapbox_lid; do
   echo "-> $p"
