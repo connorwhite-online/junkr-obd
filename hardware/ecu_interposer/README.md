@@ -59,6 +59,9 @@ a 070 and a 040 column (how far each tab engages). Rebuild it with
    070) of each side at the real pitch. Check that the female block slides
    into the ECU header, that the OEM plug's terminals enter the male block,
    and that real terminals click in and hold.
+   Before pushing anything into the ECU itself, use
+   **`stl/E*_female_plug_fittest_no_latch.stl`**: the same plug without lock
+   tines, so nothing can snap off inside the ECU header (FDM is fine for it).
 2. Adjust `cad/params.scad` (`clr`, `slide_clr`, `T040`, `T070`) if needed.
 3. Run `cad/export_all.sh` (OpenSCAD ≥ 2021), then print the sections.
 

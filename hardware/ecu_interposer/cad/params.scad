@@ -74,6 +74,7 @@ latch_end      = 18.0;   // free end: crossbar + press tab (outside the header m
 latch_tab_l    = 2.5;
 latch_pocket   = 0.6;    // body relief under the tines so they can deflect 1.4 mm
 latch_guard_x  = 3.0;    // key ridges in the centre slots start at |x| = this
+latch_tines    = true;   // false = fit-test plug with no tines (nothing to snap off inside the ECU header)
 ziptie_w       = 4.0;    // backup tie to the ECU bracket
 
 // Chamber between the two ends (wire pass-through + tap pick-off)
