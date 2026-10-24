@@ -241,7 +241,7 @@ latch side too (Toyota face views normally draw the lock at the top).
 
 | Pin | Name | Function | Terminal | Wire | Tap class |
 | --- | --- | --- | --- | --- | --- |
-| E8-1 | BATT | Constant battery (keep-alive) | 070 | B-Y | V-mon |
+| E8-1 | BATT | Constant battery (keep-alive) | 070 | B-Y | not tapped (live key-off) |
 | E8-2 | S-REL | Sub glow relay | 070 | G-R | DIG |
 | E8-3 | M-REL | ECD main relay control | 040 | L-B | DIG |
 | E8-4 | STP | Stop light switch | 040 | G-W | DIG |
@@ -252,7 +252,7 @@ latch side too (Toyota face views normally draw the lock at the top).
 | E8-9 | SP1 | Vehicle speed (meter) | 040 | V-W | CAP |
 | E8-10 | A/C | A/C magnetic clutch signal | 040 | B-Y | DIG |
 | E8-11 | STA | Starter signal | 070 | R | DIG |
-| E8-12 | +B | ECU main power (via ECD relay) | 070 | B-R | V-mon |
+| E8-12 | +B | ECU main power (via ECD relay) | 070 | B-R | V-mon + board power |
 | E8-13 | SVR | Spill valve relay | 070 | GR | DIG |
 | E8-14 | IGSW | Ignition switch | 040 | B-O | DIG |
 | E8-15 | P | ECT pattern select (PWR) | 040 | G-Y | DIG |
