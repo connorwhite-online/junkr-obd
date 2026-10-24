@@ -139,3 +139,7 @@ The ECU's own maps still decide fuel and timing.
   store, and every box gets it for free.
 - **React Native:** deferred. Worth it only for background logging,
   Bluetooth, or a store listing. The web screens can be ported then.
+- **Sensors, gauge pages and log channels:** see
+  [SENSORS_GAUGE_LOGGING.md](SENSORS_GAUGE_LOGGING.md). It adds the
+  pre-turbo EGT probe and a 3-bar MAP to the engine-bay node and extends
+  the CAN IDs above with 0x103 and 0x113–0x115.
