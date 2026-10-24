@@ -1,6 +1,6 @@
 # KiCad Hardware Designs
 
-Two PCBs:
+Three PCBs:
 
 - **`engine_bay/`** — the 12 V-tolerant board that lives next to the
   sensors. Mounts the ESP32-C3 SuperMini, MAX31855 breakout, ADS1115
@@ -13,6 +13,12 @@ Two PCBs:
   Carries only the TJA1051 transceiver, 120 Ω termination jumper, and
   the Deutsch plug. Connects to the Qualia over a short 4-wire flex
   (3.3 V, GND, TWAI_TX, TWAI_RX).
+
+- **`tap/`** — the ESP32-S3 board in the ECU interposer's tap box. Reads
+  the stock ECU's sensors, switches and pulse lines through 47 kΩ splice
+  resistors (VR, ADC and Schmitt front ends), logs to microSD and joins
+  the CAN bus. Phase 2 parts (DAC + fail-to-stock relays) are optional.
+  `frontend_check.py` checks every front-end value.
 
 ## How to use this
 

@@ -18,8 +18,9 @@ For background on the signals, see
 That makes six capture channels for exactly six timed signals, which settles
 the choice.
 
-- **Prototype:** ESP32-S3-DevKitC-1 (N16R8) or Seeed XIAO ESP32S3 on a
-  perfboard tap shield.
+- **Prototype:** Seeed XIAO ESP32S3 on a perfboard tap shield. The
+  DevKitC-1 is too long for the tap box. The XIAO has fewer pins, so the
+  prototype carries a subset of the front ends.
 - **Tap PCB:** ESP32-S3-WROOM-1-N16R8 module, with the PCB antenna at the
   board edge. The ECU sits behind the glovebox, so Wi-Fi reaches the cabin
   easily.
@@ -31,20 +32,27 @@ resistor of **≥ 47 kΩ placed at the splice inside the interposer chamber**,
 not on the tap board. Then even a shorted ribbon or a dead board can't load
 an ECU line.
 
-| Class | Signals | Front end |
+All values include that 47 kΩ, and
+[`kicad/tap/frontend_check.py`](../kicad/tap/frontend_check.py) checks
+them. The net-by-net schematic is in [`kicad/tap/`](../kicad/tap/).
+
+| Class | Signals | Front end (after the 47 kΩ splice) |
 | --- | --- | --- |
-| **ANA** (0–5 V sensors) | VA, PIM, THW, THA, THF, VRP, VRT, VC | 1 MΩ series + rail-to-rail op-amp follower (MCP6004, 5 V) + RC (fc ≈ 1 kHz) → **MCP3208** 12-bit SPI ADC, 4.096 V ref. Never load the thermistor dividers. |
-| **V-mon** (12 V rails) | +B, BATT, +BF, +BG | 100 k / 22 k divider + 5.1 V zener → MCP3208 |
-| **VR** (variable reluctance) | NE±, TDC± | **MAX9926** dual VR interface: differential, adaptive threshold, high-Z → MCPWM capture |
-| **CAP** (logic pulses) | TAC, SP1 | 100 k / 33 k divider + 74LVC1G17 Schmitt → MCPWM capture |
-| **CAP-HV** (solenoid drives) | SPV, TCV | 220 k / 10 k divider + SMAJ5.0A TVS + Schmitt. Flyback on these lines can exceed 60 V. An optocoupler (6N137) is the more cautious option. |
-| **DIG** (switches, lamps) | IDL, STA, A/C, W, G-IND, EGR, S/TH… | 100 k / 33 k + Schmitt → 74HC165 shift register (polled at 100 Hz) |
+| **ANA** (0–5 V sensors) | VA, PIM, THW, THA, THF, VRP, VRT, VC, THO | 100 k series, 10 M to AGND, MCP6004 follower at 5 V, then 3.3 k / 4.7 k + 100 nF (821 Hz) into an **MCP3208**. **Two MCP3208s** (11 channels, plus 5 Phase 2 readbacks), VDD 3.3 V, **REF3030 3.0 V reference**. The ECU line sees 10.15 MΩ. |
+| **V-mon** | +B only | 56 k / 22 k + 100 nF → MCP3208. 16 V reads 2.86 V. **BATT is not tapped**: it is live with the key off and would back-feed the board through the input clamps. |
+| **VR** (variable reluctance) | NE±, TDC±, SP2± | **MAX9926** ×2, dual VR interface: differential, adaptive threshold. NE and TDC → MCPWM capture, **SP2 → PCNT**. |
+| **CAP** (logic pulses) | TAC, SP1 | 10 k series, 1 M to GND, BZX84C5V1 clamp, 22 pF → **74LVC14** (inputs 5.5 V tolerant, also unpowered) → MCPWM capture. |
+| **CAP-HV** (solenoid drives) | SPV, TCV | Same network as CAP. The 47 kΩ + 10 kΩ limit a 60 V flyback to 1.1 mA into the zener. The old 220 k / 10 k divider could never reach the Schmitt threshold behind the 47 kΩ. |
+| **DIG** (switches, lamps) | 31 lines | Same network as CAP → 74LVC14 → 4 × 74HC165, polled at 100 Hz. Reads low at 0.8 V or less and high at 4.5 V or more. |
 
 **Power** comes from **+B (E8-12)** through the interposer itself, with no
-new feed to the battery: polyfuse 250 mA → TVS SMBJ24A → 12 V→3.3 V buck.
-+B only goes live with the EFI main relay, so nothing drains with the key
-off. **Ground** is E1 for the analog reference. The board's power return
-also goes to E1, because the tap draws under 150 mA.
+new feed to the battery. The +B power lead takes a **500 mA PTC at the
+splice** in place of the 47 kΩ. Then SS34 → SMBJ24A → Pololu D24V10F5
+5 V buck → AP2112 3.3 V LDO. +B only goes live with the ECD main relay,
+so nothing drains with the key off. The **power return is E01** (E5-13),
+and the **analog reference is E2** (E6-9, sensor ground). They join on the
+board at a single point under the ADC. The board draws about 200 mA from
++B at peak Wi-Fi, and about 270 mA with the Phase 2 relays armed.
 
 ## Firmware data flow
 
@@ -96,14 +104,38 @@ the cabin display gains RPM, timing and fuelling at no extra cost.
 
 ## Phase 2: piggyback interception (not built yet)
 
-For PIM, VRP/VRT, THF and VA, the chamber gets a three-wire pigtail: ECU
-side, harness side, and the tap. A **normally-closed** signal relay
-(Panasonic TQ2) or an analog switch whose unpowered state is ON connects
-ECU to harness. When the tap board is powered and armed, it switches the ECU
-side over to a DAC or digital-pot output. Lose power, crash, or brown out,
-and the line goes back to stock.
+For PIM, VRP/VRT, THF and VA, the chamber splits the line into a pigtail
+pair, ECU side (E) and harness side (H), plus the usual 47 kΩ tap on H.
+A **normally-closed** Panasonic TQ2-5V relay in the tap box connects E to
+H. Both poles are paralleled. When armed, the relay switches E over to an
+MCP4728 DAC output, buffered and fed through 1 kΩ. An on-board readback
+of E lets the firmware close the loop on what the ECU actually sees.
+
+The relay coil rail is on only while the firmware holds ARM high **and**
+keeps toggling KICK from its control loop. A 74LVC1G123 retriggerable
+one-shot drops the rail about 20 ms after the last toggle. Lose power,
+crash, hang or brown out, and every line goes back to stock. The
+earlier TPS3823 plan was dropped: after a hang, its reset pulse would
+re-arm the relays for 1.6 s at a time.
+
+One failure mode the relays can't cover: **unplugging the bypass
+connector (J4) opens the intercepted lines.** Fit the shorted stock
+jumper plug whenever the board is out.
 
 The project is **piggyback-only**: SPV and TCV are tap-only and are never
 intercepted or driven (see research §4). The piggyback "maps" are
 correction tables (e.g. PIM out = f(PIM in, RPM)) applied to sensor inputs.
 The ECU's own maps still decide fuel and timing.
+
+## Cabin interface (direction, 2026-10-24)
+
+- **Gauge:** the broken dash clock (a hole about 2–2.5 in across) is the
+  candidate spot for a Qualia ESP32-S3 with a 2.1 in round 480 × 480
+  display. It joins the existing CAN bus and shows the 0x110–0x112 data.
+  It's always on and needs no phone. Measure the hole and the depth
+  behind it before choosing the display.
+- **Tuning and logs:** a web app served by the tap box over its own
+  Wi-Fi, installable on a phone as a PWA. Nothing to publish in an app
+  store, and every box gets it for free.
+- **React Native:** deferred. Worth it only for background logging,
+  Bluetooth, or a store listing. The web screens can be ported then.

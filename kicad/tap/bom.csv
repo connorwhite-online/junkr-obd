@@ -1,0 +1,61 @@
+ref,value,part_number,qty,kicad_symbol,kicad_footprint,supplier,supplier_link,notes
+F1,0.5A PTC 30V,1812L050/30MR,1,Device:Polyfuse,Fuse:Fuse_1812_4532Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=1812L050/30MR,"IN THE CHAMBER at the E8-12 splice, not on the PCB. [VERIFY] PN: 0.5 A hold, >=30 V Vmax."
+R_SPLICE,47k 1%,RC0603FR-0747KL,51,Device:R,Resistor_SMD:R_0603_1608Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=RC0603FR-0747KL,"IN THE CHAMBER, one per tap lead (not the +B power lead). Order 60."
+J1-J3,Pico-Clasp 2x13,Molex Pico-Clasp 2x13 vertical,3,Connector_Generic:Conn_02x13_Odd_Even,Connector_Molex:Molex_PicoClasp_2x13 [custom],Digi-Key,https://www.digikey.com/en/products/result?keywords=Pico-Clasp dual row,[VERIFY] header and mating housing PNs + crimp terminals. Tap harnesses E5/E6/E8.
+J4,Pico-Clasp 2x5,Molex Pico-Clasp 2x5 vertical,1,Connector_Generic:Conn_02x05_Odd_Even,Connector_Molex:Molex_PicoClasp_2x05 [custom],Digi-Key,https://www.digikey.com/en/products/result?keywords=Pico-Clasp dual row,PH2 only. Also build one shorted stock jumper plug. [VERIFY] PN.
+J5,JST GH 4P,SM04B-GHS-TB,1,Connector_Generic:Conn_01x04,Connector_JST:JST_GH_SM04B-GHS-TB_1x04-1MP_P1.25mm_Horizontal,Digi-Key,https://www.digikey.com/en/products/result?keywords=SM04B-GHS-TB,CAN bus lead through the gland.
+J6,USB-C,USB4105-GF-A,1,Connector:USB_C_Receptacle_USB2.0_16P,Connector_USB:USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal,Digi-Key,https://www.digikey.com/en/products/result?keywords=USB4105-GF-A,Flash / log download.
+J7,microSD,DM3AT-SF-PEJM5,1,Connector:Micro_SD_Card_Det_Hirose_DM3AT,Connector_Card:microSD_HC_Hirose_DM3AT-SF-PEJM5,Digi-Key,https://www.digikey.com/en/products/result?keywords=DM3AT-SF-PEJM5,SDMMC 1-bit.
+D1,SS34,SS34,1,Diode:SS34,Diode_SMD:D_SMA,Digi-Key,https://www.digikey.com/en/products/result?keywords=SS34,Reverse polarity.
+D2,SMBJ24A,SMBJ24A,1,Diode:SMBJ24A,Diode_SMD:D_SMB,Digi-Key,https://www.digikey.com/en/products/result?keywords=SMBJ24A,Load-dump TVS.
+C1,47uF 35V,EEE-FK1V470P,1,Device:C_Polarized,Capacitor_SMD:CP_Elec_6.3x7.7,Digi-Key,https://www.digikey.com/en/products/result?keywords=EEE-FK1V470P,+B bulk.
+U1,Pololu D24V10F5,D24V10F5,1,Connector_Generic:Conn_01x05,"Pololu D24V10Fx footprint [custom, 0.1in pins]",Pololu,https://www.digikey.com/en/products/result?keywords=D24V10F5,5 V 1 A buck module. 1 A for Wi-Fi peaks plus PH2 coils.
+D3,BAT54C,BAT54C,1,Diode:BAT54C,Package_TO_SOT_SMD:SOT-23,Digi-Key,https://www.digikey.com/en/products/result?keywords=BAT54C,+5V / VBUS OR into the LDO.
+U2,AP2112K-3.3,AP2112K-3.3TRG1,1,Regulator_Linear:AP2112K-3.3,Package_TO_SOT_SMD:SOT-23-5,Digi-Key,https://www.digikey.com/en/products/result?keywords=AP2112K-3.3TRG1,600 mA LDO.
+U3,ESP32-S3-WROOM-1-N16R8,ESP32-S3-WROOM-1-N16R8,1,RF_Module:ESP32-S3-WROOM-1,RF_Module:ESP32-S3-WROOM-1,Digi-Key,https://www.digikey.com/en/products/result?keywords=ESP32-S3-WROOM-1-N16R8,Antenna over the board edge.
+"SW1,SW2",Tact 3x4,PTS810SJM250SMTRLFS,2,Switch:SW_Push,Button_Switch_SMD:SW_Push_SPST_NO_Alps_SKRK,Digi-Key,https://www.digikey.com/en/products/result?keywords=PTS810,"BOOT, RESET."
+D4,LED green,LTST-C191KGKT,1,Device:LED,LED_SMD:LED_0603_1608Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=LTST-C191KGKT,Status.
+D5,USBLC6-2SC6,USBLC6-2SC6,1,Power_Protection:USBLC6-2SC6,Package_TO_SOT_SMD:SOT-23-6,Digi-Key,https://www.digikey.com/en/products/result?keywords=USBLC6-2SC6,USB ESD.
+"U4,U5",MCP3208,MCP3208-CI/SL,2,Analog_ADC:MCP3208,Package_SO:SOIC-16_3.9x9.9mm_P1.27mm,Digi-Key,https://www.digikey.com/en/products/result?keywords=MCP3208-CI/SL,"12-bit 8-ch SPI ADC, VDD 3.3 V."
+U6,REF3030,REF3030AIDBZR,1,Reference_Voltage:REF3030,Package_TO_SOT_SMD:SOT-23,Digi-Key,https://www.digikey.com/en/products/result?keywords=REF3030AIDBZR,"3.000 V reference, VIN from +5V."
+U7-U10,MCP6004,MCP6004-I/SL,4,Amplifier_Operational:MCP6004,Package_SO:SOIC-14_3.9x8.7mm_P1.27mm,Digi-Key,https://www.digikey.com/en/products/result?keywords=MCP6004-I/SL,ANA followers at 5 V.
+"U11,U12",MCP6004,MCP6004-I/SL,2,Amplifier_Operational:MCP6004,Package_SO:SOIC-14_3.9x8.7mm_P1.27mm,Digi-Key,https://www.digikey.com/en/products/result?keywords=MCP6004-I/SL,PH2 DAC buffers.
+"U13,U14",MAX9926,MAX9926UAEE+,2,[custom symbol],Package_SO:QSOP-16_3.9x4.9mm_P0.635mm,Digi-Key,https://www.digikey.com/en/products/result?keywords=MAX9926,"Dual VR interface. [VERIFY] package, pinout, output type, input network."
+U15-U21,74LVC14,"74LVC14APW,118",7,74xx:74LVC14,Package_SO:TSSOP-14_4.4x5mm_P0.65mm,Digi-Key,https://www.digikey.com/en/products/result?keywords=74LVC14APW,"Schmitt inverters, 5.5 V-tolerant inputs with Ioff."
+U22-U25,74HC165,"74HC165PW,118",4,74xx:74HC165,Package_SO:TSSOP-16_4.4x5mm_P0.65mm,Digi-Key,https://www.digikey.com/en/products/result?keywords=74HC165PW,31 DIG inputs.
+U26,SN65HVD230,SN65HVD230DR,1,Interface_CAN_LIN:SN65HVD230,Package_SO:SOIC-8_3.9x4.9mm_P1.27mm,Digi-Key,https://www.digikey.com/en/products/result?keywords=SN65HVD230DR,CAN transceiver.
+JP1,Jumper 2P,,1,Jumper:Jumper_2_Open,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,Digi-Key,,CAN termination enable.
+R404,120R,,1,Device:R,Resistor_SMD:R_0805_2012Metric,Digi-Key,,CAN termination.
+R101-R114,100k 1%,RC0603FR-07100KL,14,Device:R,Resistor_SMD:R_0603_1608Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=RC0603FR-07100KL,ANA series.
+R121-R134,10M 1%,RC0603FR-0710ML,14,Device:R,Resistor_SMD:R_0603_1608Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=RC0603FR-0710ML,ANA pull-down to AGND.
+R141-R154,3.3k 1%,RC0603FR-073K3L,14,Device:R,Resistor_SMD:R_0603_1608Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=RC0603FR-073K3L,ANA divider top.
+R161-R174,4.7k 1%,RC0603FR-074K7L,14,Device:R,Resistor_SMD:R_0603_1608Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=RC0603FR-074K7L,ANA divider bottom.
+C101-C114,100nF,,14,Device:C,Capacitor_SMD:C_0603_1608Metric,Digi-Key,,At each ADC pin.
+R181-R185,47k 1%,RC0603FR-0747KL,5,Device:R,Resistor_SMD:R_0603_1608Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=RC0603FR-0747KL,PH2 readback splice resistor (on board).
+R190,56k 1%,RC0603FR-0756KL,1,Device:R,Resistor_SMD:R_0603_1608Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=RC0603FR-0756KL,+B monitor top.
+R191,22k 1%,RC0603FR-0722KL,1,Device:R,Resistor_SMD:R_0603_1608Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=RC0603FR-0722KL,+B monitor bottom.
+"R192,R193",10k 1%,RC0603FR-0710KL,2,Device:R,Resistor_SMD:R_0603_1608Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=RC0603FR-0710KL,+5V monitor.
+R201-R235,10k,RC0603FR-0710KL,35,Device:R,Resistor_SMD:R_0603_1608Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=RC0603FR-0710KL,DIG/CAP series.
+R301-R335,1M,RC0603FR-071ML,35,Device:R,Resistor_SMD:R_0603_1608Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=RC0603FR-071ML,DIG/CAP pull-down.
+D201-D235,BZX84C5V1,BZX84C5V1,35,Diode:BZX84Cxx,Package_TO_SOT_SMD:SOT-23,Digi-Key,https://www.digikey.com/en/products/result?keywords=BZX84C5V1,Gate input clamp.
+C201-C235,22pF C0G,,35,Device:C,Capacitor_SMD:C_0603_1608Metric,Digi-Key,,Gate input filter.
+R241-R243,10k,RC0603FR-0710KL,3,Device:R,Resistor_SMD:R_0603_1608Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=RC0603FR-0710KL,MAX9926 output pull-ups.
+"R1,R401-R403,CS pull-ups,SD DAT1/2",10k,RC0603FR-0710KL,8,Device:R,Resistor_SMD:R_0603_1608Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=RC0603FR-0710KL,"EN, SD and ADC CS pull-ups."
+R2,1k,,1,Device:R,Resistor_SMD:R_0603_1608Metric,Digi-Key,,LED.
+"R3,R4",5.1k,,2,Device:R,Resistor_SMD:R_0603_1608Metric,Digi-Key,,USB-C CC.
+U27,PCA9306,PCA9306DCUR,1,Logic_LevelTranslator:PCA9306,Package_SO:VSSOP-8_2.3x2mm_P0.5mm,Digi-Key,https://www.digikey.com/en/products/result?keywords=PCA9306DCUR,PH2 I2C 3.3 V to 5 V.
+U28,PCA9554,"PCA9554PW,118",1,Interface_Expansion:PCA9554,Package_SO:TSSOP-16_4.4x5mm_P0.65mm,Digi-Key,https://www.digikey.com/en/products/result?keywords=PCA9554PW,"PH2 relay gates, addr 0x20."
+"U29,U30",MCP4728,MCP4728-E/UN,2,Analog_DAC:MCP4728,Package_SO:MSOP-10_3x3mm_P0.5mm,Digi-Key,https://www.digikey.com/en/products/result?keywords=MCP4728,"PH2. Needs two I2C addresses: [VERIFY] factory address option, else reprogram one via the LDAC sequence."
+U31,74LVC1G123,74LVC1G123DCTR,1,74xGxx:74LVC1G123,Package_SO:SSOP-8_2.95x2.8mm_P0.65mm,Digi-Key,https://www.digikey.com/en/products/result?keywords=74LVC1G123DCTR,PH2 dead-man one-shot.
+R508,200k,,1,Device:R,Resistor_SMD:R_0603_1608Metric,Digi-Key,,PH2 one-shot timing.
+C501,100nF C0G/film,,1,Device:C,Capacitor_SMD:C_1206_3216Metric,Digi-Key,,"PH2 one-shot timing, about 20 ms. [VERIFY] K factor."
+K1-K5,TQ2-5V,TQ2-5V,5,Relay:TQ2,Relay_SMD:Relay_DPDT_Panasonic_TQ2SA [or THT TQ2],Digi-Key,https://www.digikey.com/en/products/result?keywords=TQ2-5V,"PH2 bypass, both poles paralleled, NC = stock path."
+Q1-Q6,2N7002,2N7002,6,Transistor_FET:2N7002,Package_TO_SOT_SMD:SOT-23,Digi-Key,https://www.digikey.com/en/products/result?keywords=2N7002,PH2 coil drivers + coil-rail enable.
+Q7,AO3401A,AO3401A,1,Transistor_FET:AO3401A,Package_TO_SOT_SMD:SOT-23,Digi-Key,https://www.digikey.com/en/products/result?keywords=AO3401A,PH2 coil-rail P-FET.
+D11-D15,1N4148W,1N4148W,5,Diode:1N4148W,Diode_SMD:D_SOD-123,Digi-Key,https://www.digikey.com/en/products/result?keywords=1N4148W,PH2 flyback.
+R501-R507,10k,RC0603FR-0710KL,7,Device:R,Resistor_SMD:R_0603_1608Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=RC0603FR-0710KL,PH2 gate pull-downs/up.
+R511-R515,1k,,5,Device:R,Resistor_SMD:R_0603_1608Metric,Digi-Key,,PH2 DAC to relay NO.
+R521-R524,4.7k,,4,Device:R,Resistor_SMD:R_0603_1608Metric,Digi-Key,,PH2 I2C pull-ups.
+"R525,ARM pull-down",200k / 100k,,2,Device:R,Resistor_SMD:R_0603_1608Metric,Digi-Key,,"PCA9306 EN, ARM pull-down."
+C bypass,100nF,,30,Device:C,Capacitor_SMD:C_0603_1608Metric,Digi-Key,,One per IC supply pin plus spares.
+C2-C12 bulk,see schematic,,11,Device:C,Capacitor_SMD:C_0805_2012Metric,Digi-Key,,Values per schematic.md designator table.
