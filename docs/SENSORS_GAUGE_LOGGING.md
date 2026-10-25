@@ -168,24 +168,29 @@ All multi-byte values big-endian, `INT16_MIN` = invalid.
 | 0x102 | engine-bay | 20 Hz | MAP gauge psi ×10 (i16) *(existing)* |
 | 0x103 | engine-bay | 2 Hz | MAP abs kPa ×10 (u16), baro kPa ×10 (u16), 5 V rail mV (u16), aux A2 mV (u16) |
 | 0x110 | tap | 50 Hz | RPM (u16), timing °BTDC ×10 (i16), TCV duty ×10 (u16) *(from the tap doc)* |
-| 0x111 | tap | 50 Hz | SPV ° ×10 (u16), VA % ×10 (u16), PIM boost kPa (u16) *(from the tap doc)* |
+| 0x111 | tap | 50 Hz | SPV ° ×10 (u16), VA % ×10 (u16), PIM kPa **absolute** (u16) *(from the tap doc)* |
 | 0x112 | tap | 5 Hz | THW, THA, THF °C (i16 ×3), THO °C (i16) |
-| 0x113 | tap | 10 Hz | piggyback: armed (u8), PIM seen kPa (u16), VA seen % ×10 (u16), THW seen °C (i16), extra fuel % (u8) |
+| 0x113 | tap | 10 Hz | piggyback: flags (u8: bit 0 armed, bit 1 learning, bits 2–7 authority %), PIM seen kPa abs (u16), VA seen % ×10 (u16), THW seen °C (i16), extra fuel in use % (u8) |
 | 0x114 | tap | 5 Hz | +B mV (u16), speed km/h ×10 (u16), DIG bits (u32: W lamp, glow, STA, lock-up, A/C, gear switches) |
-| 0x115 | tap | on change | alert code (u8), value (i16), limit (i16) |
+| 0x115 | tap | on change | alert code (u8, numbering as `gauge::Alert`), value (i16), limit (i16), in bus units |
 | 0x190 | wideband | 50 Hz | λ (rusEFI-style controller, optional) |
 
 The gauge works in whatever units it likes; the bus stays in kPa/°C for
 everything new. The old 0x100/0x102 °F/psi frames stay as they are.
+`shared/can_protocol.h` implements this table, and `pio test -e native`
+checks the packing.
 
 ## 5. Gauge screens
 
 Hardware: Adafruit Qualia ESP32-S3 + 2.1" round 480 × 480 RGB TTL display
-(TL021WVC02, PID 5806 no touch or 5792 touch) in the clock hole. Note the
-Qualia drives the panel over parallel RGB, not SPI, so
-[`src/cabin/main.cpp`](../src/cabin/main.cpp) (which uses an ST7789 SPI
-driver) has to move to the Arduino_GFX RGB panel driver before any of this
-runs.
+(TL021WVC02, PID 5806 no touch or 5792 touch) in the clock hole, driven
+over the Qualia's parallel RGB port with Arduino_GFX
+([`src/cabin/display.cpp`](../src/cabin/display.cpp)). The pages below
+are built in [`src/cabin/ui.cpp`](../src/cabin/ui.cpp); the alert rules
+are in [`src/cabin/gauge_state.h`](../src/cabin/gauge_state.h).
+
+Rendered from the firmware itself (demo drive, `pio run -e gauge-preview
+-t exec`): ![firmware pages](gauge/firmware/contact.png)
 
 **Input.** Don't rely on touch at arm's length on a bumpy trail. One
 momentary button cycles pages (long-press = back to Drive). If the clock's

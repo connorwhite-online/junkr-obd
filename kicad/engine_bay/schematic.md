@@ -22,11 +22,13 @@ the shield itself.
                        └──► U2 buck 12→5 V   ──► +5V rail (MAP sensor only)
 
         +3V3 rail powers: ESP32-C3, MAX31855, ADS1115, TJA1051
-        +5V  rail powers: MAP sensor (via J3)
+        +5V  rail powers: MAP sensor (via J3), aux sender (via J4)
 
         ESP32-C3  ── SPI ──► MAX31855 ── K-type ──► onboard terminal block on the breakout
-                  ── I²C ──► ADS1115  ── CH0  ◄── NTC divider ──► J2 (coolant connector)
-                  ── I²C ──► ADS1115  ── CH1  ◄── MAP 2:1 divider ──► J3 (MAP connector)
+                  ── I²C ──► ADS1115  ── CH0  ◄── NTC divider ──► J2 (spare, was coolant)
+                  ── I²C ──► ADS1115  ── CH1  ◄── MAP 2:1 divider ──► J3 (3-bar MAP)
+                  ── I²C ──► ADS1115  ── CH2  ◄── aux 2:1 divider ──► J4 (spare sender)
+                  ── I²C ──► ADS1115  ── CH3  ◄── +5V 2:1 divider (supply monitor)
                   ── TWAI ──► TJA1051 ── CAN_H/L ──► DT04-4P pins 3,4
                                        └─ 120 Ω term jumper
 ```
@@ -140,10 +142,10 @@ diagram (not all GPIOs are on every header position).
 | SDA | `I2C_SDA` | |
 | ADDR | `GND` | Selects address `0x48`. |
 | ALRT | NC | |
-| A0 | `NTC_TAP` | Coolant thermistor divider tap |
-| A1 | `MAP_TAP` | MAP voltage divider tap |
-| A2 | NC | |
-| A3 | NC | |
+| A0 | `NTC_TAP` | Spare since the coolant reading moved to THW from the ECU tap. J2 stays fitted for a future oil-temp sender; firmware ignores A0. |
+| A1 | `MAP_TAP` | 3-bar absolute MAP, 2:1 divider |
+| A2 | `AUX_TAP` | Spare 0–5 V sender (oil pressure later) via J4, 2:1 divider |
+| A3 | `V5_MON` | `+5V` sensor-supply monitor, 2:1 divider; makes the MAP reading ratiometric |
 
 ### TJA1051 transceiver breakout (U6)
 
@@ -198,9 +200,23 @@ R3 + R4 form a 2:1 divider: `MAP_TAP = MAP_SIG_RAW × R4 / (R3 + R4) =
 MAP_SIG_RAW / 2`. Sensor's 0.2–4.7 V output becomes 0.1–2.35 V at the
 ADC, comfortably inside the ADS1115's 0–3.3 V safe range.
 
-> The firmware constants `MAP_V_ZERO` and `MAP_V_MAX` in
-> `src/engine_bay/sensors.cpp` are updated in this PR from 0.2/4.7 to
-> 0.1/2.35 to match the divided signal.
+> The firmware undoes the divider (`DIVIDER` in
+> `src/engine_bay/sensors.cpp`) and applies the GM 3-bar curve in
+> `src/engine_bay/map_math.h`. Sea level reads about 1.6 V at J3.
+
+### Aux input and 5 V monitor (added with the 3-bar MAP)
+
+| Net | From | To |
+| --- | ---- | -- |
+| `+5V` | U2.VOUT | J4.1 (aux sender V+), R8 top |
+| `AUX_SIG_RAW` | J4.2 | R6 top |
+| `AUX_TAP` | R6 bottom, R7 top, C10 pin 1, U5 A2 | |
+| `V5_MON` | R8 bottom, R9 top, C11 pin 1, U5 A3 | |
+| `GND` | J4.3, R7 bottom, R9 bottom, C10 pin 2, C11 pin 2 | `GND` |
+
+Same 10 k / 10 k + 100 nF as the MAP input. The firmware reads A3 at
+2 Hz and divides the MAP signal by it; if A3 reads outside 4.5–5.5 V
+(not fitted), it assumes 5.0 V.
 
 ### Status LED
 
@@ -221,7 +237,7 @@ ADC, comfortably inside the ADS1115's 0–3.3 V safe range.
 | 3 | CAN_H | bidir |
 | 4 | CAN_L | bidir |
 
-### J2 — Coolant NTC (2-pin)
+### J2 — Spare NTC (2-pin, was coolant)
 
 | Pin | Signal |
 | --- | ------ |
@@ -233,5 +249,13 @@ ADC, comfortably inside the ADS1115's 0–3.3 V safe range.
 | Pin | Signal |
 | --- | ------ |
 | 1 | +5 V (from on-board buck) |
-| 2 | MAP signal (0.2–4.7 V) |
+| 2 | MAP signal (GM 3-bar: ~1.6 V at sea level, ratiometric) |
+| 3 | GND |
+
+### J4 — Aux sender (3-pin)
+
+| Pin | Signal |
+| --- | ------ |
+| 1 | +5 V (from on-board buck) |
+| 2 | Sender signal (0–5 V) |
 | 3 | GND |

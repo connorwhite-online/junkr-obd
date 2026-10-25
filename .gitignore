@@ -57,3 +57,6 @@ Thumbs.db
 # Python
 __pycache__/
 *.npz
+
+# PlatformIO
+.pio/
