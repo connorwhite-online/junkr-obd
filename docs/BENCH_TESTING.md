@@ -80,8 +80,9 @@ pull that runs EGT past 1250 °F, then cruise again.
 **Pass criteria:**
 
 - Serial prints `[cabin] demo mode: synthetic bus traffic, CAN not started`.
-- The Drive page matches `docs/gauge/firmware/01_drive.png`: boost ring on
-  the left, EGT ring on the right, the green `TUNE +6%` pill after ~18 s.
+- The Drive page matches `docs/gauge/firmware/01_drive.png`: one big boost
+  arc with the number in the middle, EGT / intake / coolant underneath,
+  and the green `TUNE +6%` pill after ~18 s.
 - The Qualia's **DOWN** button (or a button from header pin A0 to GND)
   steps Drive → Temps → Engine → Tune → Drive. A long press (0.8 s) jumps
   back to Drive.

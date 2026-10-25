@@ -212,11 +212,13 @@ Mockups (made-up example values; regenerate with
 | ![Alert](gauge/05_alert.svg) | |
 | **Alert** (overlays any page) | |
 
-1. **Drive.** Split ring: boost on the left (0–25 psi, red tick at the
-   ~15 psi fuel cut, white tick at what the ECU is being told), EGT on the
-   right (0–1600 °F, red tick at the hard limit). Center: boost big, EGT
-   below. Footer: coolant, ATF, volts. The pill at the top shows tune state:
-   STOCK (grey), TUNE +n % (green), LEARNING (blue).
+1. **Drive.** *(Simplified 2026-10-25 at Connor's request; the firmware
+   render supersedes the mockup.)* One big 270° arc for **real** boost
+   (0–25 psi, red tick at the ~15 psi fuel cut), the number in the middle,
+   and EGT, intake and coolant as icon + number underneath. What the ECU is
+   told lives on the Tune page. A small pill in the arc's bottom gap shows
+   tune state: STOCK (grey), TUNE +n % (green), LEARNING (blue), or a
+   snoozed alert.
 2. **Temps.** Coolant, ATF (THO), EGT, intake (THA), fuel (THF) as bars with
    their warn tick, plus a 10-minute coolant trend, because the trend on a
    long climb is what tells you to back off before the needle does.

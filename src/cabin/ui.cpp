@@ -12,6 +12,8 @@ LV_FONT_DECLARE(inter_bold_60);
 LV_FONT_DECLARE(inter_bold_32);
 LV_FONT_DECLARE(inter_semi_19);
 LV_FONT_DECLARE(inter_bold_15);
+LV_FONT_DECLARE(icons_26);
+LV_FONT_DECLARE(inter_bold_28);
 
 using gauge::Alert;
 using gauge::Page;
@@ -167,75 +169,74 @@ lv_obj_t* pages[gauge::N_PAGES];
 lv_obj_t* dots[gauge::N_PAGES];
 
 struct Drive {
-    lv_obj_t *boost_arc, *egt_arc, *boost_val, *boost_sub, *egt_val, *cool, *atf, *volts;
-    Tick cut, seen, egt_lim;
+    // One big arc for real boost (the stock sensor, harness side; not what
+    // the ECU is told), the number in the middle, and EGT / intake /
+    // coolant as icon + number underneath. Tune state and snoozed alerts
+    // sit in a small pill in the arc's bottom gap.
+    struct Readout {
+        lv_obj_t *icon, *val;
+        void make(lv_obj_t* p, const char* glyph, uint32_t icon_col, int cx, int cy) {
+            lv_obj_t* row = lv_obj_create(p);
+            lv_obj_remove_style_all(row);
+            lv_obj_set_size(row, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+            lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
+            lv_obj_set_flex_align(row, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+            lv_obj_set_style_pad_column(row, 3, 0);
+            lv_obj_clear_flag(row, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_CLICKABLE);
+            lv_obj_align(row, LV_ALIGN_CENTER, cx - C, cy - C);
+            icon = lv_label_create(row);
+            lv_obj_set_style_text_font(icon, &icons_26, 0);
+            lv_obj_set_style_text_color(icon, col(icon_col), 0);
+            lv_label_set_text(icon, glyph);
+            val = lv_label_create(row);
+            lv_obj_set_style_text_font(val, &inter_bold_28, 0);
+            lv_obj_set_style_text_color(val, col(FG), 0);
+            lv_label_set_text(val, "--");
+        }
+        void set(float f, float warn, float red) {
+            char b[12];
+            fmt(b, sizeof b, f, 0, "\xC2\xB0");
+            set_text(val, b);
+            set_color(val, level(f, warn, red, FG));
+        }
+    } egt, iat, cool;
+    lv_obj_t *arc, *boost_val;
+    Tick cut;
     Pill pill;
 
     void build(lv_obj_t* p) {
-        // Boost fills up the left side, 215° -> 335°; EGT up the right, 145° -> 25°.
-        boost_arc = ring_arc(p, R, RING_W, 215, 335, TRACK, BOOST, 1000, false);
-        egt_arc = ring_arc(p, R, RING_W, 25, 145, TRACK, EGT, 1000, true);
+        arc = ring_arc(p, R, 28, 225, 495, TRACK, BOOST, 1000, false);
         cut.make(p, RED, 4);
-        cut.place(R - 18, R + 18, 215 + 120 * BOOST_CUT_PSI / BOOST_MAX_PSI);
-        seen.make(p, FG, 2);
-        seen.place(R - 14, R + 14, 215);
-        egt_lim.make(p, RED, 4);
-        egt_lim.place(R - 18, R + 18, 145 - 120 * gauge::EGT_RED_F / EGT_MAX_F);
-
-        label_c(p, &inter_bold_15, BOOST, "BOOST", C - 122, 128);
-        label_c(p, &inter_bold_15, EGT, "EGT", C + 122, 128);
-        pill.make(p, C, 92, 140, 30, &inter_bold_15);
-        boost_val = label_c(p, &inter_bold_104, FG, "--", C, 190);
-        boost_sub = label_c(p, &inter_semi_19, DIM, "psi", C, 254);
-        egt_val = label_c(p, &inter_bold_60, EGT, "--", C, 306);
-        label_c(p, &inter_semi_19, DIM, "\xC2\xB0" "F pre-turbo", C, 346);
-        cool = label_c(p, &inter_semi_19, FG, "COOL --", C - 70, 388);
-        atf = label_c(p, &inter_semi_19, FG, "ATF --", C + 70, 388);
-        volts = label_c(p, &inter_bold_15, DIM, "-- V", C, 416);
+        cut.place(R - 20, R + 20, 225 + 270 * BOOST_CUT_PSI / BOOST_MAX_PSI);
+        for (int k = 0; k <= 25; k += 5) {
+            const lv_point_t q = at(R - 38, 225 + 270 * k / BOOST_MAX_PSI);
+            char b[4];
+            snprintf(b, sizeof b, "%d", k);
+            label_c(p, &inter_bold_15, DIM, b, q.x, q.y);
+        }
+        label_c(p, &inter_bold_15, BOOST, "BOOST", C, 116);
+        boost_val = label_c(p, &inter_bold_104, FG, "--", C, 196);
+        label_c(p, &inter_semi_19, DIM, "psi", C, 256);
+        egt.make(p, "\xEE\xBD\x95", EGT, C - 120, 326);    // local_fire_department
+        iat.make(p, "\xEE\xBF\x98", BOOST, C, 326);        // air
+        cool.make(p, "\xEF\x81\xB6", FG, C + 118, 326);    // thermostat
+        pill.make(p, C, 410, 132, 28, &inter_bold_15);
     }
 
     void update(const gauge::State& s, uint32_t now) {
         const Readings& r = s.readings();
-        char b[48], b2[24];
+        char b[24];
 
-        lv_arc_set_value(boost_arc, (int16_t)(1000 * frac(r.boost_psi, 0, BOOST_MAX_PSI)));
-        lv_obj_set_style_arc_color(boost_arc, col(level(r.boost_psi, gauge::BOOST_WARN_PSI,
-                                                        gauge::BOOST_RED_PSI, BOOST)), LV_PART_INDICATOR);
-        lv_arc_set_value(egt_arc, (int16_t)(1000 * frac(r.egt_f, 0, EGT_MAX_F)));
-        lv_obj_set_style_arc_color(egt_arc, col(level(r.egt_f, gauge::EGT_WARN_F, gauge::EGT_RED_F, EGT)),
-                                   LV_PART_INDICATOR);
-
+        const uint32_t bc = level(r.boost_psi, gauge::BOOST_WARN_PSI, gauge::BOOST_RED_PSI, BOOST);
+        lv_arc_set_value(arc, (int16_t)(1000 * frac(r.boost_psi, 0, BOOST_MAX_PSI)));
+        lv_obj_set_style_arc_color(arc, col(bc), LV_PART_INDICATOR);
         fmt(b, sizeof b, r.boost_psi < 0 ? 0.0f : r.boost_psi, 1);
         set_text(boost_val, b);
         set_color(boost_val, level(r.boost_psi, gauge::BOOST_WARN_PSI, gauge::BOOST_RED_PSI, FG));
 
-        const bool told = r.pb_armed && !isnan(r.boost_seen_psi);
-        if (told) {
-            fmt(b2, sizeof b2, r.boost_seen_psi < 0 ? 0.0f : r.boost_seen_psi, 1);
-            snprintf(b, sizeof b, "psi \xC2\xB7 ECU sees %s", b2);
-            seen.place(R - 14, R + 14, 215 + 120 * frac(r.boost_seen_psi, 0, BOOST_MAX_PSI));
-            lv_obj_clear_flag(seen.line, LV_OBJ_FLAG_HIDDEN);
-        } else {
-            snprintf(b, sizeof b, "psi");
-            lv_obj_add_flag(seen.line, LV_OBJ_FLAG_HIDDEN);
-        }
-        set_text(boost_sub, b);
-
-        fmt(b, sizeof b, r.egt_f, 0);
-        set_text(egt_val, b);
-        set_color(egt_val, level(r.egt_f, gauge::EGT_WARN_F, gauge::EGT_RED_F, EGT));
-
-        const float cool_f = f_or_nan(r.thw_c), atf_f = f_or_nan(r.tho_c);
-        fmt(b2, sizeof b2, cool_f, 0, "\xC2\xB0");
-        snprintf(b, sizeof b, "COOL %s", b2);
-        set_text(cool, b);
-        set_color(cool, level(cool_f, gauge::c_to_f(gauge::THW_WARN_C), gauge::c_to_f(gauge::THW_RED_C), FG));
-        fmt(b2, sizeof b2, atf_f, 0, "\xC2\xB0");
-        snprintf(b, sizeof b, "ATF %s", b2);
-        set_text(atf, b);
-        set_color(atf, level(atf_f, gauge::c_to_f(gauge::THO_WARN_C), gauge::c_to_f(gauge::THO_RED_C), FG));
-        fmt(b, sizeof b, r.vbat_v, 1, " V");
-        set_text(volts, b);
+        egt.set(r.egt_f, gauge::EGT_WARN_F, gauge::EGT_RED_F);
+        iat.set(f_or_nan(r.tha_c), 140, 160);
+        cool.set(f_or_nan(r.thw_c), gauge::c_to_f(gauge::THW_WARN_C), gauge::c_to_f(gauge::THW_RED_C));
 
         // Pill: a snoozed alert beats tune state, so it is never forgotten.
         const Alert a = s.alert().code;
