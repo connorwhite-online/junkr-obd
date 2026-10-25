@@ -10,8 +10,8 @@ https://rsms.me/inter/), 4 bpp, with `lv_font_conv` 1.5.2.
 | `inter_bold_32.c` | Bold | 32 | ASCII + `° · → λ` |
 | `inter_semi_19.c` | SemiBold | 19 | ASCII + `° · → λ` |
 | `inter_bold_15.c` | Bold | 15 | ASCII + `° · → λ` |
-| `inter_bold_28.c` | Bold | 28 | `-./0-9°` (Drive page readouts) |
-| `icons_26.c` | Material Icons Round (Apache 2.0) | 26 | U+EF55 flame, U+EFD8 air, U+F076 thermostat |
+| `inter_bold_24.c` | Bold | 24 | `-./0-9°` (Drive page readouts) |
+| `icons_22.c` | Material Icons Round (Apache 2.0) | 22 | U+EF55 flame, U+EFD8 air, U+F076 thermostat |
 
 Regenerate (example for one size):
 

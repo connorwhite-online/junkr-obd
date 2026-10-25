@@ -12,8 +12,8 @@ LV_FONT_DECLARE(inter_bold_60);
 LV_FONT_DECLARE(inter_bold_32);
 LV_FONT_DECLARE(inter_semi_19);
 LV_FONT_DECLARE(inter_bold_15);
-LV_FONT_DECLARE(icons_26);
-LV_FONT_DECLARE(inter_bold_28);
+LV_FONT_DECLARE(icons_22);
+LV_FONT_DECLARE(inter_bold_24);
 
 using gauge::Alert;
 using gauge::Page;
@@ -181,15 +181,15 @@ struct Drive {
             lv_obj_set_size(row, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
             lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
             lv_obj_set_flex_align(row, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-            lv_obj_set_style_pad_column(row, 3, 0);
+            lv_obj_set_style_pad_column(row, 5, 0);
             lv_obj_clear_flag(row, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_CLICKABLE);
             lv_obj_align(row, LV_ALIGN_CENTER, cx - C, cy - C);
             icon = lv_label_create(row);
-            lv_obj_set_style_text_font(icon, &icons_26, 0);
+            lv_obj_set_style_text_font(icon, &icons_22, 0);
             lv_obj_set_style_text_color(icon, col(icon_col), 0);
             lv_label_set_text(icon, glyph);
             val = lv_label_create(row);
-            lv_obj_set_style_text_font(val, &inter_bold_28, 0);
+            lv_obj_set_style_text_font(val, &inter_bold_24, 0);
             lv_obj_set_style_text_color(val, col(FG), 0);
             lv_label_set_text(val, "--");
         }
@@ -217,9 +217,9 @@ struct Drive {
         label_c(p, &inter_bold_15, BOOST, "BOOST", C, 116);
         boost_val = label_c(p, &inter_bold_104, FG, "--", C, 196);
         label_c(p, &inter_semi_19, DIM, "psi", C, 256);
-        egt.make(p, "\xEE\xBD\x95", EGT, C - 120, 326);    // local_fire_department
-        iat.make(p, "\xEE\xBF\x98", BOOST, C, 326);        // air
-        cool.make(p, "\xEF\x81\xB6", FG, C + 118, 326);    // thermostat
+        egt.make(p, "\xEE\xBD\x95", EGT, C - 110, 330);    // local_fire_department
+        iat.make(p, "\xEE\xBF\x98", BOOST, C, 330);        // air
+        cool.make(p, "\xEF\x81\xB6", FG, C + 110, 330);    // thermostat
         pill.make(p, C, 410, 132, 28, &inter_bold_15);
     }
 
