@@ -22,16 +22,15 @@ needs them on hand.
 
 | Item | First used in stage | Notes |
 | ---- | ------------------- | ----- |
-| Adafruit Qualia ESP32-S3 | 2 | Cabin MCU. |
+| Adafruit Qualia ESP32-S3 + 2.1" round display (PID 5792 or 5806) | 2 | Gauge MCU and panel. |
 | ESP32-C3 SuperMini | 3 | Engine-bay MCU. Buy 2 — easier to debug if you fry one. |
 | Adafruit MAX31855 breakout (PID 269) | 3 | Thermocouple amp. |
 | Adafruit ADS1115 breakout (PID 1085) | 3 | 16-bit ADC. |
 | TJA1051 / SN65HVD230 modules × 2 | 4 | CAN transceivers, one per MCU. |
 | K-type thermocouple probe | 3 (loop test), 5 (real) | Or just a short loop of copper wire for Stage 3. |
-| 10 kΩ NTC + a real automotive coolant sensor | 5 | Bench-only NTC for Stage 3 can be the resistor pair below. |
-| MAP sensor (0.2–4.7 V output, 0–29 psi) | 5 | Pin down the part in Stage 6. |
+| GM 3-bar MAP (12569240 / 16254609) | 5 | Calibration check in Stage 6. |
 | 120 Ω 1 % resistors × 2 | 4 | CAN bus termination, one each end. |
-| 10 kΩ 1 % resistors × ~5 | 3 | Divider sims + final NTC divider. |
+| 10 kΩ 1 % resistors × ~4 | 5 | Temporary 2:1 dividers for MAP and the 5 V monitor. |
 
 ---
 
@@ -51,7 +50,6 @@ needs them on hand.
 | **Soldering iron** with adjustable temp 200–450 °C | $25–80 | [Amazon US](https://www.amazon.com/s?k=adjustable+soldering+iron+pinecil) · Pinecil V2 (~$30) is excellent. |
 | **Solder + flux** | $10–15 | [Amazon US](https://www.amazon.com/s?k=63%2F37+solder+0.6mm) |
 | **Thermometer** — anything that reads water + air temp accurately | $10–20 | [Amazon US](https://www.amazon.com/s?k=digital+kitchen+thermometer) |
-| **Mug / glass container** for the warm-water NTC bath | — | The kitchen. |
 
 **Approximate bench-only total: $150–300** depending on what you already own.
 

@@ -1,14 +1,22 @@
-# Simple Gauge for Qualia ESP32-S3
+# junkr-obd: gauge, sensors and ECU tap for a 1KZ-TE Prado
 
-This repository contains a minimal three-parameter automotive gauge running on an Adafruit **Qualia ESP32-S3** and its built-in IPS display.
+A round dash gauge (Adafruit **Qualia ESP32-S3** + 2.1" 480×480 round
+display in the dead clock hole), an engine-bay sensor node, and a zero-cut
+ECU interposer with a logging tap box, all on one CAN bus. Piggyback only:
+the stock ECU stays in charge.
 
-## Parameters Displayed
+![Gauge pages, rendered from the firmware](docs/gauge/firmware/contact.png)
 
-| Sensor | Range | Notes |
+## Where the numbers come from
+
+| Quantity | Source | Notes |
 | ------ | ----- | ----- |
-| EGT (thermocouple) | up to 1800 °F | MAX31855 SPI amplifier |
-| Coolant Temperature | –40 °F – 300 °F | 10 kΩ NTC thermistor, Steinhart–Hart |
-| Boost / MAP | 0 – 29 psi | MPX2200GP analog pressure |
+| EGT, pre-turbo | engine-bay node | ungrounded K-type, MAX31855 |
+| Boost (absolute) + baro | engine-bay node | GM 3-bar MAP teed into the stock PIM hose |
+| Boost the ECU sees, RPM, timing, fuelling, pedal | ECU tap | from the interposer |
+| Coolant, ATF, intake, fuel temps, volts, lamps | ECU tap | the ECU's own sensors |
+
+Full plan: [`docs/SENSORS_GAUGE_LOGGING.md`](docs/SENSORS_GAUGE_LOGGING.md).
 
 ## System Block Diagram
 
@@ -23,8 +31,7 @@ flowchart LR
     subgraph EB["Engine Bay PCB"]
         direction TB
         S1["K-type EGT probe"] --> M1["MAX31855"]
-        S2["Coolant NTC<br/>10 kΩ, β=3950"] --> A1["ADS1115<br/>16-bit ADC"]
-        S3["MAP sensor<br/>0.2–4.7 V"] --> A1
+        S3["GM 3-bar MAP"] --> A1["ADS1115<br/>16-bit ADC"]
         M1 -- "SPI" --> C3["ESP32-C3"]
         A1 -- "I²C" --> C3
         C3 -- "TWAI" --> X1["TJA1051<br/>(CAN xcvr)"]
@@ -34,7 +41,7 @@ flowchart LR
         direction TB
         X2["TJA1051<br/>(CAN xcvr)"] -- "TWAI" --> Q["Qualia ESP32-S3"]
         T2["120 Ω term"] -.- X2
-        Q --> D["IPS display<br/>EGT · Coolant · Boost"]
+        Q --> D["2.1in round display<br/>Drive · Temps · Engine · Tune"]
     end
     X1 <-->|"4-pin Deutsch<br/>CAN_H / CAN_L<br/>+12 V / GND"| X2
 ```
@@ -52,14 +59,10 @@ flowchart LR
 
 | Function | Pin |
 | -------- | --- |
-| TFT SCK | GPIO36 |
-| TFT MOSI | GPIO35 |
-| TFT MISO | GPIO33 |
-| TFT CS | GPIO34 |
-| TFT DC | GPIO37 |
-| TFT RST | GPIO38 |
-| CAN TX (TWAI) | GPIO5 |
-| CAN RX (TWAI) | GPIO6 |
+| Display | Qualia RGB666 port + 40-pin ribbon (fixed by the board) |
+| CAN TX (TWAI) | GPIO5 (header SCK) |
+| CAN RX (TWAI) | GPIO6 (header MISO) |
+| Page button (to GND) | A0 / GPIO17; the on-board DOWN button does the same |
 
 ## Engine-Bay ESP32-C3 Pin Map
 
@@ -71,6 +74,7 @@ button on GPIO9, and the USB-Serial pins GPIO20/21.)
 | MAX31855 SCK | GPIO4 |
 | MAX31855 MISO | GPIO5 |
 | MAX31855 CS | GPIO10 |
+| ADS1115 A1 / A2 / A3 | MAP / spare sender / +5 V monitor (all via 2:1 dividers) |
 | ADS1115 SDA | GPIO6 |
 | ADS1115 SCL | GPIO7 |
 | CAN TX (TWAI) | GPIO0 |
@@ -78,7 +82,8 @@ button on GPIO9, and the USB-Serial pins GPIO20/21.)
 
 ## Calibration Constants
 
-Thermistor β: **3950 K**  |  Series resistor: **10 kΩ @ 25 °C**  |  MAP: 0.2 V → 0 psi, 4.7 V → 29 psi
+MAP (GM 3-bar, ratiometric): `kPa = 1.1 + 314.4 × V_sig / V_5V`, in
+`src/engine_bay/map_math.h`. Baro is latched with the engine stopped.
 
 ## Power Supply
 
@@ -123,68 +128,56 @@ STEP files are vendored under [`hardware/3d_models/`](hardware/3d_models/).
 
 ## Firmware Layout
 
-Single PlatformIO project, two environments selected via `build_src_filter`:
+One PlatformIO project; each environment picks its sources with
+`build_src_filter`:
 
 ```
-shared/can_protocol.h          # frame IDs + payload conventions
-src/cabin/                     # env: cabin (Qualia ESP32-S3)
-  main.cpp · ui.{cpp,h} · can_rx.{cpp,h}
-src/engine_bay/                # env: engine-bay (ESP32-C3 SuperMini)
-  main.cpp · sensors.{cpp,h} · can_tx.{cpp,h}
+shared/can_protocol.h      # every CAN frame: IDs, payloads, pack/unpack
+src/cabin/                 # env cabin / cabin-demo (Qualia ESP32-S3 gauge)
+  gauge_state.h            #   frames -> values + alerts (pure, host-tested)
+  ui.cpp                   #   LVGL pages (also runs on the PC, see below)
+  display.cpp              #   Qualia RGB panel + LVGL glue
+  button.h · demo.h · can_rx.cpp · main.cpp · fonts/ (Inter)
+src/engine_bay/            # env engine-bay (ESP32-C3 SuperMini)
+  map_math.h               #   3-bar curve + baro latch (pure, host-tested)
+  sensors.cpp · can_bus.cpp · main.cpp
+src/tap/                   # ECU tap box (ESP32-S3), piggyback lookup so far
+src/preview/               # env gauge-preview: renders the pages to PNG
+test/                      # pio test -e native
 ```
 
-- **`engine-bay`** reads MAX31855 + ADS1115 and publishes three CAN frames
-  every 50 ms (`0x100` EGT, `0x101` Coolant, `0x102` MAP×10) at 500 kbps.
-- **`cabin`** is a TWAI listener that drives an LVGL UI: a boost arc gauge
-  at the top with EGT and coolant numerics below. Values turn amber at
-  warning thresholds (EGT 1300 °F, coolant 220 °F, boost 20 psi) and red
-  at danger (1500 / 240 / 27 psi).
+- **`engine-bay`** reads EGT and the 3-bar MAP, latches baro, and sends
+  `0x100` EGT °F and `0x102` boost psi×10 at 20 Hz, plus `0x103` (absolute
+  MAP, baro, 5 V rail, spare input) at 2 Hz. It listens for the tap's rpm
+  to know when the engine is stopped. `0x101` (coolant) is retired.
+- **`cabin`** listens to everything and shows five screens: Drive, Temps,
+  Engine, Tune, and an Alert screen that takes over. One button pages,
+  long press goes back to Drive. Without a tap box on the bus it still
+  shows EGT and boost from the engine-bay node.
+- **`cabin-demo`** is the same gauge fed by a built-in 90 s drive, for
+  bench work with no bus.
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant S as Sensors
-    participant C3 as ESP32-C3 (bay)
-    participant Bus as CAN @ 500 kbps
-    participant Q as Qualia (cabin)
-    participant LV as LVGL labels
+Alert levels (pre-turbo EGT): EGT amber 1150 °F, red 1250 °F for 2 s;
+coolant 221 / 230 °F; boost 15 / 17 psi; ATF 230 / 260 °F; check-engine
+lamp with the engine running; battery under 12.4 V for 10 s running.
 
-    loop every 50 ms (20 Hz)
-        S->>C3: SPI read MAX31855 (EGT °C)
-        S->>C3: I²C read ADS1115 CH0 (NTC)
-        S->>C3: I²C read ADS1115 CH1 (MAP)
-        C3->>Bus: TX 0x100 — EGT °F (int16)
-        C3->>Bus: TX 0x101 — Coolant °F (int16)
-        C3->>Bus: TX 0x102 — MAP psi×10 (int16)
-        Bus-->>Q: RX frames
-        Q->>LV: lv_label_set_text_fmt × 3
-    end
-```
+The CAN table (IDs 0x100–0x115, units, rates) is in
+[`docs/SENSORS_GAUGE_LOGGING.md`](docs/SENSORS_GAUGE_LOGGING.md) §4 and,
+authoritatively, in `shared/can_protocol.h`.
 
-Proposed CAN frame layout (1 byte priority, 2 bytes value, big-endian):
-
-| ID | Field | Units | Type | Range |
-| --- | --- | --- | --- | --- |
-| `0x100` | EGT | °F | `int16` | 0 – 1800 |
-| `0x101` | Coolant | °F | `int16` | -40 – 300 |
-| `0x102` | MAP | psi × 10 | `int16` | 0 – 290 |
-
-## Build / Flash
+## Build / Flash / Test
 
 ```bash
-# Cabin (Qualia ESP32-S3) — display + CAN listener
-pio run -e cabin -t upload
+pio run -e cabin -t upload           # gauge on CAN
+pio run -e cabin-demo -t upload      # gauge with the demo drive, no bus needed
+pio run -e engine-bay -t upload      # engine-bay node (engine-bay-debug prints values)
+pio device monitor -e cabin
 
-# Engine bay (ESP32-C3 SuperMini) — sensor reads + CAN publisher
-pio run -e engine-bay -t upload
-
-# Serial monitor
-pio device monitor -e cabin            # or -e engine-bay
+pio test -e native                   # host unit tests
+pio run -e gauge-preview -t exec && python3 docs/gauge/firmware/convert.py
+                                     # re-render docs/gauge/firmware/*.png
 ```
 
-The cabin's display init in `src/cabin/main.cpp` currently calls
-`tft.init(240, 240)` — adjust to match the Qualia panel variant in hand
-(480×480 round IPS vs. 320×240 ST7789 vs. 240×240).
 ## ECU Interposer (in progress)
 
 A zero-cut, printable pass-through between the KZJ95's 1KZ-TE ECU and its

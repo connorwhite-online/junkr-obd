@@ -91,13 +91,13 @@ flowchart LR
 - The summary records also go out as CSV over USB or Wi-Fi so they open
   directly in a spreadsheet or a log viewer.
 
-### CAN integration (proposed, not yet in `shared/can_protocol.h`)
+### CAN integration (in `shared/can_protocol.h`)
 
 | ID | Payload |
 | --- | --- |
 | 0x110 | RPM (u16), actual timing ×10 (i16), TCV duty ×10 (u16) |
-| 0x111 | SPV duration ° ×10 (u16), VA % ×10 (u16), boost kPa (u16) |
-| 0x112 | THW, THA, THF °C (i16 ×3) |
+| 0x111 | SPV duration ° ×10 (u16), VA % ×10 (u16), PIM kPa absolute (u16) |
+| 0x112 | THW, THA, THF, THO °C (i16 ×4) |
 
 This puts the tap box on the same bus as the engine-bay EGT/boost node, and
 the cabin display gains RPM, timing and fuelling at no extra cost.

@@ -13,20 +13,18 @@ For a US-supplier shopping list with links + costs, see
 
 | Item | Used in stage |
 | ---- | ------------- |
-| Adafruit Qualia ESP32-S3 + USB-C cable | 2, 4, 5 |
+| Adafruit Qualia ESP32-S3 + 2.1" round 480×480 display (PID 5792 or 5806) + USB-C cable | 2, 4, 5 |
 | ESP32-C3 SuperMini + USB-C cable | 3, 4, 5 |
 | Adafruit MAX31855 breakout (PID 269) | 3, 4, 5 |
 | Adafruit ADS1115 breakout (PID 1085) | 3, 4, 5 |
 | Two TJA1051 / SN65HVD230 modules | 4, 5 |
 | K-type thermocouple wire (a short loop also works) | 3, 5 |
-| 10 kΩ resistor (×3 for divider sims, ×1 for NTC sim) | 3 |
+| 10 kΩ resistors (×4, temporary 2:1 dividers for MAP and the 5 V monitor) | 5 |
 | 10 kΩ trim pot or linear pot | 3 |
 | 120 Ω resistors (×2 for CAN termination) | 4, 5 |
 | Twisted pair wire, ~1 m | 4, 5 |
 | Breadboard + jumpers | 3, 4 |
-| MAP sensor + hand vacuum/pressure pump | 5, 6 |
-| Real automotive NTC (or thermistor of known curve) | 5 |
-| Cup of warm water + thermometer | 5 |
+| GM 3-bar MAP sensor + hand pressure pump | 5, 6 |
 
 **Software**
 
@@ -35,62 +33,71 @@ For a US-supplier shopping list with links + costs, see
 
 ---
 
-## Stage 1 — Compile both environments
+## Stage 1 — Compile and run the host tests
 
 No hardware needed yet.
 
 ```bash
 git clone <this repo>
 cd junkr-obd
-pio run -e cabin
+pio run -e cabin              # gauge, listening on CAN
+pio run -e cabin-demo         # gauge, fed by synthetic frames
 pio run -e engine-bay
+pio test -e native            # protocol, MAP/baro math, alerts, button (host)
+pio run -e gauge-preview -t exec && python3 docs/gauge/firmware/convert.py
 ```
 
-**Pass criterion:** Both environments produce a `.pio/build/<env>/firmware.bin`
-with no errors.
+**Pass criteria:** the three firmware builds succeed, all native tests
+pass, and `docs/gauge/firmware/*.png` show the five pages. Those PNGs are
+rendered by the real `ui.cpp` on the PC, so what you see there is what
+the panel will draw.
 
 ### Common Stage-1 fixes
 
 | Symptom | Fix |
 | ------- | --- |
 | `Adafruit_MAX31855.h: No such file` | First build downloads libs; run again, or `pio pkg install -e engine-bay`. |
-| `lv_font_montserrat_36 undefined` | Confirm `platformio.ini` still has the `-DLV_FONT_MONTSERRAT_36=1` flag under `[env:cabin]`. |
-| TWAI / `driver/twai.h` missing | Update `platform = espressif32 @ ^6.0` to pull arduino-esp32 ≥ 2.0.5. |
+| `Arduino_GFX_Library.h: No such file` | `pio pkg install -e cabin`. GFX Library for Arduino 1.6+ needs arduino-esp32 3.x; `platformio.ini` pins `espressif32 @ ^8.0.0` for that. |
+| `lv_conf.h: No such file` | The cabin envs need `-I src/cabin` and `-DLV_CONF_INCLUDE_SIMPLE` in `build_flags`. |
 | `can_protocol.h: No such file` | Make sure `[env] build_flags = -I shared` survived edits. |
+| `pio test -e native` can't find `g++` | Install a host compiler (Xcode command line tools on a Mac). |
 
 ---
 
-## Stage 2 — Cabin UI alone
+## Stage 2 — Gauge alone, demo mode
 
-Just the Qualia + USB. Confirms the display + LVGL layout works before
-any CAN comes into the picture.
+Just the Qualia, the 2.1" round display (TL021WVC02, PID 5792/5806) on
+its 40-pin ribbon, and USB. No CAN transceiver.
 
 ```bash
-pio run -e cabin -t upload
-pio device monitor -e cabin
+pio run -e cabin-demo -t upload
+pio device monitor -e cabin-demo
 ```
+
+The demo plays a 90 s loop: idle, cruise with the piggyback armed, a hill
+pull that runs EGT past 1250 °F, then cruise again.
 
 **Pass criteria:**
 
-- Display renders the boost arc gauge at the top with `0.0 psi` in the center.
-- Two numeric placeholders below: `EGT  F  ---` (left) and `COOLANT  F  ---` (right).
-- Serial prints `[cabin] TWAI init failed` — **this is expected**, no
-  transceiver is connected yet.
-- Layout fits the panel — no clipping, no off-screen text.
+- Serial prints `[cabin] demo mode: synthetic bus traffic, CAN not started`.
+- The Drive page matches `docs/gauge/firmware/01_drive.png`: one big boost
+  arc with the number in the middle, EGT / intake / coolant underneath,
+  and the green `TUNE +6%` pill after ~18 s.
+- The Qualia's **DOWN** button (or a button from header pin A0 to GND)
+  steps Drive → Temps → Engine → Tune → Drive. A long press (0.8 s) jumps
+  back to Drive.
+- About 54 s into each loop the red **EGT HIGH** screen takes over. A short
+  press hides it for 30 s (the Drive pill then reads `EGT HIGH` in red);
+  it clears on its own once EGT drops under 1150 °F.
+- Text sits inside the circle, nothing clipped at the edge.
 
-### If the display is blank / wrong size
+### If the display is blank or garbled
 
-The Qualia ships in a few panel variants. `src/cabin/main.cpp:24` has
-`tft.init(240, 240)` as a default. Change to match what's actually on
-your board:
-
-| Variant | Init call |
-| ------- | --------- |
-| 1.5" round IPS, 480×480 | `tft.init(480, 480)` (and likely a different driver — see Adafruit's Qualia docs) |
-| 1.3" square ST7789, 240×240 | `tft.init(240, 240)` |
-| 1.9" ST7789, 320×170 | `tft.init(170, 320); tft.setRotation(1)` |
-
-Rebuild, reupload, recheck.
+| Symptom | Likely cause |
+| ------- | ------------ |
+| Backlight off, nothing at all | `[cabin] display init failed`: the I/O expander at 0x3F didn't answer. Reseat the ribbon; the Qualia must be the RGB666 version. |
+| Backlight on, black | Wrong panel. The init sequence is `TL021WVC02_init_operations` (2.1" round); other Qualia panels need their own from Adafruit's examples, in `src/cabin/display.cpp`. |
+| Colours swapped or shimmering | Panel timings. Copy the porch values for your panel from Adafruit's Qualia examples. |
 
 ---
 
@@ -116,8 +123,8 @@ flowchart LR
 
     TC["K-type loop<br/>(short T+/T- with copper wire)"] --> M
 
-    NTC_SIM["NTC simulator<br/>3V3 ─ 10kΩ ─ A0 ─ 10kΩ ─ GND"] --> A
     MAP_SIM["MAP simulator<br/>10 kΩ pot wiper → A1"] --> A
+    GND3["A2, A3 → GND"] --> A
 ```
 
 ### Wiring table
@@ -147,23 +154,18 @@ and one GND rail.
 | SCL | C3 GPIO7 |
 | ADDR | GND rail (selects address `0x48`) |
 | ALRT | leave open |
-| A0 | NTC simulator tap (see below) |
+| A0 | leave open (spare; coolant now comes from the ECU tap) |
 | A1 | MAP simulator wiper |
-| A2, A3 | leave open |
+| A2, A3 | GND rail. A3 at 0 V tells the firmware "no 5 V monitor", so it assumes 5.0 V. |
 
-**NTC simulator** (drops the voltage divider exactly at room-temp
-midpoint, so coolant should read ~77 °F):
-
-```
-3.3V rail ── 10 kΩ ──┬── A0
-                     │
-                     ── 10 kΩ ── GND rail
-```
-
-**MAP simulator**: connect a 10 kΩ pot between 3.3 V and GND, wiper to
-A1. Sweep it to test the full range.
+**MAP simulator**: a 10 kΩ pot between 3.3 V and GND, wiper to A1. The
+firmware doubles every ADC reading to undo the PCB's 2:1 divider, so
+0.80 V at A1 stands for 1.60 V at the sensor, about 101 kPa (sea level).
 
 ### Upload + monitor
+
+Set the pot to about 0.8 V **before** reset: the node averages the MAP
+reading for the first 0.5 s after power-up and keeps it as baro.
 
 ```bash
 pio run -e engine-bay-debug -t upload
@@ -173,24 +175,28 @@ pio device monitor -e engine-bay-debug
 **Pass criteria** (the debug print lands every 1 s):
 
 ```
-EGT=72 F  Coolant=77 F  MAP=0.0 psi     <- pot at 0V
-EGT=72 F  Coolant=77 F  MAP=14.5 psi    <- pot at midpoint (~1.18V)
-EGT=72 F  Coolant=77 F  MAP=29.0 psi    <- pot at 2.35V (top of valid range)
+[engine-bay] baro 101.7 kPa (latched)
+EGT=72 F  MAP=101.7 kPa  baro=101.7  boost=0.0 psi  5V=0.00  aux=0.00 V   <- pot at 0.80 V
+EGT=72 F  MAP=152.0 kPa  baro=101.7  boost=7.3 psi  5V=0.00  aux=0.00 V   <- pot at 1.20 V
+EGT=72 F  MAP=227.5 kPa  baro=101.7  boost=18.3 psi ...                    <- pot at 1.80 V
 ```
 
 - EGT should be roughly room temperature when T+/T− are shorted (MAX31855
   reports the cold-junction temp).
-- Coolant should be ~77 °F with the 10 kΩ-10 kΩ divider on A0.
-- MAP should sweep 0.0 → 29.0 psi as you turn the pot from GND to ~2.35 V
-  (the firmware constants now assume the on-PCB 2:1 divider — see
-  `src/engine_bay/sensors.cpp:21-23`).
+- MAP follows `1.1 + 314.4 × (V_sensor / 5 V)` kPa, the GM 3-bar curve in
+  `src/engine_bay/map_math.h`.
+- Pot at either end (below ~0.05 V or above ~2.45 V at A1) reads `nan`:
+  that's the open/shorted-sensor detection, and the CAN frames carry the
+  invalid marker.
+- Power-cycle with the pot at 1.8 V: the log must say `baro 101.3 kPa
+  (default)`, because 227 kPa is not a believable baro.
 
 ### Stage-3 gotchas
 
 | Symptom | Likely cause |
 | ------- | ------------ |
 | EGT reads `NaN` or `-32768` | Thermocouple disconnected; MAX31855 fault. Check T+/T− short. |
-| Coolant reads `-32768` | Voltage at A0 is below 0.05 V or above 3.25 V — divider not actually 50/50. |
+| MAP always `nan` | A1 above 2.45 V or below 0.05 V; or A3 floating and reading a stray 4.6 V, so check A3 is grounded. |
 | I²C errors / ADS reads zero | Forgot to tie ADDR to GND, or pull-ups missing (Adafruit breakout has onboard pull-ups — confirm jumper). |
 | C3 keeps rebooting | GPIO0/1 momentarily floating at boot. Should be fine once TWAI starts. |
 
@@ -240,7 +246,7 @@ Re-flash:
 
 ```bash
 pio run -e engine-bay-debug -t upload      # uploads to C3 (one USB cable)
-pio run -e cabin -t upload                 # uploads to Qualia (the other USB cable)
+pio run -e cabin -t upload                 # uploads to Qualia (the other USB cable; not cabin-demo)
 ```
 
 **Pass criteria:**
@@ -248,6 +254,8 @@ pio run -e cabin -t upload                 # uploads to Qualia (the other USB ca
 - Cabin's serial no longer says `[cabin] TWAI init failed`.
 - Cabin display **updates with the Stage-3 simulator values** at ~20 Hz.
   Turn the pot — boost arc on the cabin moves immediately.
+- With no tap box on the bus the pill reads `NO TAP`, coolant/ATF/volts
+  show `--`, and boost comes from the engine-bay MAP. That's correct.
 - Engine-bay debug serial keeps printing the same values, confirming TX
   is happening (the C3 sees no errors → frames are being ACK'd by the
   cabin end).
@@ -256,8 +264,8 @@ pio run -e cabin -t upload                 # uploads to Qualia (the other USB ca
 
 | Symptom | Likely cause |
 | ------- | ------------ |
-| Cabin display stays at `---` | One of the TJA1051 S-pins floating — must be tied to GND for normal mode. |
-| Cabin shows nonsense values | Endianness mismatch — both ends use big-endian `int16`. Re-check `can_tx.cpp` and `can_rx.cpp`. |
+| Cabin display stays at `--` | One of the TJA1051 S-pins floating — must be tied to GND for normal mode. |
+| Cabin shows nonsense values | Packing mismatch. Both ends use `shared/can_protocol.h`; `pio test -e native` checks it. |
 | Bus errors / no frames | Forgot termination, or only terminated one end. Two 120 Ω terminations are correct for a 2-node bus. |
 | Updates intermittent | Twisted pair not actually twisted, or running parallel to a noise source (USB cable bundle). |
 
@@ -272,8 +280,7 @@ out if your chosen sensors agree with the firmware's constants.
 flowchart LR
     subgraph EB["Engine-bay rig"]
         TC["K-type probe<br/>(touch a soldering iron tip)"] --> M[MAX31855]
-        NTC["Real NTC sensor<br/>(in a mug of warm water)"] --> A[ADS1115]
-        MAP_S["MAP sensor + hand pump<br/>(5 V supplied from a bench supply)"] --> A
+        MAP_S["GM 3-bar MAP + hand pump<br/>(5 V supplied from a bench supply)"] --> A[ADS1115]
         M --> C3[ESP32-C3]
         A --> C3
         C3 --> X1[TJA1051]
@@ -289,13 +296,6 @@ flowchart LR
 
 ### Real-sensor wiring
 
-**NTC**: replace the 10 kΩ-10 kΩ simulator with the real NTC in the
-top leg, keep the on-board 10 kΩ in the bottom leg:
-
-```
-3.3V ── (NTC) ── A0 ── 10 kΩ ── GND
-```
-
 **MAP**: drop the pot. The MAP sensor needs 5 V — for the bench, give
 it a bench supply or a USB-pin 5 V tap (the engine-bay PCB will have a
 dedicated 12 V → 5 V buck on it, but on the breadboard, borrow 5 V
@@ -308,18 +308,25 @@ the on-PCB divider doesn't exist yet:
 MAP sensor SIG ── 10 kΩ ── A1 ── 10 kΩ ── GND
 ```
 
+Do the same for the 5 V monitor so the reading is ratiometric:
+
+```
+sensor 5 V ── 10 kΩ ── A3 ── 10 kΩ ── GND
+```
+
 ### Pass criteria
 
 - **EGT:** Touch the K-type probe to a soldering iron tip set to
-  ~600 °F. Display should read within ±20 °F. Should turn **amber at
-  1300 °F**, **red at 1500 °F**.
-- **Coolant:** Dunk the NTC in a mug of water with a separate
-  thermometer. Display should read within ±5 °F. Heat the water up:
-  **amber at 220 °F**, **red at 240 °F** (you won't reach the latter
-  without a hotplate).
-- **Boost:** Connect a hand vacuum/pressure pump to the MAP port. Sweep
-  0 → 29 psi. Arc indicator should track linearly; **amber at 20.0 psi**,
-  **red at 27.0 psi**.
+  ~600 °F. Display should read within ±20 °F. The number and ring turn
+  **amber at 1150 °F** and **red at 1250 °F**; after 2 s at or above
+  1250 °F the **EGT HIGH** screen takes over. (A hot-air gun gets there.)
+- **Boost:** Connect a hand pressure pump to the MAP port. Sweep
+  0 → 20 psi against the pump's gauge. The arc should track within
+  ±0.5 psi; **amber at 15 psi**, **red at 17 psi**, and **OVERBOOST**
+  after half a second at 17.
+- **Baro:** with the port open, the 0x103 frame's baro (and the
+  engine-bay debug print) should match a local weather report's station
+  pressure (not the sea-level-corrected one) within ~1 kPa.
 
 ### What to log
 
@@ -328,29 +335,25 @@ This is the data you need for Stage 6.
 
 ---
 
-## Stage 6 — Pick the MAP sensor
+## Stage 6 — Check the MAP calibration
 
-The firmware assumes `0.2 V → 0 psi, 4.7 V → 29 psi` at the sensor, after
-which the on-PCB 2:1 divider brings the ADC tap to 0.1 V → 2.35 V.
+The firmware is set up for the **GM 3-bar MAP** (12569240 / 16254609),
+read ratiometrically: `kPa = 1.1 + 314.4 × V_signal / V_supply`. Those two
+end points (`GM3BAR_KPA_AT_0V`, `GM3BAR_KPA_AT_VS` in
+`src/engine_bay/map_math.h`) are the only constants to touch.
 
-Whichever MAP sensor you pick, verify with a hand pump:
+With a hand pump and its gauge:
 
-1. At atmospheric (0 psi gauge): sensor signal should be ~0.2 V (or
-   ~1.7 V on a 1-bar absolute sensor — those use a different calibration,
-   you'll need to update `MAP_PSI_MAX` and the V_ZERO/V_MAX constants).
-2. At 29 psi gauge: sensor signal should be ~4.7 V.
-3. Linear in between (a 5-point check is plenty).
+1. Port open: ~1.6 V at the sensor, reads local baro (~101 kPa at sea
+   level, ~82 kPa at 1,800 m).
+2. 5, 10, 15, 20 psi gauge: compare the engine-bay debug `boost=` against
+   the pump gauge. Within ±0.5 psi is good.
+3. If it's off by a constant, adjust `GM3BAR_KPA_AT_0V`; if the error grows
+   with pressure, adjust `GM3BAR_KPA_AT_VS`. Rerun `pio test -e native`
+   (the tests check the curve's shape, not your numbers, so they will
+   fail only if a constant is way off) and reflash.
 
-Sensors that match the calibration as written:
-
-| Part | Notes |
-| ---- | ----- |
-| AEM 30-2130-30 | 0–30 psi, 0.5–4.5 V — close, may need cal tweak. |
-| GM 3-bar MAP (12569240 / 16254609) | 5 V supply, ~0.4–4.7 V across 0–43 psi absolute (~28 psi gauge). |
-| Bosch 0 281 002 137 | 4-bar TMAP, may need scaling. |
-
-If your chosen sensor doesn't fit `0.2–4.7 V over 0–29 psi`, update the
-constants in `src/engine_bay/sensors.cpp:21-23` and rebuild.
+A different sensor needs its own transfer curve in `gm3bar_kpa()`.
 
 ---
 
@@ -363,6 +366,7 @@ Only when 1–6 are all green. By now you know:
 - The display variant is correct.
 - Every sensor reads sensible values.
 - The MAP sensor calibration matches.
+- The gauge pages and alerts look and behave right on the real panel.
 
 Open `kicad/engine_bay/schematic.md` and `kicad/cabin/schematic.md`,
 capture in KiCad, route per `kicad/DESIGN_RULES.md`, and send the

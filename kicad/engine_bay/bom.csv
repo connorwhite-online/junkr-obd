@@ -22,7 +22,7 @@ R3,10kΩ 1%,Generic 0805 1%,1,Device:R,Resistor_SMD:R_0805_2012Metric,Digi-Key,h
 R4,10kΩ 1%,Generic 0805 1%,1,Device:R,Resistor_SMD:R_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+10k+1%25,MAP divider bottom.
 C8,100nF/50V,Generic 0805 X7R,1,Device:C,Capacitor_SMD:C_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+100nF+X7R,NTC signal filter.
 C9,100nF/50V,Generic 0805 X7R,1,Device:C,Capacitor_SMD:C_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+100nF+X7R,MAP signal filter.
-J2,NTC connector,JST-XH 2-pin,1,Connector_Generic:Conn_01x02,Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical,Digi-Key,https://www.digikey.com/en/products/result?keywords=B2B-XH-A,Coolant NTC input. Screw terminal acceptable substitute.
+J2,NTC connector,JST-XH 2-pin,1,Connector_Generic:Conn_01x02,Connector_JST:JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical,Digi-Key,https://www.digikey.com/en/products/result?keywords=B2B-XH-A,Spare (was coolant NTC; coolant now comes from THW via the ECU tap). Keep for a future oil-temp sender.
 J3,MAP connector,JST-XH 3-pin,1,Connector_Generic:Conn_01x03,Connector_JST:JST_XH_B3B-XH-A_1x03_P2.50mm_Vertical,Digi-Key,https://www.digikey.com/en/products/result?keywords=B3B-XH-A,MAP sensor (V+/SIG/GND).
 JP1,Term jumper,1x2 header + shunt,1,Connector_Generic:Conn_01x02,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,Digi-Key,https://www.digikey.com/en/products/result?keywords=0.1+jumper+shunt,Closes the 120 Ω termination network.
 LED1,Power LED green,LTST-C170GKT,1,Device:LED,LED_SMD:LED_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=LTST-C170GKT,Power-good indicator.
@@ -31,3 +31,10 @@ H1,Mounting hole,M3 non-plated,1,Mechanical:MountingHole,MountingHole:MountingHo
 H2,Mounting hole,M3 non-plated,1,Mechanical:MountingHole,MountingHole:MountingHole_3.2mm_M3,—,—,Corner mount.
 H3,Mounting hole,M3 non-plated,1,Mechanical:MountingHole,MountingHole:MountingHole_3.2mm_M3,—,—,Corner mount.
 H4,Mounting hole,M3 non-plated,1,Mechanical:MountingHole,MountingHole:MountingHole_3.2mm_M3,—,—,Corner mount.
+J4,Aux sender connector,JST-XH 3-pin,1,Connector_Generic:Conn_01x03,Connector_JST:JST_XH_B3B-XH-A_1x03_P2.50mm_Vertical,Digi-Key,https://www.digikey.com/en/products/result?keywords=B3B-XH-A,Spare 0-5 V sender (oil pressure later) into ADS1115 A2.
+R6,10kΩ 1%,Generic 0805 1%,1,Device:R,Resistor_SMD:R_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+10k+1%25,Aux divider top.
+R7,10kΩ 1%,Generic 0805 1%,1,Device:R,Resistor_SMD:R_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+10k+1%25,Aux divider bottom.
+R8,10kΩ 1%,Generic 0805 1%,1,Device:R,Resistor_SMD:R_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+10k+1%25,+5V monitor divider top.
+R9,10kΩ 1%,Generic 0805 1%,1,Device:R,Resistor_SMD:R_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+10k+1%25,+5V monitor divider bottom.
+C10,100nF/50V,Generic 0805 X7R,1,Device:C,Capacitor_SMD:C_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+100nF+X7R,Aux signal filter.
+C11,100nF/50V,Generic 0805 X7R,1,Device:C,Capacitor_SMD:C_0805_2012Metric,Digi-Key,https://www.digikey.com/en/products/result?keywords=0805+100nF+X7R,+5V monitor filter.

@@ -2,6 +2,12 @@
 
 Three-parameter automotive gauge: **EGT**, **coolant temp**, **boost/MAP**.
 
+> **Superseded in part (2026-10):** coolant now comes from the ECU's own
+> THW sensor through the tap box, the MAP sensor is a GM 3-bar absolute
+> unit, and the gauge is the 2.1" round 480×480 panel. See
+> [SENSORS_GAUGE_LOGGING.md](SENSORS_GAUGE_LOGGING.md) §7 for the current
+> shopping list; the rest of this file still holds for the boards.
+
 All suppliers below are US-based (Adafruit, Digi-Key, Mouser, SparkFun, Amazon US,
 RockAuto). Links use supplier search rather than direct product pages so they
 stay valid as SKUs move — pick the in-stock variant that matches the spec.
@@ -14,9 +20,9 @@ stay valid as SKUs move — pick the in-stock variant that matches the spec.
 | --- | --- | --- | --- | --- |
 | Adafruit Qualia ESP32-S3 (TFT or IPS variant) | ESP32-S3, on-board 480×480 display, USB-C | 1 | $40–55 | [adafruit.com](https://www.adafruit.com/?q=qualia+esp32-s3) · [Digi-Key](https://www.digikey.com/en/products/result?keywords=adafruit+qualia+esp32-s3) · [Mouser](https://www.mouser.com/c/?q=adafruit%20qualia%20esp32-s3) |
 
-> Note: `src/main.cpp:50` currently calls `tft.init(320, 240)` against an ST7789
-> driver — confirm this matches the panel variant you actually buy. The
-> `project.xml` declares 480×480.
+> The firmware (`src/cabin/display.cpp`) drives the 2.1" round
+> TL021WVC02 panel (PID 5792 touch / 5806 no touch) over the Qualia's RGB
+> port. Another panel needs its own init sequence and timings there.
 
 ## Engine-bay MCU
 
