@@ -1,11 +1,11 @@
 # Build Stages and Parts
 
 Three stages, each with a parts list you can click through. Adafruit and
-Pololu prices were checked 2026-10-26; the rest are rough.
+Pololu prices and stock were checked 2026-10-26; the rest are rough.
 
 | Stage | You get | Parts |
 | --- | --- | --- |
-| 1. Tap + web app | Everything the ECU sees, on your phone, plus codes and baro | ~$250–450 |
+| 1. Tap + web app | Boost, temps, rpm, speed, volts, check-engine light and baro on your phone | ~$150 |
 | 2. Round gauge | Boost, temps, rpm and alerts on the dash | ~$90–140 |
 | 3. Engine-bay box | EGT, real boost, outside air, extra temps | ~$270–420 |
 
@@ -14,45 +14,89 @@ Pololu prices were checked 2026-10-26; the rest are rough.
  ┌────────────────────┐ ┆    ┌──────────────┐          ┌────────────────────┐
  │ Engine-bay node (3)│ ┆    │  Stock ECU   │          │ Phone web app  (1) │
  └─────────┬──────────┘ ┆    └──────┬───────┘          └─────────▲──────────┘
-           │            ┆      interposer                        ┆ Wi-Fi
+           │            ┆   12 back-probes                       ┆ Wi-Fi
            │            ┆    ┌──────┴───────┐                    ┆
            └────CAN─────┼────┤ Tap box  (1) ├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
                         ┆    └──────┬───────┘
                         ┆           └──CAN──── Round gauge (2), clock hole
 ```
 
-## Stage 1: Tap the ECU
+## Stage 1: Tap the ECU (simple version)
 
-Read-only. The interposer sits between the ECU and its three plugs; the
-tap box logs and serves the phone app.
+An ESP32 Feather plus two off-the-shelf ADC boards, wired to 12 pins on
+the back of two ECU plugs (E6 and E8). Everything is in stock at Adafruit
+or Amazon, about $150, and there's no custom PCB.
+
+**Why it isn't just software:** the 1996 ECU has no data port and sends
+nothing, so there's nothing to plug into. You listen to the sensor wires
+directly. Those carry 5 V and 12 V, and the ESP32's pins die above 3.3 V,
+so each wire gets a resistor divider or an optocoupler. That and wiring is
+the whole hardware job; everything else is software.
+
+```
+E6 plug, 8 wires ──► dividers (68k/100k) ──► ADS1115 ×2 ──I²C──┐
+E8 plug, 4 wires ──► PC817 optocouplers ───────────────────────┤
+fuse box (add-a-fuse) ──► 12→5 V buck ──USB-C─────────────────►├─ ESP32-S3 Feather
+                                                               │  + SD logger, BME280, CAN
+                                                               └─ Wi-Fi ─► phone web app
+```
+
+**You get:** boost, coolant, intake, fuel and ATF temps, pedal, rpm,
+speed, battery volts, the check-engine light, baro and cabin temp.
+**Not yet:** injection timing and fuel quantity. Those come off the pump
+sensors and spill valve on E5, which need the full custom tap board, so
+that becomes a later upgrade.
+
+### The 12 taps
+
+No cutting: back-probe pins slide in behind the wire at the back of the plug.
+
+| Pin | Wire | Goes to |
+| --- | --- | --- |
+| E6-2 | PIM (boost) | ADS #1 |
+| E6-4 | THW (coolant) | ADS #1 |
+| E6-3 | THA (intake air) | ADS #1 |
+| E6-5 | THF (fuel temp) | ADS #1 |
+| E6-13 | THO (ATF temp) | ADS #2 |
+| E6-11 | VA (pedal) | ADS #2 |
+| E6-1 | VC (5 V reference) | ADS #2 |
+| E6-9 | E2 (sensor ground) | ADC ground |
+| E8-12 | +B (battery volts) | ADS #2, through a 100k/22k divider |
+| E8-18 | TAC (rpm) | optocoupler |
+| E8-9 | SP1 (speed) | optocoupler |
+| E8-5 | W (check-engine light) | optocoupler |
+
+Power comes from an add-a-fuse in the fuse box, not from the ECU.
+
+### Buy
+
+| Part | Qty | ~$ | Link |
+| --- | --- | --- | --- |
+| ESP32-S3 Feather | 1 | 17.50 | [Adafruit 5477](https://www.adafruit.com/product/5477) |
+| Adalogger FeatherWing (SD card + clock) | 1 | 8.95 | [Adafruit 2922](https://www.adafruit.com/product/2922) |
+| FeatherWing Doubler (solder area for the dividers) | 1 | 7.50 | [Adafruit 2890](https://www.adafruit.com/product/2890) |
+| ADS1115 ADC | 2 | 29.90 | [Adafruit 1085](https://www.adafruit.com/product/1085) |
+| BME280 baro/temp | 1 | 14.95 | [Adafruit 2652](https://www.adafruit.com/product/2652) |
+| STEMMA QT cable, 200 mm | 3 | 3.75 | [Adafruit 4401](https://www.adafruit.com/product/4401) |
+| CAN Pal transceiver (used in stage 2) | 1 | 3.95 | [Adafruit 5708](https://www.adafruit.com/product/5708) |
+| PC817 optocouplers | 1 pack | 7 | [Amazon](https://www.amazon.com/s?k=pc817+optocoupler+dip) |
+| 1 % resistor kit | 1 | 10 | [Amazon](https://www.amazon.com/s?k=1%25+metal+film+resistor+kit) |
+| Back-probe pins | 1 kit | 12 | [Amazon](https://www.amazon.com/s?k=back+probe+pins+kit) |
+| 12 V → 5 V USB-C buck | 1 | 10 | [Amazon](https://www.amazon.com/s?k=12v+to+5v+usb+c+buck+converter+hardwire) |
+| Add-a-fuse + inline fuse | 1 | 8 | [Amazon](https://www.amazon.com/s?k=add+a+fuse+mini+blade) |
+| 22 AWG wire + heat-shrink | 1 | 10 | [Amazon](https://www.amazon.com/s?k=22+awg+stranded+wire+kit) |
+| High-endurance microSD, 32 GB | 1 | 10 | [Amazon](https://www.amazon.com/s?k=high+endurance+microsd+32gb) |
+
+### Later upgrade: interposers + custom tap board
+
+Adds injection timing and fuel quantity (E5) and replaces the back-probes
+with a permanent fit. Parts list: [`kicad/tap/bom.csv`](../kicad/tap/bom.csv).
 
 ![The three interposer sections](build/interposers.png)
 
 | One interposer, exploded | Tap box (66 × 46 × 18 mm) |
 | --- | --- |
 | ![E5 interposer exploded](build/interposer_exploded.png) | ![Tap box exploded](build/tapbox.png) |
-
-STLs: [`hardware/ecu_interposer/stl/`](../hardware/ecu_interposer/stl/).
-
-### Buy
-
-| Part | Qty | ~$ | Link |
-| --- | --- | --- | --- |
-| Interposer prints, MJF PA12 (upload the STLs) | 1 set | 50–100 | [JLC3DP](https://jlc3dp.com/) |
-| TE 040 receptacle 175061-1 | 60 | 15–30 | [Digi-Key](https://www.digikey.com/en/products/result?keywords=175061-1) |
-| TE 040 tab 173682-1 | 60 | 15–30 | [Digi-Key](https://www.digikey.com/en/products/result?keywords=173682-1) |
-| TE 070 receptacle 173631-1 | 20 | 8–15 | [Digi-Key](https://www.digikey.com/en/products/result?keywords=173631-1) |
-| TE 070 tab 173645-1 | 20 | 8–15 | [Digi-Key](https://www.digikey.com/en/products/result?keywords=173645-1) |
-| 47 kΩ 0603 resistors (splices) | 60 | 3 | [Digi-Key](https://www.digikey.com/en/products/result?keywords=RC0603FR-0747KL) |
-| 0.5 A PTC fuse 1812L050/30MR | 2 | 2 | [Digi-Key](https://www.digikey.com/en/products/result?keywords=1812L050%2F30MR) |
-| Tap board PCB, 4-layer, assembled | 5 | 40–80 | [JLCPCB](https://jlcpcb.com/) |
-| Tap board parts (whole list) | 1 | 60–90 | [kicad/tap/bom.csv](../kicad/tap/bom.csv) |
-| 5 V 1 A buck, Pololu D24V10F5 | 1 | 12.95 | [Pololu 2831](https://www.pololu.com/product/2831) |
-| **BME280 baro/temp sensor**, STEMMA QT | 1 | 14.95 | [Adafruit 2652](https://www.adafruit.com/product/2652) |
-| STEMMA QT cable, 200 mm | 1 | 1.25 | [Adafruit 4401](https://www.adafruit.com/product/4401) |
-| Code-reader relay TQ2-5V | 1 | 4 | [Digi-Key](https://www.digikey.com/en/products/result?keywords=TQ2-5V) |
-| High-endurance microSD, 32 GB | 1 | 10–15 | [Amazon](https://www.amazon.com/s?k=high+endurance+microsd+32gb) |
-| Crimper for TE open-barrel terminals | 1 | 30–50 | [Amazon](https://www.amazon.com/s?k=engineer+PA-09+crimper) |
 
 ### Where the baro sensor goes
 
@@ -126,8 +170,8 @@ already come from the ECU.
 | Oil temp sender + drain-plug adapter (measure the thread first) | 1 | 20–40 | [Amazon](https://www.amazon.com/s?k=oil+temperature+sender+drain+plug+adapter) |
 | Wideband O2, later: Bosch LSU 4.9 + CAN controller | 1 | 200–300 | [Amazon](https://www.amazon.com/s?k=14point7+spartan+3+lsu+4.9) |
 
-## Decide before the tap board gets laid out
+## Decide
 
-- [ ] Code-reader relay on the tap board? Recommended.
-- [ ] BME280 socket on the tap board? Recommended.
+- [ ] Start with the simple stage 1 and leave the custom tap board for later? Recommended.
+- [ ] Read codes with a paperclip for now, and add a code-reader relay later? Recommended.
 - [ ] Intercooler or not? Sets where the turbo-outlet sensor goes.
