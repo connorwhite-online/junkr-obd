@@ -18,6 +18,9 @@ the stock ECU stays in charge.
 
 Full plan: [`docs/SENSORS_GAUGE_LOGGING.md`](docs/SENSORS_GAUGE_LOGGING.md).
 
+Side project: a replacement climate control face with one big temperature
+knob, in [`docs/CLIMATE_PANEL.md`](docs/CLIMATE_PANEL.md).
+
 ## System Block Diagram
 
 Two MCUs, linked by CAN over a 4-pin Deutsch harness. Sensors terminate
