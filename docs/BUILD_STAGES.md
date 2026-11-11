@@ -23,6 +23,8 @@ Pololu prices and stock were checked 2026-10-26; the rest are rough.
 
 ## Stage 1: Tap the ECU (minimal version)
 
+Step-by-step build, materials per part and the Materialize order: [STAGE1_BUILD_GUIDE.md](STAGE1_BUILD_GUIDE.md).
+
 One ESP32-S3 dev board, 24 resistors and two printed interposers. No PCB,
 no add-on boards. Every input is two resistors, and the rest is software.
 
@@ -102,7 +104,7 @@ interposer is already drawn if you want it later
 | USB-C car charger + 1 m USB-C cable | 1 | 12 | [Amazon](https://www.amazon.com/s?k=usb+c+car+charger+with+cable) |
 | 22 AWG stranded wire | 1 | 10 | [Amazon](https://www.amazon.com/s?k=22+awg+stranded+wire+kit) |
 | Interposer prints, E6 + E8 (MJF nylon or resin) | 1 set | 20–40 | [JLC3DP](https://jlc3dp.com/) |
-| Tap box (print it yourself, PETG) | 1 | 0 | — |
+| Tap box, `tapbox_min_base/lid.stl` (SLS PA12, or PETG yourself) | 1 | 0–25 | [Materialize](MATERIALIZE_MCP.md) |
 | **040 receptacle**, TE 175061-1 | 40 | 6 | [Digi-Key](https://www.digikey.com/en/products/result?keywords=175061-1) · [Mouser](https://www.mouser.com/c/?q=175061-1) |
 | **040 tab**, TE 173682-1 | 40 | 6 | [Digi-Key](https://www.digikey.com/en/products/result?keywords=173682-1) · [Mouser](https://www.mouser.com/c/?q=173682-1) |
 | **070 receptacle**, TE 173631-1 | 10 | 3 | [Digi-Key](https://www.digikey.com/en/products/result?keywords=173631-1) · [Mouser](https://www.mouser.com/c/?q=173631-1) |

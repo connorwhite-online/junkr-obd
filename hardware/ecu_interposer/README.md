@@ -90,6 +90,7 @@ a 070 and a 040 column (how far each tab engages). Rebuild it with
 | `cad/params.scad` | Process clearances, terminal body envelopes **[MEASURE]**, latch (lock bar and tines), chamber and tap box |
 | `cad/interposer.scad` | Library: `female_plug`, `male_shroud`, `chamber_half`, `tapbox_base/lid`, `section_assembly` |
 | `cad/main.scad` | Top level. Choose with `-D part=... -D sec_i=...` (0 = E5 26-pin, 1 = E6 16-pin, 2 = E8 22-pin) |
+| `cad/tapbox_min.scad` | Stage 1 minimal tap box for one ESP32-S3-DevKitC-1 (drawing KZI-121): `stl/tapbox_min_base.stl`, `stl/tapbox_min_lid.stl` |
 | `cad/fit_coupon.scad` | Fit test slice |
 | `cad/diagram.scad` | Diagram scene: terminals, pigtails, exploded / cut views (not for printing) |
 | `cad/export_all.sh` | Regenerates every STL into `stl/` |
