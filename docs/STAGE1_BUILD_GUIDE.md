@@ -11,6 +11,10 @@ small printed box. There's no PCB. Software does the rest (see
 
 ![Minimal tap wiring](build-stages/KZW-211.png)
 
+![The ten printed parts](build-stages/renders/kit.png)
+
+*Amber parts are Tough Resin; grey parts are SLS PA12.*
+
 ## 1. Printed parts and materials
 
 | Part | Qty | Material | Why |
@@ -92,6 +96,8 @@ Every bottom resistor goes from the GPIO to a board GND pin. The 13th lead
 is ground, from a board GND pin to a chassis bolt.
 
 ## 4. Build
+
+![E8 interposer, exploded](build-stages/renders/E8_exploded.png)
 
 1. **Crimp the pigtails.** For every pin of E6 (16) and E8 (22), cut about
    40 mm of wire (22 AWG, or 18 AWG for the six 070 pins on E8). Crimp a

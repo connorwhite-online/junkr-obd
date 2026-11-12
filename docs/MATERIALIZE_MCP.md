@@ -26,7 +26,8 @@ policy (`materialize_whoami` → `approval: confirm_by_email`).
 | 7 | Create the project | `materialize_create_project` (name, description, buildGuide markdown, category `automotive`, tags, `repoUrl`, `fileIds`, `visibility: private`, `license: mit`) | Bundled files take the project's license, tags and category. |
 | 8 | Add the BOM | `materialize_set_project_bom` (items: name, quantity, unit, notes, sourceUrl) | Replaces the whole list each time. |
 | 9 | Add the wiring diagram | `materialize_request_circuit_upload_url` → PUT → `materialize_add_project_circuit_image` | KZW-211.png. |
-| 10 | Add photos | `materialize_request_photo_upload_url` → PUT → `materialize_add_project_photo` | CAD renders for now. Replace them with real photos once it's built. |
+| 10 | Add renders | Render each STL with OpenSCAD (`docs/build-stages/renders/`), then `materialize_request_photo_upload_url` → PUT → `materialize_add_file_photo` + `materialize_set_file_cover_photo` per file, and `materialize_add_project_photo` + `materialize_set_project_cover_photo` + `materialize_reorder_project_photos` for the gallery | Without these, the page shows almost nothing. Swap in real photos once it's built. |
+| 10b | Images inside the build guide | `materialize_add_project_inline_image` (a photo storageKey) → paste the returned `![](...)` into the guide → `materialize_update_project` | Circuit storage keys are refused; use a photo upload. |
 | 11 | Order (only when you say so) | `materialize_create_order` (one call per part, from the quote_bom lines) | Creates a draft. You get an email, review it, and pay at `confirmationUrl`. Check status with `materialize_get_order`. |
 | 12 | Publish (optional) | `materialize_update_project` (`visibility: public`) | It's private until you flip this. |
 
