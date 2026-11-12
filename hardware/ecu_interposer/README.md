@@ -14,6 +14,7 @@ install only the ones carrying the signals you want.
                 receptacles)  │   ribbon out ──▶ tap box (ESP32-S3)   Multilock tabs)
 ```
 
+- **PCB version (proposed, rev A):** [`docs/PCB_INTERPOSER.md`](../../docs/PCB_INTERPOSER.md): one board with the real TE 176122-6 header, no chamber. CAD in `cad/pcb_interposer.scad`.
 - **Research and pinout:** [`docs/ECU_INTERPOSER_RESEARCH.md`](../../docs/ECU_INTERPOSER_RESEARCH.md)
 - **Electronics and logging:** [`docs/ECU_TAP_ARCHITECTURE.md`](../../docs/ECU_TAP_ARCHITECTURE.md)
 
