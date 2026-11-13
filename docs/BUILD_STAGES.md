@@ -26,7 +26,7 @@ Pololu prices and stock were checked 2026-10-26; the rest are rough.
 One ESP32-S3 dev board, 24 resistors and two printed interposers. No PCB,
 no add-on boards. Every input is two resistors, and the rest is software.
 
-> **Proposed:** one small E6 + E8 PCB with a XIAO ESP32-S3 on it, replacing the printed
+> **Proposed:** one PCB across all three plugs with the DevKitC soldered on, replacing the printed
 > interposers, the resistors and the DevKitC. See [PCB_INTERPOSER.md](PCB_INTERPOSER.md).
 
 ![Minimal tap wiring](build-stages/KZW-211.png)

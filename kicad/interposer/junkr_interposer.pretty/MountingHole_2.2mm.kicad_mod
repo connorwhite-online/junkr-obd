@@ -2,11 +2,11 @@
   (layer "F.Cu")
   (fp_text reference "REF**" (at 0 0) (layer "F.SilkS") hide
       (effects (font (size 1.27 1.27) (thickness 0.15)))
-    (tstamp 347b4896-4e35-4603-8a21-ee21a89bce17)
+    (tstamp 99d33ae9-c91b-497a-b533-26e08bd3b137)
   )
   (fp_text value "M2" (at 0 0) (layer "F.SilkS") hide
       (effects (font (size 1.27 1.27) (thickness 0.15)))
-    (tstamp d01d8a25-0768-4ba6-9aa7-a8d2dcf41418)
+    (tstamp cae42fc0-f9e4-4480-8271-a1f509e01711)
   )
-  (pad "" np_thru_hole circle (at 0 0) (size 2.2 2.2) (drill 2.2) (layers "F&B.Cu" "*.Mask") (tstamp 570097a1-b863-4023-918c-f219fe7e618f))
+  (pad "" np_thru_hole circle (at 0 0) (size 2.2 2.2) (drill 2.2) (layers "F&B.Cu" "*.Mask") (tstamp 9b91473d-6508-4502-815a-e7471cb1aef6))
 )

@@ -3,7 +3,7 @@
 
 A small two-layer grid maze router (A*, 8-way, vias allowed). The 64
 pass-throughs are already drawn (locked) by gen_board.py; this only adds
-the 24 short tap / ADC connections, then the ground pours, and writes
+the 34 short tap / ADC connections, then the ground pours, and writes
 interposer.kicad_pcb.
 
     python3 gen_board.py && python3 route.py
@@ -58,6 +58,10 @@ class Grid:
         edge = (self.X < x0 + e) | (self.X > x1 - e) | (self.Y < y0 + e) | (self.Y > y1 - e)
         ev = (self.X < x0 + 0.3 + VIA_D / 2) | (self.X > x1 - 0.3 - VIA_D / 2) | \
              (self.Y < y0 + 0.3 + VIA_D / 2) | (self.Y > y1 - 0.3 - VIA_D / 2)
+        cx0, cy0, cx1, cy1 = G.CUT          # the notch where the harness plugs go
+        for arr, e_ in ((self.trk, 0.3 + TW / 2), (self.via, 0.3 + VIA_D / 2)):
+            m = (self.X > cx0 - e_) & (self.Y < cy1 + e_)
+            arr[:, m] = BLOCK
         self.trk[:, edge] = BLOCK
         self.via[:, ev] = BLOCK
 
@@ -276,9 +280,11 @@ def main():
         print(f"routed {netname}: {len(path)} cells, {len(vias)} vias")
 
     # TAP_GND pours under the plugs (ECU side), both layers
-    # L-shaped: under the plugs (ECU side) plus the XIAO end of the board
-    poly = [(x0 + 0.4, y0 + 0.4), (-118.5, y0 + 0.4), (-118.5, 7.4), (x1 - 0.4, 7.4),
-            (x1 - 0.4, y1 - 0.4), (x0 + 0.4, y1 - 0.4)]
+    # Under the ECU-side plugs, plus the DevKitC flag, except under its antenna
+    ya = G.DK_PIN1_Y - 1.5
+    poly = [(x0 + 0.4, y0 + 0.4), (-124.4, y0 + 0.4), (-124.4, -24.6), (-118.5, -24.6),
+            (-118.5, 7.4), (x1 - 0.4, 7.4), (x1 - 0.4, y1 - 0.4), (-124.4, y1 - 0.4),
+            (-124.4, ya), (x0 + 0.4, ya)]
     for L in LAYERS:
         G.add_zone(b, "TAP_GND", L, poly)
     P.ZONE_FILLER(b).Fill(b.Zones())
