@@ -56,6 +56,8 @@ lib.astar.argtypes = [I32P, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_i
                       ctypes.c_int, ctypes.c_int, I32P, ctypes.c_int]
 lib.set_rip.restype = None
 lib.set_rip.argtypes = [U8P, ctypes.c_int, ctypes.c_float]
+lib.set_hist.restype = None
+lib.set_hist.argtypes = [F32P]
 lib.stamp.restype = None
 lib.stamp.argtypes = [I32P, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, I32P, ctypes.c_int,
                       I16P, I16P, ctypes.c_int, ctypes.c_int, ctypes.c_int]
@@ -139,6 +141,8 @@ class Router:
         for plist in self.pads.values():
             for _, _, cells in plist:
                 self.hard[np.array(cells, dtype=np.int64)] = 1
+        self.hist = np.zeros(g.L * g.H * g.W, dtype=np.float32)
+        lib.set_hist(self.hist)
 
     def code(self, name):
         if name not in self.netcode:
@@ -361,19 +365,23 @@ class Router:
             if n != "GND" and n not in queue:
                 queue.append(n)
         it = 0
-        limit = 30 * len(queue) + 200
+        limit = 2500
         while queue and it < limit:
             net = queue.pop(0)
             it += 1
             self.rip(net)
-            cross = 30.0 * (1 + self.ripped.get(net, 0) / 2.0)
+            # a net that keeps getting torn up stops tearing up others
+            cross = 30.0 if self.ripped.get(net, 0) < 10 else 0.0
             for vn in self.route_net(net, cross=cross):
                 if vn not in queue:
                     queue.append(vn)
-            if any(f[0] == net for f in self.failed) and net not in queue and self.ripped[net] < 12:
+            if any(f[0] == net for f in self.failed) and net not in queue and self.ripped[net] < 14:
                 queue.append(net)
             if it % 25 == 0:
                 print("  rip-up %d: queue %d, %d failed, %.0fs" % (it, len(queue), len(self.failed), time.time() - t0))
+        for net in queue:   # out of iterations: route what can be routed without ripping
+            self.rip(net)
+            self.route_net(net)
         print("routing done %.0fs: %d tracks, %d vias, %d failed" % (
             time.time() - t0, len(self.tracks), len(self.vias), len(self.failed)))
 
@@ -408,7 +416,11 @@ class Router:
                 path = self.route_conn(net, self.tree[net], plist[j][2], hint, w, clr if w > 0.25 else 0.15, v2,
                                        window=20.0, cross=cross)
                 if path is not None:
-                    for vn in self.victims(net, path, w, clr if w > 0.25 else 0.15, v2):
+                    vs = self.victims(net, path, w, clr if w > 0.25 else 0.15, v2)
+                    if vs:
+                        # make this corridor dearer for everyone next time
+                        self.hist[np.array(path, dtype=np.int64)] += 1.5
+                    for vn in vs:
                         self.rip(vn)
                         ripped.append(vn)
             if path is None:

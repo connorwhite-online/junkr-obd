@@ -34,7 +34,7 @@ static node_t hpop(void) {
 
 /* Rip-up support: cells of other nets' tracks may be crossed at a cost when
  * cross_cost > 0. Pads (hard[] set), blockages (-1) and the hard net never can. */
-static const uint8_t *g_hard; static int g_hard_net; static float g_cross;
+static const uint8_t *g_hard; static int g_hard_net; static float g_cross; static const float *g_hist;
 
 /* 1: clear, 0: blocked, 2: clear only by ripping another net's track. */
 static int disk_ok(const int32_t *occ, int W, int H, int l, int x, int y, int net,
@@ -57,6 +57,8 @@ static int disk_ok(const int32_t *occ, int W, int H, int l, int x, int y, int ne
 void set_rip(const uint8_t *hard, int hard_net, float cross_cost) {
     g_hard = hard; g_hard_net = hard_net; g_cross = cross_cost;
 }
+/* PathFinder-style history: extra cost per cell that keeps being fought over. */
+void set_hist(const float *hist) { g_hist = hist; }
 
 /* Returns path length (cells) written to out (as l*H*W+y*W+x, target first),
  * 0 if no path. src/tgt are flat cell indices. */
@@ -106,7 +108,7 @@ int astar(const int32_t *occ, int W, int H, int L, int net,
                 if (!disk_ok(occ, W, H, l, x + DX[k], y, net, tdx, tdy, ntd) &&
                     !disk_ok(occ, W, H, l, x, y + DY[k], net, tdx, tdy, ntd)) continue;
             }
-            float ng = gc + DC[k] * layer_cost[l] + (ok == 2 ? g_cross : 0);
+            float ng = gc + DC[k] * layer_cost[l] + (ok == 2 ? g_cross : 0) + (g_hist ? g_hist[ni] : 0);
             if (ng < g[ni]) {
                 g[ni] = ng; par[ni] = idx;
                 float h = 0;

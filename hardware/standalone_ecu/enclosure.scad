@@ -67,9 +67,9 @@ module tray() {
             }
             // mounting ears for the dash bracket
             for (y = [20, OH - 20]) for (side = [0, 1])
-                translate([side ? OW : -12, y - 8, 0]) difference() {
-                    cube([12, 16, 4]);
-                    translate([side ? 6 : 6, 8, -1]) cylinder(d = 5.5, h = 6);
+                translate([side ? OW - 1 : -12, y - 8, 0]) difference() {
+                    cube([13, 16, 4]);   // 1 mm into the wall so it fuses with the tray
+                    translate([side ? 7 : 6, 8, -1]) cylinder(d = 5.5, h = 6);
                 }
         }
         for (h = HOLES) translate([bx(h[0]), by(h[1]), FLOOR]) cylinder(d = 4.2, h = BOARD_Z);   // insert bore
