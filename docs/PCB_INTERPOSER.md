@@ -66,7 +66,7 @@ the taps: 17 pins to their divider, 17 dividers to the ESP32, one ground.
 | Channels | 12 | **17** (adds gear, lock-up, 4L, transfer neutral) |
 | Size | two stacks about 60 mm long, plus a tap box | one 158 × 63 mm L-shaped board in a tray, about 24 mm tall |
 | Harness plugs move back by | about 60 mm | **0 mm** (the ECU moves back about 51 mm on its tails instead) |
-| Rough cost | $158 print quote + terminals + DevKitC | **about $90 to $140** |
+| Rough cost | $158 print quote + terminals + DevKitC | **about $130 to $180** |
 
 Cost: board about $15 to $30 for five from JLCPCB (2 oz copper) plus
 shipping. Header $10 to $14. Plug housings, 64 receptacles and wire $35 to $55. DevKitC about

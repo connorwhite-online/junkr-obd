@@ -1,0 +1,14 @@
+Quantity,Manufacturer Part Number,Manufacturer,Customer Reference
+1,176122-6,TE Connectivity,J1 ECU header 64P (check stock; else Mouser/TTI)
+1,175110-6,TE Connectivity,J2 E8 plug 22P (check suffix on your plug)
+1,175109-6,TE Connectivity,J3 E6 plug 16P (check suffix on your plug)
+1,175111-6,TE Connectivity,J4 E5 plug 26P (non-stock at Digi-Key; check suffix)
+60,175061-1,TE Connectivity,040 receptacles (48 + spares)
+20,173631-1,TE Connectivity,070 receptacles (16 + spares)
+1,ESP32-S3-DEVKITC-1-N16,Espressif Systems,U1 DevKitC (N16R8 or N8R8 also fit)
+25,RC0805FR-07100KL,YAGEO,R1-R17 100k
+10,RC0805FR-0782KL,YAGEO,R51 R52 R54-R58 R60 82k
+10,RC0805FR-0727KL,YAGEO,R53 R61 R63-R67 27k
+5,RC0805FR-0718KL,YAGEO,R59 18k
+5,RC0805FR-07150KL,YAGEO,R62 150k
+20,CL10B103KB8NNNC,Samsung,C1-C17 10nF optional
