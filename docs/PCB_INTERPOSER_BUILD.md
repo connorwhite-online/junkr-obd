@@ -9,6 +9,9 @@ side cutters, an open-barrel crimper, multimeter, a USB-C car charger (2 A) and 
 
 ![Assembled](pcb-interposer/assembly_ecu_side.png)
 
+Drawings: [KZT-301 assembly](pcb-interposer/drawings/KZT-301.png) and
+[KZT-302 tails + taps](pcb-interposer/drawings/KZT-302.png).
+
 ## 1. Get the parts
 
 Everything is in the BOM. Three things to sort first:
@@ -26,9 +29,9 @@ Everything is in the BOM. Three things to sort first:
 
 ## 2. Check the board before soldering anything
 
-1. Lay the bare board on the paper copy of `kicad/interposer/img/board_top.png`
-   and sit the header and the DevKitC on it. The pins should line up with
-   the holes.
+1. Print `kicad/interposer/img/board_top.png` at 1:1 (the board is
+   158.5 mm wide) and lay the header and the DevKitC on it. The pins
+   should line up with the holes.
 2. **Pad numbering check** (one time): with the meter in continuity mode,
    probe an E8 header pin and find which tail pad it reaches on the bare
    board. It should match the pin numbers printed on the silkscreen.
@@ -91,9 +94,11 @@ ECU's header is now, so your stiff harness never has to bend or reach.
 2. **No shorts:** check each pin against its neighbors, and power pins
    against ground pins.
 3. **TAP_GND is isolated:** the DevKitC's GND must not beep to any ECU
-   ground pin (E1, E01, E02, E03, E2).
+   ground pin (E1, E01, E02).
 4. **Power the DevKitC from USB** and flash the tap firmware. With nothing
-   plugged in, every channel should read about 0 V.
+   plugged in, every channel should read about 0 V. (As of 2026-11-13 the
+   DevKitC tap firmware isn't written yet; the board can be built and
+   fitted before it is, since the truck runs normally with it unpowered.)
 
 ## 8. Fit it in the truck
 
