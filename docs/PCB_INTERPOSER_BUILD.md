@@ -3,9 +3,9 @@
 Solder it on the bench, plug it in between the ECU and its three harness
 plugs, plug a USB-C cable into it. Nothing in the truck gets cut.
 
-**Time:** about 3 to 4 hours at the bench. **Tools:** soldering iron (a fine
+**Time:** about 4 to 5 hours at the bench. **Tools:** soldering iron (a fine
 tip and a chisel tip for the big pins), 60/40 or SAC solder, flux,
-side cutters, multimeter, a USB-C car charger (2 A) and a cable.
+side cutters, an open-barrel crimper, multimeter, a USB-C car charger (2 A) and a cable.
 
 ![Assembled](pcb-interposer/assembly_ecu_side.png)
 
@@ -16,13 +16,11 @@ Everything is in the BOM. Three things to sort first:
 1. **Order the board.** Upload `kicad/interposer/gerbers/` (zipped) to
    JLCPCB or PCBWay: 2 layers, 1.6 mm, **2 oz copper**, HASL. Five boards
    are about $15 to $30.
-2. **Get the ECU-side plugs.** Easiest: a junkyard ECU harness from a
-   1KZ-TE, 3S-GTE or 1994-ish Camry, with the 22, 16 and 26 pin plugs
-   that fit your ECU. Cut each plug off with **150 mm** of wire left on.
-   The long, flexible tails are what let the board sit exactly where the
-   ECU's header is now, so your stiff harness never has to bend or reach.
-   Check by eye that it matches the plug in your truck (same keying, same
-   pin count) before you cut.
+2. **Order the ECU-side plug parts** (all in the BOM): TE housings
+   175110-6 (E8), 175109-6 (E6) and 175111-x (E5), 48 small (040) and 16
+   big (070) receptacles, 22 and 18 AWG wire. Before ordering, read the
+   part number moulded on each of your truck's three harness plugs: the
+   ECU-side plugs are the same housings, and the last digit sets the key.
 3. **Print the tray and lid** (`pcb_tray.stl`, `pcb_lid.stl`) in PETG at
    home, or SLS PA12.
 
@@ -60,14 +58,24 @@ Leave the 10 nF caps off unless an analog channel turns out noisy later.
 3. Trim the leads on the back to about 1.5 mm so the board sits flat in
    the tray.
 
-## 5. Solder the ECU-side plugs (J2, J3, J4)
+## 5. Make the ECU-side plugs and solder them on (J2, J3, J4)
 
-1. For each plug, strip 3 mm off each tail wire.
-2. Wire to pad: the plug's pin 1 goes to the **square pad** of its row.
-   Upper-row wires go to the row nearer the header, lower-row wires to the
-   row nearer the ECU edge. Work one column at a time, left to right.
-3. Bundle each plug's tails with a strip of tape or a loose sleeve, so the
-   three plugs hang off the board's ECU edge on 150 mm of flexible wire.
+The long, flexible tails are what let the board sit exactly where the
+ECU's header is now, so your stiff harness never has to bend or reach.
+
+1. **Cut 64 tails, 150 mm each:** 48 in 22 AWG for the small pins, 16 in
+   18 AWG for the big pins (E8 columns 1, 2 and 11; E5 columns 1, 2, 11,
+   12 and 13, both rows).
+2. **Crimp a receptacle on one end** of each: 175061-1 on the 22 AWG,
+   173631-1 on the 18 AWG. Tug-test every crimp.
+3. **Load each housing** from the wire side, pin 1 first, until each
+   receptacle clicks. Pin N of the plug goes to the tail pad marked N on
+   the board, so work one column at a time and solder as you go.
+4. **Solder the free ends** into the board: strip 3 mm, the plug's pin 1
+   goes to the square pad of its row. Upper-row wires go to the row
+   nearer the header, lower-row wires to the row nearer the ECU edge.
+5. **Sleeve each plug's tails** in braided sleeve so the three plugs hang
+   off the board's ECU edge on 150 mm of flexible wire.
 
 ## 6. Solder the DevKitC (U1)
 

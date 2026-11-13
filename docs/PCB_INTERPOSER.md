@@ -32,11 +32,11 @@ two printed connector shells that have to hold OEM tolerances.
   into genuine TE plastic with the real latch, so the FDM/SLS mating
   tolerance question goes away.
 - **ECU side:** nobody sells a board-mount female for these terminals, so
-  the board takes the three OEM female plugs on short tails. The easiest
-  source is a junkyard Toyota ECU harness: cut the plugs off with 150 mm of
-  wire and solder the wires in. The long tails let the board sit where
+  the board takes three new TE plug housings (the same ones as your harness
+  plugs) on 150 mm crimped tails. The long tails let the board sit where
   the ECU's header is now, so the stiff harness doesn't move; the ECU
-  moves back about 5 cm on its tails instead. Nothing printed goes into the ECU.
+  moves back about 5 cm on its tails instead. Nothing printed goes into
+  the ECU.
 - **Taps and ESP32:** 17 dividers and an ESP32-S3-DevKitC-1 sit on the
   board. The 12 stage 1 channels (including E2) plus five from E5: the
   A/T shift solenoids S1 and S2 (gear), the lock-up solenoid SL, and the
@@ -60,16 +60,16 @@ the taps: 17 pins to their divider, 17 dividers to the ESP32, one ground.
 | | Printed (E6 + E8) | PCB rev C (E5 + E6 + E8) |
 | --- | --- | --- |
 | Mating plastic, harness side | printed copy of the header | **real TE 176122-6** |
-| Mating plastic, ECU side | printed plug, resin | **OEM plugs** (junkyard or TE) |
-| Crimps and splices | 76 crimps, 12 splices | 0 crimps with junkyard plugs, 128 solder joints |
+| Mating plastic, ECU side | printed plug, resin | **new TE housings** (same as the harness plugs) |
+| Crimps and splices | 76 crimps, 12 splices | 64 crimps (one per tail), 128 solder joints |
 | ESP32 | DevKitC in a separate box on Dupont leads | **DevKitC soldered on the board** |
 | Channels | 12 | **17** (adds gear, lock-up, 4L, transfer neutral) |
 | Size | two stacks about 60 mm long, plus a tap box | one 158 × 63 mm L-shaped board in a tray, about 24 mm tall |
 | Harness plugs move back by | about 60 mm | **0 mm** (the ECU moves back about 51 mm on its tails instead) |
-| Rough cost | $158 print quote + terminals + DevKitC | **about $75 to $120** |
+| Rough cost | $158 print quote + terminals + DevKitC | **about $90 to $140** |
 
 Cost: board about $15 to $30 for five from JLCPCB (2 oz copper) plus
-shipping. Header $10 to $14. Junkyard pigtail $20 to $40. DevKitC about
+shipping. Header $10 to $14. Plug housings, 64 receptacles and wire $35 to $55. DevKitC about
 $15 to $20. Resistors $3. Tray and lid printed at home in PETG, or about
 $20 to $35 in SLS PA12.
 
@@ -103,8 +103,8 @@ $20 to $35 in SLS PA12.
 2. Measure an OEM plug's length and the ECU face around the header. The
    board stops about 4 mm short of the header mouth.
 3. Measure your DevKitC's row spacing (drawn at 22.86 mm).
-4. Choose where the ECU-side plugs come from: a junkyard pigtail
-   (recommended) or new TE housings plus 64 receptacles.
+4. Read the part numbers moulded on the truck's three harness plugs, so the
+   ECU-side housings have the same keying.
 
 Side view, harness on the left and ECU on the right:
 
