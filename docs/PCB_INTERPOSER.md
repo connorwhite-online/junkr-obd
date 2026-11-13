@@ -1,6 +1,9 @@
-# PCB Interposer (proposal, rev A)
+# PCB Interposer (proposal, rev B)
 
-One thin board instead of three printed "plug + chamber + shroud" stacks.
+One small board that plugs in between the ECU and the E6 + E8 harness
+plugs, with the ESP32 already on it. Plug it in, run a USB cable to a car
+charger, done. It tucks behind the glovebox next to the ECU.
+
 The board files are in [`kicad/interposer/`](../kicad/interposer/), and the
 tray and lid are in
 [`hardware/ecu_interposer/cad/pcb_interposer.scad`](../hardware/ecu_interposer/cad/pcb_interposer.scad).
@@ -19,22 +22,26 @@ two printed connector shells that have to hold OEM tolerances.
 ## The PCB version
 
 ```
- OEM harness plugs ==> TE 176122-6 header ==board== OEM female plugs ==> ECU
-  (unchanged)          (the ECU's own part)   │      (20 mm tails)
-                                              └─ 12 dividers ─ 2x7 header ─▶ ESP32-S3
+ E6 + E8 harness plugs ==> TE 176122-6 header ==board== OEM female plugs ==> ECU
+  (unchanged)              (sawn after E6)        │      (20 mm tails)
+                                                  └─ 11 dividers ─▶ XIAO ESP32-S3 (on the board)
+ E5 harness plug ======================================================> ECU (untouched)
 ```
 
 - **Harness side:** a real **TE 176122-6**, the same right-angle header
-  the ECU uses (about $10 to $14, in production). The harness plugs click
-  into genuine TE plastic with the real latch, so the FDM/SLS mating
-  tolerance question goes away.
+  the ECU uses (about $10 to $14, in production), sawn off after the E6
+  section. The harness plugs click into genuine TE plastic with the real
+  latch, so the FDM/SLS mating tolerance question goes away.
 - **ECU side:** nobody sells a board-mount female for these terminals, so
-  the board takes the three OEM female plugs on short tails. The easiest
-  source is a junkyard Toyota ECU harness: cut the three plugs off with
-  25 mm of wire and solder the wires in. Nothing printed goes into the ECU.
-- **Taps:** both divider resistors for every channel sit on the back of
-  the board. A 2x7 header carries 12 safe 0 to 3.3 V signals and ground
-  to the DevKitC on Dupont leads. The Dupont-end resistors go away.
+  the board takes the two OEM female plugs on short tails. The easiest
+  source is a junkyard Toyota ECU harness: cut the E6 and E8 plugs off
+  with 25 mm of wire and solder the wires in. Nothing printed goes into
+  the ECU.
+- **Taps and ESP32:** both divider resistors for every channel and a
+  Seeed XIAO ESP32-S3 sit on the board. No tap box, no Dupont leads. The
+  XIAO's USB-C sticks out of the end for power and flashing, and its
+  antenna lead comes out the same end.
+- **E5 isn't touched.** Its plug stays in the ECU as it is now.
 
 | Harness side | Exploded |
 | --- | --- |
@@ -42,38 +49,45 @@ two printed connector shells that have to hold OEM tolerances.
 
 ![Board and tails, lid off](pcb-interposer/board_ecu_side.png)
 
+## Why there are so many traces
+
+38 of them are the pass-throughs: every E6 and E8 pin has to reach the
+ECU, so each header pin gets one short straight trace to its tail pad.
+That's the same 38 wires the printed version had, just flat. The other 22
+are the taps: 11 pins to their divider and 11 dividers to the XIAO.
+
 ## Compared with the printed interposer
 
-| | Printed (E6 + E8) | PCB (all three plugs) |
+| | Printed (E6 + E8) | PCB rev B (E6 + E8) |
 | --- | --- | --- |
 | Mating plastic, harness side | printed copy of the header | **real TE 176122-6** |
 | Mating plastic, ECU side | printed plug, resin | **OEM plugs** (junkyard or TE) |
-| Crimps and splices | 76 crimps, 12 splices | 0 crimps with junkyard plugs (64 with new TE housings), 64 solder joints |
-| Divider resistors | 12 in splices, 12 at the Dupont ends | 24 on the board |
-| Size | two stacks about 60 mm long, plus a tap box | one 130 × 46 × 24 mm board in a tray |
+| Crimps and splices | 76 crimps, 12 splices | 0 crimps with junkyard plugs, 76 solder joints |
+| ESP32 | DevKitC in a separate box on Dupont leads | **XIAO soldered on the board** |
+| Size | two stacks about 60 mm long, plus a tap box | one 97 × 46 × 24 mm board in a tray |
 | Harness plugs move back by | about 60 mm | about **51 mm** |
-| Plugs covered | E6, E8 | **E5, E6, E8** (E5 passes straight through, ready for later taps) |
-| Rough cost | $158 print quote + terminals | **about $60 to $100** |
+| Rough cost | $158 print quote + terminals + DevKitC | **about $55 to $95** |
 
-Cost for the PCB version: board about $15 to $30 for five from JLCPCB
-(2 oz copper) plus shipping. Header $10 to $14. Junkyard pigtail $20 to
-$40. Resistors and header $5. Tray and lid printed at home in PETG, or
-about $15 to $25 in SLS PA12.
+Cost: board about $10 to $25 for five from JLCPCB (2 oz copper) plus
+shipping. Header $10 to $14. Junkyard pigtail $20 to $40. XIAO ESP32-S3
+about $8. Resistors $3. Tray and lid printed at home in PETG, or about
+$15 to $25 in SLS PA12.
 
-## What it costs in quality, honestly
+## What it costs, honestly
 
-- **It's one piece over all three plugs.** The header spans E5, E6 and E8,
-  so E5 has to pass through too, including the spill valve and timing
-  valve drives and the power grounds. It is still a passive copper path
-  with no parts in it, but it adds 128 solder joints to wires the engine
-  needs. Every joint gets a continuity check before the engine starts.
-  If you'd rather leave E5 alone, the header can be sawn through the
-  wall between E5 and E6, and a shorter board done. That's not drawn yet.
-- **Power pins.** The 070 pins carry ECU power, grounds and the SPV/TCV
-  drives. Their traces are 1.4 mm on both layers where there's room, and
-  0.5 to 0.8 mm per layer for 3 to 12 mm where they pass between pads.
-  With 2 oz copper that's fine for the ECU's few amps of current. The
-  peak SPV current isn't measured yet [VERIFY].
+- **E2 isn't tapped.** The XIAO has 11 GPIO and there are 12 stage 1
+  channels, so E2 (sensor ground) went. Sensor readings use the XIAO's
+  ground as the reference, which costs a little accuracy if E2 floats
+  above chassis ground. A board revision with a bigger ESP32 module could
+  bring it back.
+- **The header has to be sawn.** One cut through a 1.48 mm wall, with the
+  E5 pins pulled first. Done carefully it leaves the E6 cavity whole.
+- **Power pins.** The 070 pins in E6/E8 carry ECU power and grounds. Their
+  traces are 1.4 mm on both layers where there's room, and 0.5 to 0.8 mm
+  per layer for a few mm where they pass between pads. With 2 oz copper
+  that's fine for the ECU's few amps.
+- **76 solder joints on wires the engine needs.** Each one gets a
+  continuity check before the engine starts.
 - **The ECU-side plugs float on their tails.** That's on purpose: each
   plug finds its own cavity in the ECU, the way a harness plug does.
 - **Depth.** It's still about 51 mm. Most of that is the two plastic
@@ -86,9 +100,9 @@ about $15 to $25 in SLS PA12.
    (see [`kicad/interposer/README.md`](../kicad/interposer/README.md)).
 2. Measure an OEM plug's length and the ECU face around the header. The
    board stops about 4 mm short of the header mouth.
-3. Choose where the ECU-side plugs come from: a junkyard pigtail
-   (recommended) or new TE housings plus 64 receptacles.
-4. Decide whether E5 passes through (as drawn) or the header is cut.
+3. Check the XIAO footprint against the Seeed drawing.
+4. Choose where the ECU-side plugs come from: a junkyard pigtail
+   (recommended) or new TE housings plus 38 receptacles.
 
 Side view, harness on the left and ECU on the right:
 

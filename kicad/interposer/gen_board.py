@@ -44,21 +44,24 @@ PLUGS = {
                              (-96.949, 1), (-93.950, 1), (-90.950, 1), (-87.950, 1),
                              (-84.950, 1), (-81.951, 1), (-78.849, 2)]),
     "E6": dict(pad0=22, cols=[(-72.901 + 3.0 * i, 1) for i in range(8)]),
-    "E5": dict(pad0=38, cols=[(-45.954, 2), (-42.454, 2), (-39.350, 1), (-36.350, 1),
-                              (-33.350, 1), (-30.350, 1), (-27.351, 1), (-24.351, 1),
-                              (-21.351, 1), (-18.352, 1), (-15.250, 2), (-11.750, 2),
-                              (-8.250, 2)]),
 }
+# Rev B: E6 + E8 only. The 176122-6 is sawn through the wall between E6 and
+# E5 (footprint x = -49.8 .. -48.3) and the E5 harness plug stays in the ECU.
+# E5 pads, for a later all-three board:
+E5_COLS = [(-45.954, 2), (-42.454, 2), (-39.350, 1), (-36.350, 1), (-33.350, 1), (-30.350, 1),
+           (-27.351, 1), (-24.351, 1), (-21.351, 1), (-18.352, 1), (-15.250, 2), (-11.750, 2),
+           (-8.250, 2)]
+HDR_CUT = -49.3                # header end after the saw cut (E6 side of the E6/E5 wall)
 ROW_Y = (0.0, -4.50088)        # header rows: upper, lower
 TAIL_Y = (3.0, 5.8)            # ECU-side tail holes: upper, lower
 HDR_PAD, HDR_DRILL = 1.8, 1.1
 TAIL = {1: (1.9, 1.2), 2: (2.3, 1.5)}     # pad, drill for 040 / 070 tails
-PEGS = [(-114.600, -10.201), (-75.750, -10.201), (-49.050, -10.201), (-3.200, -10.201)]
+PEGS = [(-114.600, -10.201), (-75.750, -10.201)]   # the other two go with the E5 offcut
 PEG_D = 3.5                    # [VERIFY] header board-lock pegs
 
-BOARD = (-124.0, -25.0, 5.5, 21.0)        # x0, y0, x1, y1 (ECU edge at y1)
+BOARD = (-146.0, -25.0, -49.2, 21.0)      # x0, y0, x1, y1 (ECU edge at y1); x1 clears the E5 plug
 CLEAR = 0.25
-MOUNT = [(-121.5, -22.0), (-121.5, -1.0), (3.0, -22.0), (3.0, -1.0)]   # M2 to the cover
+MOUNT = [(-143.5, -22.5), (-143.5, 18.5), (-52.5, 17.5), (-114.0, 3.0)]   # M2; the last one also holds the lid
 MOUNT_D = 2.2
 
 # Pin names (E6 / E8 / E5), from hardware/ecu_interposer/pinout_kzj95_at.csv
@@ -71,10 +74,19 @@ def load_pinout():
             names[(r["connector"], int(r["pin"]))] = nm
     return names
 
-# Taps for stage 1 (docs/BUILD_STAGES.md pin map): (plug, pin, bottom R, GPIO)
-TAPS = [("E6", 2, "82k", 1), ("E6", 4, "82k", 2), ("E8", 5, "27k", 3), ("E6", 3, "82k", 4),
-        ("E6", 5, "82k", 5), ("E6", 13, "82k", 6), ("E6", 11, "82k", 7), ("E6", 1, "82k", 8),
-        ("E8", 12, "18k", 9), ("E6", 9, "82k", 10), ("E8", 18, "27k", 11), ("E8", 9, "150k", 12)]
+# Taps, rev B (XIAO ESP32-S3 on the board): (plug, pin, bottom R, GPIO).
+# GPIO1-9 are ADC1 (D0-D5, D8-D10); TAC and SP1 are pulse inputs on GPIO43/44.
+# E2 (sensor ground) is dropped: the XIAO has 11 pins and E2 sits near 0 V.
+TAPS = [("E6", 2, "82k", 1), ("E6", 4, "82k", 2), ("E6", 3, "82k", 3), ("E6", 5, "82k", 4),
+        ("E6", 13, "82k", 5), ("E6", 11, "82k", 6), ("E6", 1, "82k", 7), ("E8", 12, "18k", 8),
+        ("E8", 5, "27k", 9), ("E8", 18, "27k", 43), ("E8", 9, "150k", 44)]
+
+# XIAO ESP32-S3 pins, numbered 1..14 counter-clockwise from D0 (Seeed order).
+XIAO = {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 43,          # D0..D6
+        8: 44, 9: 7, 10: 8, 11: 9, 12: "3V3", 13: "GND", 14: "5V"}  # D7..D10, 3V3, GND, 5V
+XIAO_C = (-134.0, -3.0)        # centre; USB-C points at the -X board edge
+XIAO_ROW = 15.24               # [VERIFY] row spacing against Seeed's footprint
+GPIO_PIN = {g: p for p, g in XIAO.items()}
 
 
 def pin_xy(plug, pin):
@@ -92,6 +104,8 @@ def route_x(plug, i):
     x, t = cols[i]
     if i + 1 < len(cols):
         xn, tn = cols[i + 1]
+    elif plug == "E6":
+        return x + 1.45, 0.5            # last E6 column: stay inside the board edge
     else:
         xn, tn = x + 3.4, 1
     # gaps in the header row and in the tail row; take the tighter
@@ -109,7 +123,6 @@ def route_x(plug, i):
 board = None
 nets = {}
 CONNS = []
-J5_MAP = []
 
 
 def net(name):
@@ -272,9 +285,9 @@ def build():
                 pth(j1, d["pad0"] + pin, x, ROW_Y[r], HDR_PAD, HDR_DRILL, netname(plug, pin))
     for x, y in PEGS:
         npth(j1, x, y, PEG_D)
-    rect(j1, -117.8, -25.5, 0.0, -7.0, P.F_Fab)
-    rect(j1, -117.8, -25.5, 0.0, -7.0, P.F_CrtYd, 0.05)
-    fp_line(j1, -117.8, -25.5, 0.0, -25.5, P.F_SilkS, 0.2)
+    rect(j1, -117.8, -25.5, HDR_CUT, -7.0, P.F_Fab)
+    rect(j1, -117.8, -25.5, HDR_CUT, -7.0, P.F_CrtYd, 0.05)
+    fp_line(j1, -117.8, -25.5, HDR_CUT, -25.5, P.F_SilkS, 0.2)
     j1.Reference().SetPosition(V(-118.8, -2))
     board.Add(j1)
 
@@ -286,7 +299,7 @@ def build():
         board.Add(h)
 
     # J2..J4: ECU-side tails (OEM plug housing wires soldered in) -----------
-    refs = {"E8": "J2", "E6": "J3", "E5": "J4"}
+    refs = {"E8": "J2", "E6": "J3"}
     for plug, d in PLUGS.items():
         cols = d["cols"]
         n = len(cols)
@@ -354,42 +367,46 @@ def build():
         for dy, s_ in ((17.7, f"{plug}-{pin}"), (18.7, names.get((plug, pin))), (19.7, rb)):
             text(s_, cx + 0.3, dy, 0.8, P.B_SilkS, mirror=True)
         CONNS.append((sig, ("tail", plug, pin), (f"R{gpio}", 1)))
-        CONNS.append((adc, (f"R{gpio + 20}", 1), ("J5", k + 2)))
+        CONNS.append((adc, (f"R{gpio + 20}", 1), ("U1", GPIO_PIN[gpio])))
 
-    # J5: 2x7 2.54 mm right-angle header to the ESP32-S3 --------------------
-    # Pin 1 = TAP_GND, pins 2..13 follow the cells left to right, pin 14 spare.
-    hx, hy = -119.8, 4.0
-    j5 = new_fp("J5", "ESP32-S3 2x7", hx, hy, "PinHeader_2x07_P2.54_Horizontal")
-    order = ["TAP_GND"] + [f"ADC_GPIO{t[3]:02d}" for t in taps_sorted] + [None]
-    for k, nn in enumerate(order):
-        col, row = k % 2, k // 2
-        pth(j5, k + 1, hx - col * 2.54, hy + row * 2.54, 1.7, 1.0, nn,  # pin 14 spare
-            P.PAD_SHAPE_RECT if k == 0 else P.PAD_SHAPE_CIRCLE)
-    rect(j5, hx - 2.54 - 1.3, hy - 1.3, hx + 1.3, hy + 6 * 2.54 + 1.3, P.F_CrtYd, 0.05)
-    j5.Reference().SetPosition(V(hx - 1.27, hy - 2.4))
-    board.Add(j5)
-    # tie both J5 ground pins into the pour
-    track(hx, hy, hx + 2.6, hy, 0.5, "TAP_GND", P.F_Cu)
-    track(hx + 2.6, hy, hx + 2.6, 8.4, 0.5, "TAP_GND", P.F_Cu)
-    J5_MAP.clear()
-    for k, nn in enumerate(order):
-        J5_MAP.append(nn)
+    # U1: Seeed XIAO ESP32-S3, through-hole on 2.54 mm headers ---------------
+    # Pin rows run along X; USB-C overhangs the -X edge, the U.FL antenna
+    # lead leaves the same end. Top view, USB to the left: the row toward the
+    # harness edge is 5V GND 3V3 D10 D9 D8 D7, the row toward the ECU is D0..D6.
+    ux, uy = XIAO_C
+    u1 = new_fp("U1", "XIAO ESP32-S3", ux, uy, "XIAO_ESP32S3_THT")
+    for p in range(1, 15):
+        if p <= 7:
+            x, y = ux - 7.62 + (p - 1) * 2.54, uy + XIAO_ROW / 2
+        else:
+            x, y = ux + 7.62 - (p - 8) * 2.54, uy - XIAO_ROW / 2
+        g = XIAO[p]
+        nn = "TAP_GND" if g == "GND" else (None if g in ("3V3", "5V") else
+              (f"ADC_GPIO{g:02d}" if any(t[3] == g for t in TAPS) else None))
+        pth(u1, p, x, y, 1.7, 1.0, nn, P.PAD_SHAPE_RECT if p == 1 else P.PAD_SHAPE_CIRCLE)
+        lab = {"GND": "GND", "3V3": "3V3", "5V": "5V"}.get(g, None)
+        if lab is None:
+            tap = [t for t in TAPS if t[3] == g]
+            lab = names.get((tap[0][0], tap[0][1])) if tap else f"IO{g}"
+        text(lab, x, y + (2.0 if p <= 7 else -2.0), 0.8)
+    rect(u1, ux - 10.5, uy - 8.9, ux + 10.5, uy + 8.9, P.F_SilkS, 0.15)
+    rect(u1, ux - 11.5, uy - 9.4, ux + 10.8, uy + 9.4, P.F_CrtYd, 0.05)
+    fp_line(u1, ux - 10.5, uy - 4.5, ux - 13.0, uy - 4.5, P.F_SilkS, 0.15)
+    fp_line(u1, ux - 10.5, uy + 4.5, ux - 13.0, uy + 4.5, P.F_SilkS, 0.15)
+    u1.Reference().SetPosition(V(ux, uy))
+    board.Add(u1)
+    text("USB-C", ux - 9.0, uy, 0.8, angle=90)
 
     # silk legends
-    text("HARNESS SIDE: OEM plugs click in here", -60, -23.6, 1.0)
-    text("ECU SIDE", -28, 19.6, 1.0)
-    text("junkr-obd  KZJ95 1KZ-TE PCB interposer  rev A", -28, 12.0, 0.9, P.B_SilkS, mirror=True)
-    text("TAP_GND = ESP32 ground only", -28, 14.0, 0.8, P.B_SilkS, mirror=True)
-    for k, nn in enumerate(J5_MAP):
-        col, row = k % 2, k // 2
-        lab = "-" if nn is None else "G" if nn == "TAP_GND" else nn.replace("ADC_GPIO", "").lstrip("0")
-        text(lab, hx + 1.9 if col == 0 else hx - 2.54 - 1.75, hy + row * 2.54, 0.8,
-             P.B_SilkS, mirror=True)
-    text("GPIO", hx + 2.6, hy - 1.9, 0.8, P.B_SilkS, mirror=True)
+    text("HARNESS SIDE: OEM plugs click in here", -83, -23.6, 1.0)
+    text("ECU SIDE", -100, 19.6, 1.0)
+    text("junkr-obd  KZJ95 1KZ-TE PCB interposer  rev B", -92, -21.0, 1.0, P.B_SilkS, mirror=True)
+    text("TAP_GND = ESP32 ground only", -92, -18.5, 0.8, P.B_SilkS, mirror=True)
+    text("saw the 176122-6 between E6 and E5", -92, -16.5, 0.8, P.B_SilkS, mirror=True)
 
     board.Save(os.path.join(HERE, "interposer_unrouted.kicad_pcb"))
     import json
-    json.dump(dict(conns=CONNS, j5=J5_MAP, refs=refs), open(os.path.join(HERE, "conns.json"), "w"), indent=1)
+    json.dump(dict(conns=CONNS, refs=refs), open(os.path.join(HERE, "conns.json"), "w"), indent=1)
     print("wrote interposer_unrouted.kicad_pcb + conns.json")
 
 

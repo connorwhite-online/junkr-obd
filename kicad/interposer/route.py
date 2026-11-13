@@ -276,7 +276,9 @@ def main():
         print(f"routed {netname}: {len(path)} cells, {len(vias)} vias")
 
     # TAP_GND pours under the plugs (ECU side), both layers
-    poly = [(x0 + 0.4, 7.4), (-49.6, 7.4), (-49.6, y1 - 0.4), (x0 + 0.4, y1 - 0.4)]
+    # L-shaped: under the plugs (ECU side) plus the XIAO end of the board
+    poly = [(x0 + 0.4, y0 + 0.4), (-118.5, y0 + 0.4), (-118.5, 7.4), (x1 - 0.4, 7.4),
+            (x1 - 0.4, y1 - 0.4), (x0 + 0.4, y1 - 0.4)]
     for L in LAYERS:
         G.add_zone(b, "TAP_GND", L, poly)
     P.ZONE_FILLER(b).Fill(b.Zones())

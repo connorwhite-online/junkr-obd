@@ -1,6 +1,6 @@
 // =====================================================================
-//  PCB interposer (rev A): one board between the ECU and all three
-//  harness plugs, plus its two printed parts (tray + lid).
+//  PCB interposer (rev B): one board between the ECU and the E6 + E8
+//  harness plugs, with a XIAO ESP32-S3 on it, plus a printed tray + lid.
 //
 //    harness plugs ==> TE 176122-6 header (real part) ==board== OEM-style
 //                      female plugs on 20 mm tails ==> ECU
@@ -24,6 +24,10 @@ part = "assembly";
 // ---- placement --------------------------------------------------------
 SECS     = [SEC_E5, SEC_E6, SEC_E8];
 SEC_XC   = [-27.104, -62.401, -94.188];   // cavity centres in footprint x
+ON       = [1, 2];                        // rev B: E6 + E8 go through the board, E5 stays in the ECU
+HDR_CUT  = -49.3;                         // 176122-6 sawn between E6 and E5
+XIAO_C   = [-134.0, 3.0];                 // XIAO ESP32-S3 centre (3D frame)
+LID_X0   = -119.9;                        // the lid covers the tails only, not the XIAO
 ZF       = PCB_T + HDR_WALL + HDR_GROOVE_D;   // header cavity floor above the board bottom
 HDR_MOUTH = 25.5;                         // harness edge of the header
 HDR_BACK  = 7.0;                          // back face of the header body
@@ -40,8 +44,9 @@ module sec_T(i, yo) {
 
 // ---- parts that are bought -------------------------------------------
 module header_176122() {
-    color("#3a3a3a") {
-        for (i = [0 : 2]) {
+    color("#3a3a3a") intersection() {
+        translate([-200, -100, -10]) cube([200 + HDR_CUT, 200, 100]);
+        union() { for (i = ON) {
             s = SECS[i];
             sec_T(i, HDR_MOUTH - sh_len(s))
                 intersection() {
@@ -49,13 +54,12 @@ module header_176122() {
                     translate([-100, -50, sh_len(s) - (HDR_MOUTH - HDR_BACK)]) cube([200, 100, 100]);
                 }
         }
-        // board-lock ears at both ends and the centre
-        for (e = [[-117.8, -113.4], [-4.4, 0.0]])
-            translate([e[0], HDR_BACK, PCB_T]) cube([e[1] - e[0], 8.5, 5.5]);
-    }
+        // board-lock ear at the E8 end
+        translate([-117.8, HDR_BACK, PCB_T]) cube([4.4, 8.5, 5.5]);
+    } }
     // right-angle pins: out of the back face, bend down into the board
     color("#c8a24a")
-        for (i = [0 : 2]) {
+        for (i = ON) {
             s = SECS[i];
             for (c = s_cols(s), r = [0, 1]) {
                 x = SEC_XC[i] - cx(s, c[0]);
@@ -75,11 +79,16 @@ module oem_plug(i) {
 }
 
 module ecu_plugs() {
-    for (i = [0 : 2]) color("#d9d4c7") sec_T(i, PLUG_REAR - plug_total(SECS[i])) oem_plug(i);
+    for (i = ON) color("#d9d4c7") sec_T(i, PLUG_REAR - plug_total(SECS[i])) oem_plug(i);
 }
 
 module harness_plugs(gap = 0) {
-    for (i = [0 : 2]) color("#5d6066") sec_T(i, HDR_MOUTH - insert_len(SECS[i]) + gap) oem_plug(i);
+    for (i = ON) color("#5d6066") sec_T(i, HDR_MOUTH - insert_len(SECS[i]) + gap) oem_plug(i);
+}
+
+// context: the E5 harness plug stays plugged straight into the ECU
+module e5_plug_in_ecu() {
+    color("#5d6066", 0.6) sec_T(0, PLUG_REAR - plug_total(SEC_E5)) oem_plug(0);
 }
 
 // short tails: plug rear -> straight back -> down into the board
@@ -117,11 +126,17 @@ module pcb_board() {
         translate([p[0] - p[2] / 2, p[1] - p[3] / 2, -0.55]) cube([p[2], p[3], 0.5]);
 }
 
-module j5_header() {                 // 2x7 right-angle, pins out of the -X edge
-    color("#151515") translate([-124.3, -20.6, PCB_T]) cube([2.5, 16.0, 5.1]);
-    color("#c8a24a") for (k = [0 : 13])
-        let (col = k % 2, row = floor(k / 2), x = -119.8 - col * 2.54, y = -(4.0 + row * 2.54))
-            translate([-130.5, y - 0.32, PCB_T + 1.27 + col * 2.54]) cube([x + 130.5, 0.64, 0.64]);
+module xiao() {                      // Seeed XIAO ESP32-S3 on 2.54 mm headers, USB-C to -X
+    x = XIAO_C[0]; y = XIAO_C[1]; z = PCB_T + 2.5;
+    color("#151515") for (r = [-1, 1]) translate([x - 9.0, y + r * 7.62 - 1.27, PCB_T]) cube([18.0, 2.54, 2.5]);
+    color("#2a5db0") translate([x - 10.5, y - 8.9, z]) cube([21.0, 17.8, 1.2]);
+    color("#c0c0c0") {
+        translate([x - 1.0, y - 6.0, z + 1.2]) cube([10.0, 12.0, 2.4]);       // shield can
+        translate([x - 11.7, y - 4.5, z + 1.2]) cube([7.3, 9.0, 3.2]);       // USB-C
+    }
+    color("#c8a24a") for (r = [-1, 1], k = [0 : 6])
+        translate([x - 7.62 + k * 2.54 - 0.32, y + r * 7.62 - 0.32, -1.2]) cube([0.64, 0.64, z + 1.2 + 1.2]);
+    color("#d4a94a") translate([x + 8.0, y + 5.5, z + 1.2]) cylinder(d = 2.5, h = 1.0, $fn = 16);  // U.FL
 }
 
 // ---- printed parts ----------------------------------------------------
@@ -140,7 +155,7 @@ module tray() {
             for (x = [o[0] - wall, o[2] - 0.01]) translate([x, o[1], zb]) cube([wall + 0.01, o[3] - o[1] + wall, PCB_T - zb]);
             translate([o[0] - wall, o[3] - 0.01, zb]) cube([o[2] - o[0] + 2 * wall, wall + 0.01, PCB_T - zb]);
             // plateau under the header: takes the plug insertion force (about 100 N)
-            translate([-117.0, HDR_BACK + 1.0, zb]) cube([116.0, HDR_MOUTH - HDR_BACK - 1.6, -zb]);
+            translate([-117.0, HDR_BACK + 1.0, zb]) cube([HDR_CUT + 116.5, HDR_MOUTH - HDR_BACK - 1.6, -zb]);
             // bosses under the M2 holes
             for (m = PCB_MOUNT) translate([m[0], m[1], zb]) cylinder(d = 5.0, h = -zb, $fn = 24);
             // ledge along the ECU edge
@@ -149,8 +164,6 @@ module tray() {
         for (m = PCB_MOUNT) translate([m[0], m[1], zb + 0.8]) cylinder(d = 1.7, h = 10, $fn = 16);
         // header pegs poke through the board
         for (h = PCB_HOLES) if (h[4] == 0 && h[2] > 3) translate([h[0], h[1], zb + floor_t]) cylinder(d = h[2] + 1, h = 10, $fn = 24);
-        // J5 pins leave over the left wall
-        translate([o[0] - wall - 1, -21, PCB_T - 0.01]) cube([wall + 2, 18, 10]);
         // ziptie slot (backup to the latch, as before)
         translate([-62, o[1] + 4, zb - 1]) cube([ziptie_w, 1.8, 10]);
     }
@@ -162,21 +175,21 @@ module lid() {
     y1 = HDR_BACK;                    // butts against the header's back face
     difference() {
         union() {
-            translate([o[0] - wall, y0, lid_top - 1.6]) cube([o[2] - o[0] + 2 * wall, y1 - y0 + 2.0, 1.6]);
-            // end walls with the screw ears
-            for (x = [o[0] - wall, o[2] - 4.0]) translate([x, y0, PCB_T]) cube([4.0 + wall, y1 - y0, lid_top - PCB_T]);
+            translate([LID_X0, y0, lid_top - 1.6]) cube([o[2] + wall - LID_X0, y1 - y0 + 2.0, 1.6]);
+            // left end wall (with the screw) sits on the board; the right one on the tray wall
+            translate([LID_X0, y0, PCB_T]) cube([7.0, y1 - y0, lid_top - PCB_T]);
+            translate([o[2], y0, PCB_T]) cube([wall, y1 - y0, lid_top - PCB_T]);
             // a lip over the header's top edge keeps the lid from rocking
-            translate([-113.4, y1, lid_top - 1.6]) cube([113.0, 2.0, 1.6]);
+            translate([-113.4, y1, lid_top - 1.6]) cube([HDR_CUT + 113.4, 2.0, 1.6]);
         }
         for (m = PCB_MOUNT) if (m[1] > y0 && m[1] < y1) {
             translate([m[0], m[1], PCB_T - 1]) cylinder(d = 2.4, h = 40, $fn = 16);
             translate([m[0], m[1], lid_top - 2.5]) cylinder(d = 4.2, h = 10, $fn = 24);
         }
-        // J5 body sits under the left end wall
-        translate([o[0] - wall - 1, -21, PCB_T - 0.01]) cube([7.5, 17, 6.0]);
         // embossed legend
-        translate([-60, -0.5, lid_top - 0.4]) linear_extrude(1)
-            text("E8            E6                    E5", size = 3.2, halign = "center", valign = "center");
+        for (t = [["E8", -94.2], ["E6", -62.4]])
+            translate([t[1], -0.5, lid_top - 0.4]) linear_extrude(1)
+                text(t[0], size = 3.2, halign = "center", valign = "center");
     }
 }
 
@@ -186,16 +199,16 @@ module ecu_face() {                  // context only: the ECU's header face
 }
 
 if (part == "assembly") {
-    pcb_board(); header_176122(); j5_header(); tails(); ecu_plugs(); harness_plugs();
+    pcb_board(); header_176122(); xiao(); tails(); ecu_plugs(); harness_plugs(); e5_plug_in_ecu();
     color("#2b2f36") tray();
     color("#2b2f36", 0.55) lid();
 }
 else if (part == "exploded") {
-    pcb_board(); header_176122(); j5_header(); tails(); ecu_plugs();
+    pcb_board(); header_176122(); xiao(); tails(); ecu_plugs(); e5_plug_in_ecu();
     harness_plugs(35);
     color("#2b2f36") translate([0, 0, -14]) tray();
     color("#2b2f36", 0.8) translate([0, 0, 22]) lid();
 }
-else if (part == "board") { pcb_board(); header_176122(); j5_header(); tails(); }
+else if (part == "board") { pcb_board(); header_176122(); xiao(); tails(); }
 else if (part == "tray") tray();
 else if (part == "lid") translate([0, 0, lid_top]) rotate([180, 0, 0]) lid();
