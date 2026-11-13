@@ -1,23 +1,44 @@
-# Digi-Key order (rev C)
+# Ordering the parts (rev C)
 
-Upload `digikey_cart.csv` at digikey.com > BOM Manager (or "Upload a list"
-on the cart page). It maps Quantity, Manufacturer Part Number and Customer
-Reference. Nothing has been ordered.
+Nothing has been ordered. Stock and prices were checked on 2026-11-13.
 
-## Parts that need a check before you pay
+## 1. The ECU header (J1): Ballenger Motorsports
 
-Stock below is from distributor search results on 2026-11-13, not live.
+TE 176122-6 can't be bought in small quantities: Digi-Key, Newark and Arrow
+all start at 1,600 pieces with an 18-week lead time. The same 64-way header
+is used on the NA Miata and OBD1 Honda ECUs, and Ballenger sells it singly:
 
-| Part | What I found | If Digi-Key can't supply it |
-| --- | --- | --- |
-| 176122-6 header | No Digi-Key listing found. Others list ~$10-14; Avnet shows 0 stock / long lead. | Mouser, TTI, Master Electronics, or a pulled Toyota ECU header. |
-| 175110-6, 175109-6 plugs | No Digi-Key listing found. | Mouser, TTI, automotiveconnectors.com. |
-| 175111-6 plug (E5) | Listed at Digi-Key as non-stock, quote only. | 174516-6 (26P, stocked) may fit, but its key is unverified: compare with your E5 plug first. |
-| 175061-1, 173631-1 receptacles | Not confirmed at Digi-Key; TTI sells 173631-1 on reels. | Mouser or TTI, often cut-tape or bag quantities. |
-| ESP32-S3-DevKitC-1 | N16 ~$13 at Digi-Key; N16R8 not found. | N16, N8R8 and N16R8 share the footprint. Amazon also works. |
+- [NA Miata 64 Way ECU Header Receptacle, CONN-100747](https://www.bmotorsports.com/shop/product_info.php/products_id/3454): $29.99, in stock.
 
-Read the part number moulded on each of your three harness plugs first:
-the last digit of the housing sets its key and colour.
+TE makes this header in -1, -6 and -7 colour versions (rusEFI wiki). Before
+buying, ask Ballenger which TE number theirs is, and compare it with your
+truck: its harness plugs must click into it.
+
+## 2. Plugs and terminals: Digi-Key (`digikey_cart.csv`)
+
+Upload `digikey_cart.csv` in Digi-Key's BOM Manager. The plug housings are
+TE's 17451x-6 numbers, which rusEFI lists as the same mating plugs for this
+header as 17510x-6 (those aren't stocked anywhere now).
+
+| Ref | Part | Digi-Key stock | Each |
+| --- | --- | --- | --- |
+| J2 E8 22P | 174515-6 | 0 at Digi-Key; 4,205 on its Marketplace | $2.74 |
+| J3 E6 16P | 174514-6 | 44 | $1.85 |
+| J4 E5 26P | 174516-6 | 138 | $2.81 |
+| 040 receptacle | 173716-1 (replaces 175061-1, which needs 32,000) | 63,638 | $0.16 |
+| 070 receptacle | 173631-1 (cut tape) | 29,320 | $0.19 |
+
+All three plugs are gray (-6). Read the part number moulded on each of
+your truck's harness plugs first. If they end in -6 these match; if not,
+tell me and I'll find the matching suffix.
+
+## Backup for the plugs: Ballenger kits (terminals included)
+
+- [22 Way, CONN-75908](https://www.bmotorsports.com/shop/product_info.php/products_id/3461): $12.25, 17 small + 7 large terminals.
+- [16 Way, CONN-75907](https://www.bmotorsports.com/shop/product_info.php/products_id/3460): $11.25, 17 small terminals.
+- [26 Way, CONN-75909](https://www.bmotorsports.com/shop/product_info.php/products_id/3462): $12.25, 17 small + 11 large terminals.
+
+These are Miata parts, so the same key/colour check applies.
 
 ## Not from Digi-Key
 

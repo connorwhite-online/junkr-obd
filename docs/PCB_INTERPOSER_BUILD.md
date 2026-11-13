@@ -19,9 +19,11 @@ Everything is in the BOM. Three things to sort first:
 1. **Order the board.** Upload `kicad/interposer/gerbers/` (zipped) to
    JLCPCB or PCBWay: 2 layers, 1.6 mm, **2 oz copper**, HASL. Five boards
    are about $15 to $30.
-2. **Order the ECU-side plug parts** (all in the BOM): TE housings
-   175110-6 (E8), 175109-6 (E6) and 175111-x (E5), 48 small (040) and 16
-   big (070) receptacles, 22 and 18 AWG wire. Before ordering, read the
+2. **Order the header and the ECU-side plug parts** (see
+   `kicad/interposer/DIGIKEY_ORDER.md`): the 64-way header from Ballenger
+   Motorsports (CONN-100747), and from Digi-Key the TE housings 174515-6
+   (E8), 174514-6 (E6) and 174516-6 (E5), 48 small (173716-1) and 16 big
+   (173631-1) receptacles. Wire comes from anywhere: 22 and 18 AWG. Before ordering, read the
    part number moulded on each of your truck's three harness plugs: the
    ECU-side plugs are the same housings, and the last digit sets the key.
 3. **Print the tray and lid** (`pcb_tray.stl`, `pcb_lid.stl`) in PETG at
@@ -69,7 +71,7 @@ ECU's header is now, so your stiff harness never has to bend or reach.
 1. **Cut 64 tails, 150 mm each:** 48 in 22 AWG for the small pins, 16 in
    18 AWG for the big pins (E8 columns 1, 2 and 11; E5 columns 1, 2, 11,
    12 and 13, both rows).
-2. **Crimp a receptacle on one end** of each: 175061-1 on the 22 AWG,
+2. **Crimp a receptacle on one end** of each: 173716-1 on the 22 AWG,
    173631-1 on the 18 AWG. Tug-test every crimp.
 3. **Load each housing** from the wire side, pin 1 first, until each
    receptacle clicks. Pin N of the plug goes to the tail pad marked N on
