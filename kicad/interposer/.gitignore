@@ -1,0 +1,5 @@
+__pycache__/
+interposer_unrouted.kicad_pcb
+conns.json
+*.kicad_prl
+*-backups/
