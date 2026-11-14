@@ -1,0 +1,5 @@
+junkr_ecu_[A-Z].kicad_*
+route_report_[A-Z].txt
+drc_report_[A-Z].txt
+fab/gerbers/
+*-bak
