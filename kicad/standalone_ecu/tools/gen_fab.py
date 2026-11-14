@@ -28,7 +28,7 @@ HAND = ("Relay_THT", "junkr_ecu", "Connector_JST", "Connector_PinHeader", "Conne
 def gerbers():
     gdir = os.path.join(FAB, "gerbers")
     os.makedirs(gdir, exist_ok=True)
-    layers = "F.Cu,In1.Cu,In2.Cu,B.Cu,F.Paste,B.Paste,F.SilkS,B.SilkS,F.Mask,B.Mask,Edge.Cuts"
+    layers = "F.Cu,In1.Cu,In2.Cu,In3.Cu,In4.Cu,B.Cu,F.Paste,B.Paste,F.SilkS,B.SilkS,F.Mask,B.Mask,Edge.Cuts"
     subprocess.check_call(["kicad-cli", "pcb", "export", "gerbers", "-o", gdir + "/", "-l", layers,
                            "--subtract-soldermask", BOARD], stdout=subprocess.DEVNULL)
     subprocess.check_call(["kicad-cli", "pcb", "export", "drill", "-o", gdir + "/", "--format", "excellon",

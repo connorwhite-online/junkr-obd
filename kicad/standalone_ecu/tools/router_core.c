@@ -59,6 +59,8 @@ void set_rip(const uint8_t *hard, int hard_net, float cross_cost) {
 }
 /* PathFinder-style history: extra cost per cell that keeps being fought over. */
 void set_hist(const float *hist) { g_hist = hist; }
+static long g_cap = 2500000;
+void set_cap(long cap) { g_cap = cap; }
 
 /* Returns path length (cells) written to out (as l*H*W+y*W+x, target first),
  * 0 if no path. src/tgt are flat cell indices. */
@@ -93,7 +95,7 @@ int astar(const int32_t *occ, int W, int H, int L, int net,
         if (closed[idx]) continue;
         closed[idx] = 1;
         if (tgt[idx]) { found = idx; break; }
-        if (++expanded > 2500000) break;
+        if (++expanded > g_cap) break;
         int l = idx / WH; int rem = idx % WH; int y = rem / W, x = rem % W;
         float gc = g[idx];
         if (l == plane_layer) continue;
@@ -105,7 +107,7 @@ int astar(const int32_t *occ, int W, int H, int L, int net,
             int ok = tgt[ni] ? 1 : disk_ok(occ, W, H, l, xx, yy, net, tdx, tdy, ntd);
             if (!ok) continue;
             if (k >= 4) {  /* diagonal: both orthogonal neighbours must be clear too */
-                if (!disk_ok(occ, W, H, l, x + DX[k], y, net, tdx, tdy, ntd) &&
+                if (!disk_ok(occ, W, H, l, x + DX[k], y, net, tdx, tdy, ntd) ||
                     !disk_ok(occ, W, H, l, x, y + DY[k], net, tdx, tdy, ntd)) continue;
             }
             float ng = gc + DC[k] * layer_cost[l] + (ok == 2 ? g_cross : 0) + (g_hist ? g_hist[ni] : 0);

@@ -4,7 +4,7 @@ Fixed anchors are listed explicitly. Everything else is placed by
 gen_pcb.py inside its region, as close as it can get to the parts it
 connects to.
 
-Board: 200 x 140 mm, 4 layers. The harness plugs enter the top edge.
+Board: 200 x 140 mm, 6 layers. The harness plugs enter the top edge.
 """
 W, H = 200.0, 140.0
 
@@ -19,7 +19,7 @@ ANCHORS = {   # ref: (x, y, rotation deg)
     "J2": (HX + TAIL_X0["E5"], HY + TAIL_DY, 0),
     "J3": (HX + TAIL_X0["E6"], HY + TAIL_DY, 0),
     "J4": (HX + TAIL_X0["E8"], HY + TAIL_DY, 0),
-    "U33": (20.0, 27.0, 0),        # ESP32-S3 module, antenna up at the top edge
+    "U33": (17.0, 27.0, 0),        # ESP32-S3 module, antenna up at the top edge
     "J7": (171.0, 6.0, 0),         # AUX Micro-Fit 2x6, top edge right of the header
     "J5": (3.5, 62.0, 270),        # USB-C on the left edge
     "J6": (11.0, 88.0, 90),        # microSD, left edge
@@ -56,5 +56,5 @@ FIXED = {
     "Q13": (186.0, 74.0, 0), "Q16": (186.0, 96.0, 0), "Q14": (166.0, 74.0, 0),
 }
 
-# M3 mounting holes. Top-left sits below the ESP32 antenna keep-out.
-HOLES = ((4, 20), (W - 4, H - 4), (4, H - 4), (W - 4, 30))
+# M3 mounting holes. Top-left sits below the ESP32 module courtyard (antenna keep-out).
+HOLES = ((4, 46), (W - 4, H - 4), (4, H - 4), (W - 4, 30))

@@ -42,7 +42,11 @@ def load_fp(fpid):
     return fp
 
 
-def courtyard(fp, margin=0.3):
+MARGIN = float(os.environ.get("PLACE_MARGIN", "0.9"))   # routing room around each part
+
+
+def courtyard(fp, margin=None):
+    margin = MARGIN if margin is None else margin
     fp.BuildCourtyardCaches()
     cy = fp.GetCourtyard(P.F_CrtYd)
     if cy.OutlineCount():
@@ -84,9 +88,9 @@ POWERISH = {"GND", "3V3", "3V3A", "3V3_RF", "V5", "V5_OR", "VIN", "PB", "VREF", 
 
 def build():
     board = P.BOARD()
-    board.SetCopperLayerCount(4)
+    board.SetCopperLayerCount(6)
     ds = board.GetDesignSettings()
-    ds.SetCopperLayerCount(4)
+    ds.SetCopperLayerCount(6)
     nets = {}
 
     def net(name):
@@ -142,7 +146,7 @@ def place(board, fps):
     floating = [p.ref for p in CIR.c.parts if p.ref not in placed]
 
     def area(ref):
-        r = courtyard(fps[ref], 0)
+        r = courtyard(fps[ref], 0.0)
         return (r[2] - r[0]) * (r[3] - r[1])
 
     floating.sort(key=lambda r: -area(r))

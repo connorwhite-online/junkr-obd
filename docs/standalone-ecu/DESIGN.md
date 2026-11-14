@@ -59,7 +59,7 @@ wheel on the pump's roller ring: 64 slots per pump turn (720 deg CA), with
 
 ## Board
 
-200 × 140 mm, 4 layers (signal / GND / signal / signal), 353 parts on
+200 × 140 mm, 6 layers (signal / GND plane / 3 inner signal / signal; GND poured on every layer), 353 parts on
 10 schematic sheets. The harness header (TE 176122-6, the Toyota ECU
 header) sits on the top edge; the three tail footprints (rev C interposer
 geometry) behind it carry the stock ECU's side in shadow mode.

@@ -9,7 +9,7 @@ Files are in `kicad/standalone_ecu/fab/`:
 
 | File | For |
 | --- | --- |
-| `junkr_ecu_gerbers.zip` | PCB: 4 layers, 200 × 140 mm, 1.6 mm, 1 oz outer / 0.5 oz inner, ENIG (the header and tails are press-fit sensitive, ENIG keeps the holes flat) |
+| `junkr_ecu_gerbers.zip` | PCB: 6 layers, 200 × 140 mm, 1.6 mm, 1 oz outer / 0.5 oz inner, ENIG. Rules: 0.15 mm tracks, 0.12 mm spacing, 0.45 / 0.2 mm vias (standard 6-layer capability at JLCPCB and PCBWay) |
 | `bom.csv` | assembly BOM: Comment, Designator, Footprint, MPN |
 | `cpl.csv` | pick and place, top side only |
 

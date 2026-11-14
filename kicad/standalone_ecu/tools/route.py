@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Route junkr_ecu_unrouted.kicad_pcb on a 0.1 mm grid (A* in router_core.c).
 
-Layers: F.Cu (0), In1.Cu = solid GND plane (1), In2.Cu (2), B.Cu (3).
+Layers: F.Cu (0), In1.Cu = solid GND plane (1), In2-In4.Cu (2-4), B.Cu (5).
 Every SMD GND pad gets a short escape to a via into the plane; all other
-nets are routed as trees on F, In2 and B. Then GND zones are poured on all
+nets are routed as trees on F, In2-In4 and B. Then GND zones are poured on all
 layers, zones are filled and KiCad's DRC runs.
 
     /usr/bin/python3 route.py
@@ -21,7 +21,7 @@ import pcbnew as P
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "..")
 G = 0.1                                   # grid, mm
-LAYERS = [P.F_Cu, P.In1_Cu, P.In2_Cu, P.B_Cu]
+LAYERS = [P.F_Cu, P.In1_Cu, P.In2_Cu, P.In3_Cu, P.In4_Cu, P.B_Cu]
 PLANE = 1
 
 CLASSES = {  # name: (track width, clearance)
@@ -40,8 +40,12 @@ for n in ("PB", "VIN", "VIN_RAW", "V5", "V5_OR", "VRLY", "BUCK_SW", "VBUS", "IGS
     NETCLASS[n] = "Power"
 for n in ("H_SPV", "S_SPV", "O_SPV", "SPV_SHUNT", "SPV_REC_N", "H_TCV", "S_TCV", "O_TCV", "TCV_SHUNT"):
     NETCLASS[n] = "HighCurrent"
+STAMP_GROW = 0.05   # rasterised copper errs outward by this much, so the grid never under-counts
+PRE_NETS = ("3V3", "3V3A", "VREF")
+FINE = set(os.environ.get("ROUTE_FINE", "U100").split(","))
 RAIL_PRI = 1 if os.environ.get("ROUTE_RAILFIRST") else 3
-VIA = {"Default": (0.6, 0.3), "Rail": (0.6, 0.3), "Power": (0.8, 0.4), "HighCurrent": (1.0, 0.5)}
+SMALL_VIA = tuple(float(v) for v in os.environ.get("ROUTE_VIA", "0.45,0.2").split(","))   # signal via: dia, drill
+VIA = {"Default": SMALL_VIA, "Rail": SMALL_VIA, "Power": (0.8, 0.4), "HighCurrent": (1.0, 0.5)}
 
 lib = ctypes.CDLL(os.environ.get("ROUTER_SO", "/tmp/claude-0/work/router_core2.so"))
 I32P = np.ctypeslib.ndpointer(dtype=np.int32, flags="C_CONTIGUOUS")
@@ -59,6 +63,8 @@ lib.set_rip.restype = None
 lib.set_rip.argtypes = [U8P, ctypes.c_int, ctypes.c_float]
 lib.set_hist.restype = None
 lib.set_hist.argtypes = [F32P]
+lib.set_cap.restype = None
+lib.set_cap.argtypes = [ctypes.c_long]
 lib.stamp.restype = None
 lib.stamp.argtypes = [I32P, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, I32P, ctypes.c_int,
                       I16P, I16P, ctypes.c_int, ctypes.c_int, ctypes.c_int]
@@ -121,8 +127,8 @@ def pad_cells(grid, pad, grow=0.0):
 
 def pad_layers(pad):
     if pad.GetAttribute() in (P.PAD_ATTRIB_PTH, P.PAD_ATTRIB_NPTH):
-        return [0, 1, 2, 3]
-    return [0] if pad.IsOnLayer(P.F_Cu) else [3]
+        return list(range(len(LAYERS)))
+    return [0] if pad.IsOnLayer(P.F_Cu) else [len(LAYERS) - 1]
 
 
 class Router:
@@ -143,6 +149,9 @@ class Router:
             for _, _, cells in plist:
                 self.hard[np.array(cells, dtype=np.int64)] = 1
         self.hist = np.zeros(g.L * g.H * g.W, dtype=np.float32)
+        self.final = False
+        self.pre = {}
+        self.pre_paths = {}
         lib.set_hist(self.hist)
 
     def code(self, name):
@@ -172,12 +181,12 @@ class Router:
                 name = pad.GetNetname()
                 layers = pad_layers(pad)
                 if pad.GetAttribute() == P.PAD_ATTRIB_NPTH or not name:
-                    xs, ys = pad_cells(g, pad, grow=0.0)
+                    xs, ys = pad_cells(g, pad, grow=STAMP_GROW)
                     if pad.GetAttribute() == P.PAD_ATTRIB_NPTH:
                         r = P.ToMM(pad.GetDrillSize().x) / 2
                         c = pad.GetPosition()
                         cx, cy = g.cell(P.ToMM(c.x), P.ToMM(c.y))
-                        dx, dy = disk(r / G + 0.5)
+                        dx, dy = disk((r + 0.12) / G)   # hole clearance 0.2 incl. the track clearance
                         xs, ys = list(cx + dx), list(cy + dy)
                     for l in layers:
                         for x, y in zip(xs, ys):
@@ -185,7 +194,7 @@ class Router:
                                 occ[l, y, x] = -1
                     continue
                 code = self.code(name)
-                xs, ys = pad_cells(g, pad)
+                xs, ys = pad_cells(g, pad, grow=STAMP_GROW)
                 if not xs:
                     c = pad.GetPosition()
                     cx, cy = g.cell(P.ToMM(c.x), P.ToMM(c.y))
@@ -215,8 +224,8 @@ class Router:
             tgt[c] = 1
         tdx, tdy = disk((width / 2 + clr + 0.05) / G)
         vdx, vdy = disk((via[0] / 2 + clr + 0.05) / G)
-        layer_cost = np.array([1.0, 1.0, 1.15, 1.05], dtype=np.float32)
-        layer_ok = np.array([1, 1 if plane_target else 0, 1, 1], dtype=np.uint8)
+        layer_cost = np.array([1.0, 1.0, 1.1, 1.1, 1.15, 1.05], dtype=np.float32)
+        layer_ok = np.array([1, 1 if plane_target else 0, 1, 1, 1, 1], dtype=np.uint8)
         srcs = np.array(src, dtype=np.int32)
         # window: bbox of src + tgt + margin
         pts = list(src) + list(tgt_cells)
@@ -224,6 +233,8 @@ class Router:
         cy = [(c % (g.H * g.W)) // g.W for c in pts]
         out = np.zeros(400000, dtype=np.int32)
         wins = (window, 40.0) if cross == 0 else (window, 60.0)
+        if self.final:
+            wins = (window, 40.0, 250.0)
         for win in wins:
             m = int(win / G)
             bx0, by0 = max(0, min(cx) - m), max(0, min(cy) - m)
@@ -265,6 +276,47 @@ class Router:
         names = {v: k for k, v in self.netcode.items()}
         return [names[v] for v in hit]
 
+    def pre_route(self):
+        for net in PRE_NETS:
+            plist = self.pads.get(net, [])
+            if len(plist) < 2:
+                continue
+            w_cls, clr = self.width(net)
+            via = VIA[NETCLASS.get(net, "Default")]
+            pos = [(P.ToMM(p.GetPosition().x), P.ToMM(p.GetPosition().y)) for p, _, _ in plist]
+            clusters = {}       # pad index -> cluster id
+            cells = {}          # cluster id -> cells
+            for i, (pad, _, pc) in enumerate(plist):
+                if pad.GetParent().GetReference() not in FINE:
+                    continue
+                cands = [j for j in range(len(plist)) if plist[j][0].GetParent().GetReference() not in FINE]
+                if not cands:
+                    continue
+                j = min(cands, key=lambda j: math.hypot(pos[i][0] - pos[j][0], pos[i][1] - pos[j][1]))
+                w = min(w_cls, 0.25)
+                hint = self.grid.cell(*pos[i])
+                src = list(cells[clusters[j]]) if j in clusters else list(plist[j][2])
+                path = self.route_conn(net, src, pc, hint, w, clr, via, window=6.0)
+                if path is None:
+                    continue
+                saved = list(self.tree.get(net, []))
+                self.tree[net] = []
+                self.commit(net, path, w, via)
+                self.pre_paths.setdefault(net, []).append((path, w, via))
+                pcells = self.tree[net]
+                self.tree[net] = saved
+                cid = clusters.get(j, len(cells))
+                if cid not in cells:
+                    cells[cid] = list(plist[j][2])
+                    clusters[j] = cid
+                cells[cid] += pcells + list(pc)
+                clusters[i] = cid
+            if clusters:
+                self.pre[net] = (clusters, cells)
+                # nobody may run over these: they are never ripped
+                code = self.code(net)
+                self.hard[self.grid.flat == code] = 1
+
     def rip(self, net):
         g = self.grid
         code = self.code(net)
@@ -280,8 +332,10 @@ class Router:
         self.tracks = [t for t in self.tracks if t[0] != net]
         self.vias = [v for v in self.vias if v[0] != net]
         self.failed = [f for f in self.failed if f[0] != net]
-        self.tree[net] = []
         self.ripped[net] = self.ripped.get(net, 0) + 1
+        for path, w, via in self.pre_paths.get(net, []):   # supply pre-routes stay
+            self.commit(net, path, w, via)
+        self.tree[net] = []
 
     def commit(self, net, path, width, via):
         """Turn a cell path into tracks + vias, stamp it into the grid."""
@@ -289,8 +343,8 @@ class Router:
         code = self.code(net)
         WH = g.W * g.H
         cells = [(int(c // WH), int((c % WH) % g.W), int((c % WH) // g.W)) for c in path]
-        sdx, sdy = disk(width / 2 / G)
-        vdx, vdy = disk(via[0] / 2 / G)
+        sdx, sdy = disk((width / 2 + STAMP_GROW) / G)
+        vdx, vdy = disk((via[0] / 2 + STAMP_GROW) / G)
         run = []
         for i, (l, x, y) in enumerate(cells):
             if run and run[-1][0] != l:
@@ -303,7 +357,9 @@ class Router:
                     self.vias.append((net, vx, vy, via[0], via[1]))
                     vc = np.array([g.idx(0, x, y)], dtype=np.int32)
                     lib.stamp(g.flat, g.W, g.H, g.L, code, vc, 1, vdx, vdy, len(vdx), 1, PLANE)
-                    for ll in (0, 2, 3):
+                    for ll in range(g.L):
+                        if ll == PLANE:
+                            continue
                         self.tree.setdefault(net, []).append(g.idx(ll, x, y))
                 run = []
             run.append((l, x, y))
@@ -338,12 +394,19 @@ class Router:
             w = min(0.4, max(0.2, min(P.ToMM(pad.GetSize().x), P.ToMM(pad.GetSize().y)) * 0.8))
             c = pad.GetPosition()
             hint = self.grid.cell(P.ToMM(c.x), P.ToMM(c.y))
-            path = self.route_conn("GND", cells, [], hint, w, 0.15, (0.6, 0.3), plane_target=True, window=3.0)
+            path = self.route_conn("GND", cells, [], hint, w, 0.15, SMALL_VIA, plane_target=True, window=3.0)
+            if path is None:
+                w = 0.15
+                path = self.route_conn("GND", cells, [], hint, w, 0.1, SMALL_VIA, plane_target=True, window=8.0)
             if path is None:
                 self.failed.append(("GND", pad.GetParent().GetReference() + "." + pad.GetNumber()))
                 continue
-            self.commit("GND", path, w, (0.6, 0.3))
+            self.commit("GND", path, w, SMALL_VIA)
         print("GND escapes done %.1fs, %d vias" % (time.time() - t0, len(self.vias)))
+        # 1b) supply pins of the fine-pitch parts go to their nearest same-net pad
+        #     (the decoupling cap) before anything else crowds them
+        self.pre_route()
+        print("supply pre-route done %.1fs" % (time.time() - t0))
         # 2) everything else, by class then size
         order = []
         for net, plist in self.pads.items():
@@ -353,6 +416,9 @@ class Router:
             ys = [P.ToMM(p.GetPosition().y) for p, _, _ in plist]
             span = (max(xs) - min(xs)) + (max(ys) - min(ys))
             pri = {"HighCurrent": 0, "Power": 1, "Rail": RAIL_PRI, "Default": 2}[NETCLASS.get(net, "Default")]
+            # nets on fine-pitch parts (the LQFP-144) escape first, while there is room
+            if any(p.GetParent().GetReference() in FINE for p, _, _ in plist) and pri >= 1:
+                pri = 0.5
             order.append((pri, span, net))
         order.sort()
         for k, (_, _, net) in enumerate(order):
@@ -381,7 +447,29 @@ class Router:
                 queue.append(net)
             if it % 25 == 0:
                 print("  rip-up %d: queue %d, %d failed, %.0fs" % (it, len(queue), len(self.failed), time.time() - t0))
-        for net in queue:   # out of iterations: route what can be routed without ripping
+        # out of iterations: route what is left without ripping, whole-board
+        # windows, a bigger search budget and a fine-pitch fallback
+        self.final = True
+        lib.set_cap(12000000)
+        left = list(queue)
+        for n, _ in self.failed:
+            if n != "GND" and n not in left:
+                left.append(n)
+        print("final pass: %d nets" % len(left))
+        gfail = [f for f in self.failed if f[0] == "GND"]
+        self.failed = [f for f in self.failed if f[0] != "GND"]
+        for _, ref in gfail:
+            rr, num = ref.split(".")
+            for pad, layers, cells in self.pads["GND"]:
+                if pad.GetParent().GetReference() == rr and pad.GetNumber() == num:
+                    c = pad.GetPosition()
+                    hint = self.grid.cell(P.ToMM(c.x), P.ToMM(c.y))
+                    path = self.route_conn("GND", cells, [], hint, 0.127, 0.1, SMALL_VIA, plane_target=True, window=10.0)
+                    if path is None:
+                        self.failed.append(("GND", ref))
+                    else:
+                        self.commit("GND", path, 0.127, SMALL_VIA)
+        for net in left:
             self.rip(net)
             self.route_net(net)
         print("routing done %.0fs: %d tracks, %d vias, %d failed" % (
@@ -399,6 +487,18 @@ class Router:
         done = [0]
         todo = list(range(1, len(plist)))
         self.tree[net] = list(plist[0][2])
+        clusters, ccells = self.pre.get(net, ({}, {}))
+
+        def absorb(j):
+            # pads already joined to j by the supply pre-route come along
+            if j in clusters:
+                cid = clusters[j]
+                self.tree[net].extend(ccells[cid])
+                for k, c in clusters.items():
+                    if c == cid and k in todo:
+                        todo.remove(k)
+                        done.append(k)
+        absorb(0)
         while todo:
             best = min(((math.hypot(pos[i][0] - pos[j][0], pos[i][1] - pos[j][1]), j) for j in todo for i in done))
             j = best[1]
@@ -408,13 +508,15 @@ class Router:
             if padmin < w:
                 w = max(0.2, min(w, padmin))
             hint = self.grid.cell(*pos[j])
+            uv = via
             path = self.route_conn(net, self.tree[net], plist[j][2], hint, w, clr, via)
             if path is None and w > 0.25:
-                w = 0.25
-                path = self.route_conn(net, self.tree[net], plist[j][2], hint, w, 0.15, (0.6, 0.3))
+                w, uv = 0.25, SMALL_VIA
+                path = self.route_conn(net, self.tree[net], plist[j][2], hint, w, 0.15, uv)
             if path is None and cross > 0:
                 w = w if w <= 0.25 else 0.25
-                v2 = via if w > 0.25 else (0.6, 0.3)
+                v2 = via if w > 0.25 else SMALL_VIA
+                uv = v2
                 path = self.route_conn(net, self.tree[net], plist[j][2], hint, w, clr if w > 0.25 else 0.15, v2,
                                        window=20.0, cross=cross)
                 if path is not None:
@@ -425,18 +527,63 @@ class Router:
                     for vn in vs:
                         self.rip(vn)
                         ripped.append(vn)
+            if path is None and self.final and w <= 0.25:
+                # last resort: 0.127 / 0.1 mm (fine for a 6-layer fab), still no crossing
+                w, uv = 0.127, SMALL_VIA
+                path = self.route_conn(net, self.tree[net], plist[j][2], hint, w, 0.1, uv)
             if path is None:
                 self.failed.append((net, pad.GetParent().GetReference() + "." + pad.GetNumber()))
             else:
-                self.commit(net, path, w, via)
+                self.commit(net, path, w, uv)
                 self.tree[net].extend(plist[j][2])
             done.append(j)
             todo.remove(j)
+            if path is not None:
+                absorb(j)
         return ripped
 
     # ------------------------------------------------------------------
+    def merge_vias(self):
+        """Two same-net vias closer than 0.6 mm (a path that changed layer twice
+        in a row) become one: the second is dropped and every track that ended
+        on it gets a short stub to the first. The stub lies inside both vias'
+        cleared disks, so it needs no new clearance check."""
+        kept, stubs = [], []
+        by_net = {}
+        for v in self.vias:
+            net, x, y, dia, drill = v
+            near = None
+            for k in by_net.get(net, []):
+                if math.hypot(k[1] - x, k[2] - y) < 0.6:
+                    near = k
+                    break
+            if near is None:
+                kept.append(v)
+                by_net.setdefault(net, []).append(v)
+                continue
+            if near[3] < dia:      # keep the bigger via's size
+                i = kept.index(near)
+                near = (near[0], near[1], near[2], dia, drill)
+                kept[i] = near
+                by_net[net] = [near if k[1:3] == near[1:3] else k for k in by_net[net]]
+            if (round(near[1], 3), round(near[2], 3)) == (round(x, 3), round(y, 3)):
+                continue
+            ends = set()
+            for tnet, layer, pts, width in self.tracks:
+                if tnet != net:
+                    continue
+                for px, py in (pts[0], pts[-1]):
+                    if abs(px - x) < 1e-3 and abs(py - y) < 1e-3:
+                        ends.add((layer, width))
+            for layer, width in ends:
+                stubs.append((net, layer, [(x, y), (near[1], near[2])], width))
+        dropped = len(self.vias) - len(kept)
+        self.vias = kept
+        self.tracks += stubs
+        return dropped
+
     def write(self, board):
-        nets = {n.GetNetname(): n for n in board.GetNetsByName().values()} if False else None
+        print("merged %d stacked vias" % self.merge_vias())
         netmap = board.GetNetsByName()
         for net, layer, pts, width in self.tracks:
             ni = netmap[net]
@@ -462,13 +609,31 @@ class Router:
             board.Add(v)
 
 
+def set_rules(board):
+    """Board rules that match what the router guarantees (6-layer fab: 0.1 mm
+    spacing is standard; the router keeps at least 0.12)."""
+    ds = board.GetDesignSettings()
+    nc = ds.m_NetSettings.m_DefaultNetClass
+    nc.SetClearance(P.FromMM(0.12))
+    nc.SetTrackWidth(P.FromMM(0.15))
+    nc.SetViaDiameter(P.FromMM(SMALL_VIA[0]))
+    nc.SetViaDrill(P.FromMM(SMALL_VIA[1]))
+    ds.m_MinClearance = P.FromMM(0.1)
+    ds.m_TrackMinWidth = P.FromMM(0.12)
+    ds.m_HoleClearance = P.FromMM(0.2)
+    ds.m_HoleToHoleMin = P.FromMM(0.25)
+    ds.m_MinThroughDrill = P.FromMM(0.2)
+    ds.m_ViasMinSize = P.FromMM(0.4)
+    ds.m_ViasMinAnnularWidth = P.FromMM(0.1)
+
+
 def add_zones(board):
     netmap = board.GetNetsByName()
     gnd = netmap["GND"]
     bb = board.GetBoardEdgesBoundingBox()
     x0, y0 = bb.GetX(), bb.GetY()
     x1, y1 = x0 + bb.GetWidth(), y0 + bb.GetHeight()
-    for layer, prio in ((P.In1_Cu, 0), (P.F_Cu, 0), (P.B_Cu, 0), (P.In2_Cu, 0)):
+    for layer, prio in ((P.In1_Cu, 0), (P.F_Cu, 0), (P.B_Cu, 0), (P.In2_Cu, 0), (P.In3_Cu, 0), (P.In4_Cu, 0)):
         z = P.ZONE(board)
         z.SetLayer(layer)
         z.SetNet(gnd)
@@ -477,7 +642,7 @@ def add_zones(board):
         z.SetMinThickness(P.FromMM(0.2))
         z.SetThermalReliefGap(P.FromMM(0.3))
         z.SetThermalReliefSpokeWidth(P.FromMM(0.4))
-        z.SetPadConnection(P.ZONE_CONNECTION_THERMAL)
+        z.SetPadConnection(P.ZONE_CONNECTION_THT_THERMAL)   # SMD pads solid, through-hole on spokes
         z.SetIslandRemovalMode(P.ISLAND_REMOVAL_MODE_ALWAYS)
         ol = z.Outline()
         ol.NewOutline()
@@ -497,6 +662,7 @@ def main():
     r.route_all()
     r.write(board)
     add_zones(board)
+    set_rules(board)
     tag = os.environ.get("ROUTE_TAG", "")
     dst = os.path.join(OUT, "junkr_ecu%s.kicad_pcb" % tag)
     board.Save(dst)
@@ -505,6 +671,11 @@ def main():
         for n, p in r.failed:
             f.write("%s %s\n" % (n, p))
     print("saved", dst)
+    if os.environ.get("ROUTE_DRC", "1") == "1":
+        b2 = P.LoadBoard(dst)
+        rpt = os.path.join(OUT, "drc_report%s.txt" % tag)
+        P.WriteDRCReport(b2, rpt, P.EDA_UNITS_MILLIMETRES, True)
+        print("drc:", rpt)
 
 
 if __name__ == "__main__":

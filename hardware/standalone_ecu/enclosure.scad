@@ -20,7 +20,7 @@ STANDOFF = 6;                      // board underside to floor (THT leads, relay
 ABOVE = 27;                        // floor of the lid to board top: tallest part + margin
 HEADER_H = 24;                     // TE 176122-6 shroud height above the board [VERIFY]
 LIP = 2;                           // lid tongue into the tray
-HOLES = [[4, 20], [BW - 4, BH - 4], [4, BH - 4], [BW - 4, 30]];
+HOLES = [[4, 46], [BW - 4, BH - 4], [4, BH - 4], [BW - 4, 30]];
 
 IW = BW + 2 * GAP; IH = BH + 2 * GAP;
 OW = IW + 2 * WALL; OH = IH + 2 * WALL;
