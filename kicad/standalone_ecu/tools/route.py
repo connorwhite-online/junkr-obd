@@ -42,6 +42,9 @@ for n in ("PB", "VIN", "VIN_RAW", "V5", "V5_OR", "VRLY", "BUCK_SW", "VBUS", "IGS
 for n in ("H_SPV", "S_SPV", "O_SPV", "SPV_SHUNT", "SPV_REC_N", "H_TCV", "S_TCV", "O_TCV", "TCV_SHUNT"):
     NETCLASS[n] = "HighCurrent"
 STAMP_GROW = 0.05   # rasterised copper errs outward by this much, so the grid never under-counts
+import random
+RNG = random.Random(int(os.environ.get("ROUTE_SEED", "0")))
+JITTER = float(os.environ.get("ROUTE_JITTER", "0.0"))
 PRE_NETS = ("3V3", "3V3A", "VREF")
 FINE = set(os.environ.get("ROUTE_FINE", "U100").split(","))
 RAIL_PRI = 1 if os.environ.get("ROUTE_RAILFIRST") else 3
@@ -441,6 +444,7 @@ class Router:
             # nets on fine-pitch parts (the LQFP-144) escape first, while there is room
             if any(p.GetParent().GetReference() in FINE for p, _, _ in plist) and pri >= 1:
                 pri = 0.5
+            span *= 1.0 + JITTER * (RNG.random() - 0.5)   # seeded ordering jitter: routing is chaotic, try several
             order.append((pri, span, net))
         order.sort()
         for k, (_, _, net) in enumerate(order):
@@ -507,6 +511,36 @@ class Router:
         self.tracks, self.vias, self.failed = list(s[1]), list(s[2]), list(s[3])
         self.tree = {k: list(v) for k, v in s[4].items()}
 
+    def force(self, nets):
+        """Clear an area: rip every net with copper near the pads of the given
+        nets, route those nets first, then the ripped ones. Kept only if fewer
+        connections end up open."""
+        g = self.grid
+        for rad in (2.0, 3.0, 4.5, 6.0, 8.0):
+            before = len(self.failed)
+            snap = self.snapshot()
+            near = set()
+            inv = {v: k for k, v in self.netcode.items()}
+            for net in nets:
+                for pad, _, cells in self.pads[net]:
+                    c = pad.GetPosition()
+                    cx, cy = g.cell(P.ToMM(c.x), P.ToMM(c.y))
+                    m = int(rad / G)
+                    win = g.occ[:, max(0, cy - m):cy + m + 1, max(0, cx - m):cx + m + 1]
+                    for code in np.unique(win):
+                        if code > 0 and inv.get(int(code)) not in (None, "GND") and inv[int(code)] not in nets:
+                            near.add(inv[int(code)])
+            for n in list(nets) + sorted(near):
+                self.rip(n)
+            for n in nets:
+                self.route_net(n)
+            for n in sorted(near, key=lambda n: len(self.pads[n])):
+                self.route_net(n)
+            print("  force r=%.1f: ripped %d nets, %d -> %d open" % (rad, len(near), before, len(self.failed)))
+            if len(self.failed) < before:
+                return
+            self.restore(snap)
+
     def endgame(self, t0):
         """Last few open connections: tear up whatever blocks one, reroute the
         victims, and keep the result only if fewer connections are open."""
@@ -514,7 +548,7 @@ class Router:
         t1 = time.time()
         tries = {}
         while self.failed and time.time() - t1 < budget:
-            nets = [n for n, _ in self.failed if n != "GND" and tries.get(n, 0) < 6]
+            nets = [n for n, _ in self.failed if n != "GND" and tries.get(n, 0) < int(os.environ.get("ROUTE_TRIES", "6"))]
             if not nets:
                 break
             net = nets[0]
@@ -746,6 +780,9 @@ def main():
         r.final = True
         lib.set_cap(12000000)
         print("resumed: %d open" % len(r.failed))
+        force = os.environ.get("ROUTE_FORCE")
+        if force:
+            r.force(force.split(","))
         r.endgame(time.time())
     else:
         r.route_all()
