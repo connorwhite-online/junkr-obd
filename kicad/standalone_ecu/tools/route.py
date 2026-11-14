@@ -788,6 +788,31 @@ class Router:
             board.Add(v)
 
 
+def drop_crowded_vias(board):
+    """A GND escape via that lands among a footprint's own GND holes (a
+    thermal pad's via field) is redundant and too close to drill: remove it
+    and the stub that fed it."""
+    holes = []
+    for fp in board.GetFootprints():
+        for pad in fp.Pads():
+            if pad.GetNetname() == "GND" and pad.GetAttribute() == P.PAD_ATTRIB_PTH:
+                holes.append((P.ToMM(pad.GetPosition().x), P.ToMM(pad.GetPosition().y), P.ToMM(pad.GetDrillSize().x)))
+    drop = []
+    for t in board.GetTracks():
+        if t.GetClass() != "PCB_VIA" or t.GetNetname() != "GND":
+            continue
+        x, y, d = P.ToMM(t.GetPosition().x), P.ToMM(t.GetPosition().y), P.ToMM(t.GetDrillValue())
+        if any(math.hypot(x - hx, y - hy) - (d + hd) / 2 < 0.25 for hx, hy, hd in holes):
+            drop.append(t)
+    for v in drop:
+        p = v.GetPosition()
+        for t in list(board.GetTracks()):
+            if t.GetClass() == "PCB_TRACK" and t.GetNetname() == "GND" and (t.GetStart() == p or t.GetEnd() == p):
+                board.Remove(t)
+        board.Remove(v)
+    return len(drop)
+
+
 def set_rules(board):
     """Board rules that match what the router guarantees (6-layer fab: 0.1 mm
     spacing is standard; the router keeps at least 0.12)."""
@@ -802,6 +827,7 @@ def set_rules(board):
     ds.m_HoleClearance = P.FromMM(0.2)
     ds.m_HoleToHoleMin = P.FromMM(0.25)
     ds.m_MinThroughDrill = P.FromMM(0.2)
+    ds.m_MinResolvedSpokes = 1   # GND pins that also have tracks and plane vias
     ds.m_ViasMinSize = P.FromMM(0.4)
     ds.m_ViasMinAnnularWidth = P.FromMM(0.1)
 
@@ -866,6 +892,7 @@ def main():
             pickle.dump({"occ": r.grid.occ, "tracks": r.tracks, "vias": r.vias, "failed": r.failed,
                          "tree": r.tree, "pre": r.pre, "pre_paths": r.pre_paths, "hist": r.hist}, f)
     r.write(board)
+    print("dropped %d crowded GND vias" % drop_crowded_vias(board))
     add_zones(board)
     set_rules(board)
     tag = os.environ.get("ROUTE_TAG", "")
