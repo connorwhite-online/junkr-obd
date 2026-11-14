@@ -64,4 +64,4 @@ HOLES = ((4, 46), (W - 4, H - 4), (4, H - 4), (W - 4, 30))
 # out of room near the divider and left it 30 mm away.
 # C36 (VDDA 100n) and C17 (VREF+ 100n) go right at MCU pins 32 / 33: the
 # placer had them 50+ mm away, and an analog supply decoupler is useless there.
-MOVES = {"C43": (81.0, 107.25, 90), "C36": (87.0, 109.25, 90), "C17": (87.0, 106.75, 90)}
+MOVES = {"C43": (81.0, 107.25, 90), "C36": (87.0, 109.25, 90), "C17": (87.0, 106.25, 90)}
