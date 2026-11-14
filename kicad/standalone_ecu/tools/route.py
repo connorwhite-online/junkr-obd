@@ -511,6 +511,76 @@ class Router:
         self.tracks, self.vias, self.failed = list(s[1]), list(s[2]), list(s[3])
         self.tree = {k: list(v) for k, v in s[4].items()}
 
+    def apply_moves(self, oldboard):
+        """A saved routing state was made with some parts elsewhere (placement
+        MOVES). Lift their old pads and stubs, clear the new spot, and route
+        what touches them again."""
+        g = self.grid
+        redo, touched = set(), set()
+        for fp in self.board.GetFootprints():
+            of = oldboard.FindFootprintByReference(fp.GetReference())
+            if of.GetPosition() == fp.GetPosition() and of.GetOrientationDegrees() == fp.GetOrientationDegrees():
+                continue
+            print("  moved", fp.GetReference())
+            for pad in of.Pads():
+                net = pad.GetNetname()
+                if not net:
+                    continue
+                code = self.code(net)
+                xs, ys = pad_cells(g, pad, grow=STAMP_GROW)
+                for l in pad_layers(pad):
+                    for x, y in zip(xs, ys):
+                        if g.occ[l, y, x] == code:
+                            g.occ[l, y, x] = 0
+                px, py = P.ToMM(pad.GetPosition().x), P.ToMM(pad.GetPosition().y)
+                self.tracks = [t for t in self.tracks if not (t[0] == net and any(
+                    math.hypot(q[0] - px, q[1] - py) < 0.9 for q in (t[2][0], t[2][-1])))]
+                self.vias = [v for v in self.vias if not (v[0] == net and math.hypot(v[1] - px, v[2] - py) < 1.6)]
+                touched.add(net)
+            for pad in fp.Pads():
+                net = pad.GetNetname()
+                if not net:
+                    continue
+                code = self.code(net)
+                xs, ys = pad_cells(g, pad, grow=0.3)
+                for l in pad_layers(pad):
+                    for x, y in zip(xs, ys):
+                        o = int(g.occ[l, y, x])
+                        if o > 0 and o != code:
+                            inv = {v: k for k, v in self.netcode.items()}
+                            redo.add(inv[o])
+                touched.add(net)
+        redo -= {"GND"}
+        for n in redo:
+            self.rip(n)
+        for fp in self.board.GetFootprints():
+            for pad in fp.Pads():
+                net = pad.GetNetname()
+                if net and fp.GetReference() in [f.GetReference() for f in self.board.GetFootprints()
+                                                  if oldboard.FindFootprintByReference(f.GetReference()).GetPosition() != f.GetPosition()]:
+                    code = self.code(net)
+                    xs, ys = pad_cells(g, pad, grow=STAMP_GROW)
+                    for l in pad_layers(pad):
+                        for x, y in zip(xs, ys):
+                            if g.occ[l, y, x] == 0:
+                                g.occ[l, y, x] = code
+                    if net == "GND":
+                        c = pad.GetPosition()
+                        hint = g.cell(P.ToMM(c.x), P.ToMM(c.y))
+                        cells = [cc for pp, _, cc in self.pads["GND"] if pp.GetParent().GetReference() == fp.GetReference()
+                                 and pp.GetNumber() == pad.GetNumber()][0]
+                        path = self.route_conn("GND", cells, [], hint, 0.25, 0.1, SMALL_VIA, plane_target=True, window=6.0)
+                        if path is not None:
+                            self.commit("GND", path, 0.25, SMALL_VIA)
+                        else:
+                            self.failed.append(("GND", fp.GetReference() + "." + pad.GetNumber()))
+        for n in sorted(touched - {"GND"}):
+            self.rip(n)
+            self.route_net(n)
+        for n in sorted(redo, key=lambda n: len(self.pads[n])):
+            self.route_net(n)
+        print("  after moves: %d open (rerouted %d nets)" % (len(self.failed), len(redo) + len(touched)))
+
     def force(self, nets):
         """Clear an area: rip every net with copper near the pads of the given
         nets, route those nets first, then the ripped ones. Kept only if fewer
@@ -780,6 +850,9 @@ def main():
         r.final = True
         lib.set_cap(12000000)
         print("resumed: %d open" % len(r.failed))
+        old = os.environ.get("ROUTE_OLDSRC")
+        if old:
+            r.apply_moves(P.LoadBoard(old))
         force = os.environ.get("ROUTE_FORCE")
         if force:
             r.force(force.split(","))

@@ -224,6 +224,9 @@ def place(board, fps):
         for n, x, y in pad_pos(ref):
             if n and n not in POWERISH:
                 netpos.setdefault(n, []).append((x, y))
+    for ref, (x, y, rot) in getattr(PL, "MOVES", {}).items():
+        fps[ref].SetOrientationDegrees(rot)
+        fps[ref].SetPosition(V(x, y))
     return placed
 
 

@@ -58,3 +58,8 @@ FIXED = {
 
 # M3 mounting holes. Top-left sits below the ESP32 module courtyard (antenna keep-out).
 HOLES = ((4, 46), (W - 4, H - 4), (4, H - 4), (W - 4, 30))
+
+# Moves applied after automatic placement (the rest of the board stays exactly
+# where the placer put it). C43 is the PIM ADC filter cap: the placer had run
+# out of room near the divider and left it 30 mm away.
+MOVES = {"C43": (81.0, 107.25, 90)}
