@@ -11,6 +11,7 @@ layers, zones are filled and KiCad's DRC runs.
 import ctypes
 import math
 import os
+import pickle
 import subprocess
 import sys
 import time
@@ -63,6 +64,8 @@ lib.set_rip.restype = None
 lib.set_rip.argtypes = [U8P, ctypes.c_int, ctypes.c_float]
 lib.set_hist.restype = None
 lib.set_hist.argtypes = [F32P]
+lib.set_novia.restype = None
+lib.set_novia.argtypes = [U8P]
 lib.set_cap.restype = None
 lib.set_cap.argtypes = [ctypes.c_long]
 lib.stamp.restype = None
@@ -153,6 +156,25 @@ class Router:
         self.pre = {}
         self.pre_paths = {}
         lib.set_hist(self.hist)
+        # no vias in a ring just outside the fine-pitch pad rows: every pin gets
+        # a clear lane out before the first via
+        g = self.grid
+        self.novia = np.zeros(g.H * g.W, dtype=np.uint8)
+        ring = float(os.environ.get("ROUTE_RING", "1.2"))
+        for fp in self.board.GetFootprints():
+            if fp.GetReference() not in FINE or fp.GetReference() == "U33":
+                continue
+            xs = [P.ToMM(p.GetPosition().x) for p in fp.Pads()]
+            ys = [P.ToMM(p.GetPosition().y) for p in fp.Pads()]
+            x0, x1, y0, y1 = min(xs) - 0.75 - ring, max(xs) + 0.75 + ring, min(ys) - 0.75 - ring, max(ys) + 0.75 + ring
+            ix0, iy0 = g.cell(min(xs) + 0.75, min(ys) + 0.75)
+            ix1, iy1 = g.cell(max(xs) - 0.75, max(ys) - 0.75)
+            cx0, cy0 = g.cell(x0, y0)
+            cx1, cy1 = g.cell(x1, y1)
+            m = self.novia.reshape(g.H, g.W)
+            m[cy0:cy1 + 1, cx0:cx1 + 1] = 1
+            m[iy0:iy1 + 1, ix0:ix1 + 1] = 0
+        lib.set_novia(self.novia)
 
     def code(self, name):
         if name not in self.netcode:
@@ -500,10 +522,25 @@ class Router:
             before = len(self.failed)
             snap = self.snapshot()
             self.rip(net)
-            victims = self.route_net(net, cross=5.0 * tries[net])
-            for vn in victims:
+            # a local rip-up cascade: victims may tear up others in turn, a few
+            # levels deep, then whatever is left routes without crossing
+            queue = list(self.route_net(net, cross=5.0 * tries[net]))
+            depth = {vn: 1 for vn in queue}
+            steps = 0
+            while queue and steps < 40:
+                vn = queue.pop(0)
+                steps += 1
                 self.rip(vn)
-            for vn in victims:
+                if depth[vn] < 4:
+                    for v2 in self.route_net(vn, cross=8.0 * depth[vn]):
+                        if v2 not in depth or depth[v2] < 4:
+                            depth[v2] = depth.get(v2, depth[vn]) + 1
+                            if v2 not in queue:
+                                queue.append(v2)
+                else:
+                    self.route_net(vn)
+            for vn in queue:
+                self.rip(vn)
                 self.route_net(vn)
             if len(self.failed) < before:
                 print("  endgame %s: %d -> %d open, %.0fs" % (net, before, len(self.failed), time.time() - t0))
@@ -691,11 +728,31 @@ def add_zones(board):
 
 
 def main():
-    src = os.path.join(OUT, "junkr_ecu_unrouted.kicad_pcb")
+    src = os.environ.get("ROUTE_SRC", os.path.join(OUT, "junkr_ecu_unrouted.kicad_pcb"))
     board = P.LoadBoard(src)
     r = Router(board)
     print("grid %dx%dx%d, %d nets with pads" % (r.grid.W, r.grid.H, r.grid.L, len(r.pads)))
-    r.route_all()
+    resume = os.environ.get("ROUTE_RESUME")
+    state = os.environ.get("ROUTE_STATE")
+    if resume:
+        # pick up a saved routing state and only run the endgame again
+        with open(resume, "rb") as f:
+            st = pickle.load(f)
+        r.grid.occ[...] = st["occ"]
+        r.tracks, r.vias, r.failed, r.tree = st["tracks"], st["vias"], st["failed"], st["tree"]
+        r.pre, r.pre_paths, r.hist[...] = st["pre"], st["pre_paths"], st["hist"]
+        for net in r.pre:
+            r.hard[r.grid.flat == r.code(net)] = 1
+        r.final = True
+        lib.set_cap(12000000)
+        print("resumed: %d open" % len(r.failed))
+        r.endgame(time.time())
+    else:
+        r.route_all()
+    if state:
+        with open(state, "wb") as f:
+            pickle.dump({"occ": r.grid.occ, "tracks": r.tracks, "vias": r.vias, "failed": r.failed,
+                         "tree": r.tree, "pre": r.pre, "pre_paths": r.pre_paths, "hist": r.hist}, f)
     r.write(board)
     add_zones(board)
     set_rules(board)

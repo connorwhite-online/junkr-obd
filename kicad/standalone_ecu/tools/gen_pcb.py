@@ -264,7 +264,7 @@ def main():
     place(board, fps)
     outline(board)
     silk(board)
-    path = os.path.join(OUT, "junkr_ecu_unrouted.kicad_pcb")
+    path = os.environ.get("PLACE_OUT", os.path.join(OUT, "junkr_ecu_unrouted.kicad_pcb"))
     board.Save(path)
     print("saved", path, len(fps), "footprints")
 

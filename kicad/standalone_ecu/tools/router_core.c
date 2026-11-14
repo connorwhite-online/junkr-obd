@@ -60,6 +60,8 @@ void set_rip(const uint8_t *hard, int hard_net, float cross_cost) {
 /* PathFinder-style history: extra cost per cell that keeps being fought over. */
 void set_hist(const float *hist) { g_hist = hist; }
 static long g_cap = 2500000;
+static const uint8_t *g_novia;   /* W*H cells where no via may land (fine-pitch escape rings) */
+void set_novia(const uint8_t *m) { g_novia = m; }
 void set_cap(long cap) { g_cap = cap; }
 
 /* Returns path length (cells) written to out (as l*H*W+y*W+x, target first),
@@ -121,6 +123,7 @@ int astar(const int32_t *occ, int W, int H, int L, int net,
         }
         /* via to the other layers */
         int vok = -1;
+        if (g_novia && g_novia[y * W + x]) continue;
         for (int l2 = 0; l2 < L; l2++) {
             if (l2 == l || !layer_ok[l2]) continue;
             int32_t ni = l2 * WH + y * W + x;
