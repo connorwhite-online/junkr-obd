@@ -472,8 +472,44 @@ class Router:
         for net in left:
             self.rip(net)
             self.route_net(net)
+        self.endgame(t0)
         print("routing done %.0fs: %d tracks, %d vias, %d failed" % (
             time.time() - t0, len(self.tracks), len(self.vias), len(self.failed)))
+
+    def snapshot(self):
+        return (self.grid.occ.copy(), list(self.tracks), list(self.vias), list(self.failed),
+                {k: list(v) for k, v in self.tree.items()})
+
+    def restore(self, s):
+        self.grid.occ[...] = s[0]
+        self.tracks, self.vias, self.failed = list(s[1]), list(s[2]), list(s[3])
+        self.tree = {k: list(v) for k, v in s[4].items()}
+
+    def endgame(self, t0):
+        """Last few open connections: tear up whatever blocks one, reroute the
+        victims, and keep the result only if fewer connections are open."""
+        budget = float(os.environ.get("ROUTE_ENDGAME", "900"))
+        t1 = time.time()
+        tries = {}
+        while self.failed and time.time() - t1 < budget:
+            nets = [n for n, _ in self.failed if n != "GND" and tries.get(n, 0) < 6]
+            if not nets:
+                break
+            net = nets[0]
+            tries[net] = tries.get(net, 0) + 1
+            before = len(self.failed)
+            snap = self.snapshot()
+            self.rip(net)
+            victims = self.route_net(net, cross=5.0 * tries[net])
+            for vn in victims:
+                self.rip(vn)
+            for vn in victims:
+                self.route_net(vn)
+            if len(self.failed) < before:
+                print("  endgame %s: %d -> %d open, %.0fs" % (net, before, len(self.failed), time.time() - t0))
+            else:
+                self.restore(snap)
+        print("endgame done: %d open" % len(self.failed))
 
     def route_net(self, net, cross=0.0):
         """Route a net. With cross > 0 a connection that cannot be made may run

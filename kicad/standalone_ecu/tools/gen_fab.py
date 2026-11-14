@@ -10,6 +10,7 @@ PCBWay assembly (Comment, Designator, Footprint, MPN). Through-hole parts
 import collections
 import csv
 import os
+import shutil
 import subprocess
 import zipfile
 
@@ -20,13 +21,14 @@ import circuit as CIR
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, "..")
 FAB = os.path.join(ROOT, "fab")
-BOARD = os.path.join(ROOT, "junkr_ecu.kicad_pcb")
+BOARD = os.environ.get("FAB_BOARD", os.path.join(ROOT, "junkr_ecu.kicad_pcb"))
 
 HAND = ("Relay_THT", "junkr_ecu", "Connector_JST", "Connector_PinHeader", "Connector_Molex", "MountingHole")
 
 
 def gerbers():
     gdir = os.path.join(FAB, "gerbers")
+    shutil.rmtree(gdir, ignore_errors=True)
     os.makedirs(gdir, exist_ok=True)
     layers = "F.Cu,In1.Cu,In2.Cu,In3.Cu,In4.Cu,B.Cu,F.Paste,B.Paste,F.SilkS,B.SilkS,F.Mask,B.Mask,Edge.Cuts"
     subprocess.check_call(["kicad-cli", "pcb", "export", "gerbers", "-o", gdir + "/", "-l", layers,
