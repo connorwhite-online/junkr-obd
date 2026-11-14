@@ -318,6 +318,8 @@ class Router:
                 if not cands:
                     continue
                 j = min(cands, key=lambda j: math.hypot(pos[i][0] - pos[j][0], pos[i][1] - pos[j][1]))
+                if math.hypot(pos[i][0] - pos[j][0], pos[i][1] - pos[j][1]) > 8.0:
+                    continue    # no decoupler close by: a long pre-route only walls in the pins
                 w = min(w_cls, 0.25)
                 hint = self.grid.cell(*pos[i])
                 src = list(cells[clusters[j]]) if j in clusters else list(plist[j][2])

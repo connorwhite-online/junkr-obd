@@ -227,7 +227,78 @@ def place(board, fps):
     for ref, (x, y, rot) in getattr(PL, "MOVES", {}).items():
         fps[ref].SetOrientationDegrees(rot)
         fps[ref].SetPosition(V(x, y))
+    snap_decouplers(fps, "U100", ("3V3", "VCAP"))
     return placed
+
+
+def snap_decouplers(fps, ic, nets):
+    """Each supply pin of the MCU gets its own decoupling cap, moved to the
+    nearest free spot to that pin. The placer works by sheet and region and had
+    left them 40 mm away, which is useless for decoupling and floods the board
+    with supply tracks. Everything else stays where it is."""
+    import numpy as np
+    G = 0.25
+    sheet = {p.ref: p.sheet for p in CIR.c.parts}
+    u = fps[ic]
+
+    def grid(skip):
+        occ = np.zeros((int(PL.H / G) + 2, int(PL.W / G) + 2), dtype=bool)
+        for ref, fp in fps.items():
+            if ref in skip:
+                continue
+            x0, y0, x1, y1 = courtyard(fp, 0.25)
+            occ[max(0, int(y0 / G)):int(y1 / G) + 1, max(0, int(x0 / G)):int(x1 / G) + 1] = True
+        for (hx, hy) in PL.HOLES:
+            occ[int((hy - 4) / G):int((hy + 4) / G), max(0, int((hx - 4) / G)):int((hx + 4) / G)] = True
+        return occ
+
+    pins = [p for p in u.Pads() if p.GetNetname() in nets]
+    caps = {}
+    for ref, fp in fps.items():
+        ns = sorted(p.GetNetname() for p in fp.Pads())
+        if ref.startswith("C") and sheet.get(ref) == sheet[ic] and len(ns) == 2 and "GND" in ns:
+            n = [x for x in ns if x != "GND"][0]
+            if n in nets:
+                caps.setdefault(n, []).append(ref)
+    for n in caps:   # small caps first: 100n at the pins
+        caps[n].sort(key=lambda r: (fps[r].GetValue() != "100n", r))
+    moved = []
+    for pin in pins:
+        pool = caps.get(pin.GetNetname(), [])
+        if not pool:
+            continue
+        ref = pool.pop(0)
+        fp = fps[ref]
+        occ = grid({ref})
+        px, py = P.ToMM(pin.GetPosition().x), P.ToMM(pin.GetPosition().y)
+        best = None
+        for rot in (0, 90):
+            fp.SetOrientationDegrees(rot)
+            fp.SetPosition(V(0, 0))
+            cx0, cy0, cx1, cy1 = courtyard(fp, 0.25)
+            for r10 in range(0, 80):
+                rad = r10 * 0.25
+                n = max(1, int(2 * math.pi * rad / 0.25))
+                for k in range(n):
+                    a = 2 * math.pi * k / n
+                    x, y = round((px + rad * math.cos(a)) * 4) / 4, round((py + rad * math.sin(a)) * 4) / 4
+                    x0, y0, x1, y1 = cx0 + x, cy0 + y, cx1 + x, cy1 + y
+                    if x0 < 1 or y0 < 1 or x1 > PL.W - 1 or y1 > PL.H - 1:
+                        continue
+                    if not occ[int(y0 / G):int(y1 / G) + 1, int(x0 / G):int(x1 / G) + 1].any():
+                        d = math.hypot(x - px, y - py)
+                        if best is None or d < best[0]:
+                            best = (d, x, y, rot)
+                        break
+                if best and best[0] <= rad:
+                    break
+        if best and best[0] < 12:
+            fp.SetOrientationDegrees(best[3])
+            fp.SetPosition(V(best[1], best[2]))
+            moved.append("%s->%s.%s %.1fmm" % (ref, ic, pin.GetNumber(), best[0]))
+        else:
+            pool.insert(0, ref)
+    print("decouplers:", ", ".join(moved))
 
 
 def outline(board):
