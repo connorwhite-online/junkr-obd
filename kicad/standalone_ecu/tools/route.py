@@ -25,7 +25,7 @@ LAYERS = [P.F_Cu, P.In1_Cu, P.In2_Cu, P.B_Cu]
 PLANE = 1
 
 CLASSES = {  # name: (track width, clearance)
-    "Default": (0.2, 0.15),
+    "Default": tuple(float(v) for v in os.environ.get("ROUTE_DEFAULT", "0.2,0.15").split(",")),
     "Rail": (0.25, 0.15),
     "Power": (0.5, 0.2),
     "HighCurrent": (1.5, 0.25),
@@ -40,6 +40,7 @@ for n in ("PB", "VIN", "VIN_RAW", "V5", "V5_OR", "VRLY", "BUCK_SW", "VBUS", "IGS
     NETCLASS[n] = "Power"
 for n in ("H_SPV", "S_SPV", "O_SPV", "SPV_SHUNT", "SPV_REC_N", "H_TCV", "S_TCV", "O_TCV", "TCV_SHUNT"):
     NETCLASS[n] = "HighCurrent"
+RAIL_PRI = 1 if os.environ.get("ROUTE_RAILFIRST") else 3
 VIA = {"Default": (0.6, 0.3), "Rail": (0.6, 0.3), "Power": (0.8, 0.4), "HighCurrent": (1.0, 0.5)}
 
 lib = ctypes.CDLL(os.environ.get("ROUTER_SO", "/tmp/claude-0/work/router_core2.so"))
@@ -351,7 +352,7 @@ class Router:
             xs = [P.ToMM(p.GetPosition().x) for p, _, _ in plist]
             ys = [P.ToMM(p.GetPosition().y) for p, _, _ in plist]
             span = (max(xs) - min(xs)) + (max(ys) - min(ys))
-            pri = {"HighCurrent": 0, "Power": 1, "Rail": 3, "Default": 2}[NETCLASS.get(net, "Default")]
+            pri = {"HighCurrent": 0, "Power": 1, "Rail": RAIL_PRI, "Default": 2}[NETCLASS.get(net, "Default")]
             order.append((pri, span, net))
         order.sort()
         for k, (_, _, net) in enumerate(order):
@@ -366,7 +367,8 @@ class Router:
                 queue.append(n)
         it = 0
         limit = 2500
-        while queue and it < limit:
+        budget = float(os.environ.get("ROUTE_BUDGET", "1e9"))
+        while queue and it < limit and time.time() - t0 < budget:
             net = queue.pop(0)
             it += 1
             self.rip(net)
@@ -495,9 +497,10 @@ def main():
     r.route_all()
     r.write(board)
     add_zones(board)
-    dst = os.path.join(OUT, "junkr_ecu.kicad_pcb")
+    tag = os.environ.get("ROUTE_TAG", "")
+    dst = os.path.join(OUT, "junkr_ecu%s.kicad_pcb" % tag)
     board.Save(dst)
-    with open(os.path.join(OUT, "route_report.txt"), "w") as f:
+    with open(os.path.join(OUT, "route_report%s.txt" % tag), "w") as f:
         f.write("failed connections: %d\n" % len(r.failed))
         for n, p in r.failed:
             f.write("%s %s\n" % (n, p))
