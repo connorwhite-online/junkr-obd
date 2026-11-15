@@ -51,6 +51,26 @@ def sourcing():
 
 TAILS = ("J2", "J3", "J4")   # hand-made shadow-mode pigtails, never fab assembled
 
+# JLCPCB upload variants. "jlcpcb" is the board as designed. "jlcpcb_lean" is the
+# cheaper build: same values, ratings and packages on cheaper preferred parts,
+# all status LEDs red (a basic part), and the SWD/UPDI fallback headers left
+# off (flashing is over USB-C; fit them by hand if a chip is ever bricked).
+VARIANTS = {
+    "jlcpcb": {"swap": {}, "dnp": TAILS},
+    "jlcpcb_lean": {
+        "swap": {
+            ("SS310", "D_SMA"): ("SS310", "C7420364"),
+            ("BAT54S", "SOT-23"): ("BAT54S", "C7420333"),
+            ("BZT52C12", "D_SOD-123"): ("BZT52C12", "C19077410"),
+            ("BSS123", "SOT-23"): ("BSS123", "C7420338"),
+            ("green", "LED_0603_1608Metric"): ("KT-0603R (red)", "C2286"),
+            ("yellow", "LED_0603_1608Metric"): ("KT-0603R (red)", "C2286"),
+            ("blue", "LED_0603_1608Metric"): ("KT-0603R (red)", "C2286"),
+        },
+        "dnp": TAILS + ("J10", "J12"),
+    },
+}
+
 
 def bom_cpl():
     SRC = sourcing()
@@ -81,29 +101,31 @@ def bom_cpl():
             src = SRC.get((value, fpn.split(":")[1]), {})
             w.writerow([value, ",".join(g["refs"]), fpn.split(":")[1], src.get("MPN") or mpn, src.get("LCSC", ""),
                         len(g["refs"]), "hand solder" if g["hand"] else "SMT", src.get("Buy link", ""), g["note"]])
-    # JLCPCB turnkey assembly: their BOM and CPL formats, everything except the shadow tails
-    jdir = os.path.join(FAB, "jlcpcb")
-    os.makedirs(jdir, exist_ok=True)
-    with open(os.path.join(jdir, "bom_jlcpcb.csv"), "w", newline="") as f:
-        w = csv.writer(f)
-        w.writerow(["Comment", "Designator", "Footprint", "LCSC Part #"])
+    # JLCPCB turnkey assembly: their BOM and CPL formats, one folder per variant
+    for name, var in VARIANTS.items():
+        jdir = os.path.join(FAB, name)
+        os.makedirs(jdir, exist_ok=True)
+        rows = collections.OrderedDict()   # merge lines that end up on the same LCSC part
         for (value, fpn, mpn), g in groups.items():
-            refs = [r for r in g["refs"] if r not in TAILS]
+            refs = [r for r in g["refs"] if r not in var["dnp"]]
             if not refs:
                 continue
-            src = SRC.get((value, fpn.split(":")[1]), {})
-            w.writerow([src.get("MPN") or mpn or value, ",".join(refs), fpn.split(":")[1], src.get("LCSC", "")])
-    with open(os.path.join(jdir, "cpl_jlcpcb.csv"), "w", newline="") as f:
-        w = csv.writer(f)
-        w.writerow(["Designator", "Mid X", "Mid Y", "Layer", "Rotation"])
-        for ref, x, y, side, rot in cpl:
-            if ref not in TAILS:
-                w.writerow([ref, "%.3fmm" % x, "%.3fmm" % y, side.capitalize(), "%.1f" % rot])
-    with open(os.path.join(FAB, "cpl.csv"), "w", newline="") as f:
-        w = csv.writer(f)
-        w.writerow(["Designator", "Mid X", "Mid Y", "Layer", "Rotation"])
-        for ref, x, y, side, rot in cpl:
-            w.writerow([ref, "%.3fmm" % x, "%.3fmm" % y, side, "%.1f" % rot])
+            fps = fpn.split(":")[1]
+            src = SRC.get((value, fps), {})
+            part, lcsc = var["swap"].get((value, fps), (src.get("MPN") or mpn or value, src.get("LCSC", "")))
+            row = rows.setdefault((lcsc or part, fps), [part, [], fps, lcsc])
+            row[1] += refs
+        with open(os.path.join(jdir, "bom_jlcpcb.csv"), "w", newline="") as f:
+            w = csv.writer(f)
+            w.writerow(["Comment", "Designator", "Footprint", "LCSC Part #"])
+            for part, refs, fps, lcsc in rows.values():
+                w.writerow([part, ",".join(refs), fps, lcsc])
+        with open(os.path.join(jdir, "cpl_jlcpcb.csv"), "w", newline="") as f:
+            w = csv.writer(f)
+            w.writerow(["Designator", "Mid X", "Mid Y", "Layer", "Rotation"])
+            for ref, x, y, side, rot in cpl:
+                if ref not in var["dnp"]:
+                    w.writerow([ref, "%.3fmm" % x, "%.3fmm" % y, side.capitalize(), "%.1f" % rot])
     return groups
 
 

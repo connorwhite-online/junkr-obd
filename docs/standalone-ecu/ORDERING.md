@@ -5,8 +5,8 @@ soldered on, through-hole relays and the harness header included. The only
 thing left for you is the three shadow-mode tails (J2-J4), and you only
 need those if you run shadow mode.
 
-Nothing has been ordered. Prices below are estimates from the parts
-library on 2026-11-15; JLCPCB's quote page gives the real number.
+Nothing has been ordered. Prices below are estimates from 2026-11-15;
+JLCPCB's quote page gives the real number.
 
 ## Why JLCPCB
 
@@ -26,8 +26,8 @@ All in `kicad/standalone_ecu/fab/`:
 | Upload as | File |
 | --- | --- |
 | Gerber | `junkr_ecu_gerbers.zip` |
-| BOM | `jlcpcb/bom_jlcpcb.csv` (Comment, Designator, Footprint, LCSC Part #) |
-| CPL (pick and place) | `jlcpcb/cpl_jlcpcb.csv` |
+| BOM | `jlcpcb/bom_jlcpcb.csv` (or `jlcpcb_lean/`) |
+| CPL (pick and place) | `jlcpcb/cpl_jlcpcb.csv` (or `jlcpcb_lean/`) |
 
 `bom.csv` is the full BOM with the exact MPN and a buy link for every line.
 `tools/sourcing.csv` is where the part choices live; `gen_fab.py`
@@ -56,24 +56,71 @@ regenerates all of the above from the board.
 7. Pay only after you've checked the preview. JLCPCB's engineers review
    the order and email if anything needs a decision.
 
-## Estimate
+## Two upload zips
 
-| | 2 boards assembled | 5 boards assembled |
+| Zip | What it is |
+| --- | --- |
+| `jlcpcb_order_files.zip` | the board as designed (`fab/jlcpcb/`) |
+| `jlcpcb_lean_order_files.zip` | cheaper build (`fab/jlcpcb_lean/`): SS310, BAT54S, BZT52C12 and BSS123 on JLCPCB "preferred" parts with the same value, rating and package; all six status LEDs red (a basic part) instead of green/yellow/blue; SWD (J10) and UPDI (J12) headers left off. Flashing is over USB-C either way; J12 is a plain 3-pin header you can add by hand if a chip ever needs rescue |
+
+Both use the same Gerbers. The lean zip saves only about $10 per order,
+for the reasons below.
+
+## Where the money goes
+
+Estimate for Standard PCBA (ESP32 modules are generally among JLCPCB's
+"Standard only" parts), using JLCPCB's published fees on 2026-11-15
+and LCSC part prices at the order quantity. The PCB price is the
+shakiest number: JLCPCB doesn't publish 6-layer prices for a board this
+size, so it's scaled from their 100 x 100 mm price. Upload the zip to
+their quote page for the real figure.
+
+| | 1 board | 2 boards | 5 boards |
+| --- | --- | --- | --- |
+| 6-layer PCB, 5 pcs (minimum), ENIG | ~$100 (80-130) | ~$100 | ~$100 |
+| Parts (LCSC prices; J1 and K1-K3 via Global Sourcing) | $111 | $218 | $514 |
+| Setup $25.56, stencil $8.21, hand-solder $3.58, misc ~$1 | $38 | $38 | $38 |
+| Feeder loading, $1.53 for each of 85 SMT part types | $130 | $130 | $130 |
+| Joints: 1,463 SMT at $0.0016, 152 through-hole at $0.0164 | $5 | $10 | $24 |
+| **Current build** | **~$385** | **~$495** | **~$805** |
+| **Lean zip** (81 part types, cheaper parts) | ~$375 | ~$485 | ~$790 |
+
+Shipping and tax are extra, typically $20-40 by DHL.
+
+Why so much, and why the swap barely helps:
+
+- **Parts are about half.** Roughly $110 a board, mostly a few chips:
+  MAX9926 x2 ($18), STM32H743 ($11), DRV8803 x5 ($11), INA240 x2 ($10),
+  relays ($14), ESP32-S3 ($5). The resistors and capacitors together are
+  under $5.
+- **Feeder loading is a third.** On Standard assembly JLCPCB charges
+  $1.53 for every distinct part type loaded onto the machines, basic or
+  extended. This board has 85 types, so about $130 per order, however
+  many boards. Swapping to basic parts only saves this fee on Economic
+  assembly, which this board can't use because of the ESP32 module.
+- **The PCB is fixed.** 5 boards is the minimum whether you assemble 1
+  or 5.
+
+## Options
+
+| Option | 2 boards | Trade-off |
 | --- | --- | --- |
-| Parts from the JLCPCB library | ~$190 | ~$440 |
-| J1 + K1-K3 via Global Sourcing | ~$50 | ~$125 |
-| 6-layer PCB, 5 pcs, ENIG | ~$150-250 | ~$150-250 |
-| Assembly: setup, stencil, 61 extended-part loading fees ($3 each), SMT and THT joints | ~$230 | ~$270 |
-| **Total before shipping and tax** | **~$620-720** | **~$985-1085** |
+| A. Current build, `jlcpcb_order_files.zip` | ~$495 | Nothing to solder except the shadow tails. |
+| B. Lean build, `jlcpcb_lean_order_files.zip` | ~$485 | All status LEDs are red, and no SWD/UPDI headers (USB-C still flashes everything). |
+| C. Assemble just 1 board (either zip, quantity 1) | ~$375-385 | The cheapest way to a working prototype. A second board later repeats the ~$170 setup and feeder fees. |
+| D. Bare boards + parts, solder it yourself | ~$220 for 1 | You place 353 parts including a 144-pin 0.5 mm chip. Realistic with a stencil and hot plate, but it's a weekend and a half. |
+| E. Relays as an add-on | not offered | The relays connect this board's drivers to the harness in both modes, so dropping them needs a board change. It would also remove the hardware fuel cut. Saves ~$15 a board. |
+| F. 4-layer board | not offered | At this size it didn't route on 4 layers (150+ connections left over). It would need a bigger board and enclosure, and saves only ~$40-60 on the PCB. |
 
-Per board that is roughly $310-360 for two or $200-220 for five. The
-extended-part fees are per order, not per board, so the fifth board is
-much cheaper than the second. The board has 1,463 SMT joints and 152
-through-hole joints (the tails excluded).
+The bigger savings would come from a rev B that changes chips, at
+roughly $30-40 a board. Examples: a cheaper STM32 (H723), cheaper
+current-sense amps instead of the INA240s, and smaller relays. Each of
+those needs re-checking against the [VERIFY] list, so they aren't done
+here.
 
-Parts in short supply for a 5-board order (check before ordering):
-MAX9926 (60 in stock, 10 needed), SUD50P10-43L (35, 5), PTS810 boot
-switch (51, 5), ATtiny1616 (335, 5), INA240A1 (438, 10).
+Parts with thin stock (check before ordering 5): MAX9926 (60 in stock,
+10 needed), SUD50P10-43L (35, 5), PTS810 boot switch (51, 5),
+ATtiny1616 (335, 5), INA240A1 (438, 10).
 
 ## What arrives, and what's left for you
 
