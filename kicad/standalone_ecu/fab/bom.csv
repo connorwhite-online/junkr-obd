@@ -1,96 +1,96 @@
-Comment,Designator,Footprint,MPN,Qty,Assembly,Note
-1u,C1,C_0805_2012Metric,,1,SMT,
-10u,"C10,C12,C14,C20,C97",C_0805_2012Metric,,5,SMT,
-4u7,"C100,C32",C_0805_2012Metric,,2,SMT,
-100n,"C101,C17,C19,C2,C21,C22,C23,C24,C25,C26,C27,C28,C29,C30,C31,C36,C39,C40,C41,C42,C47,C5,C52,C62,C66,C69,C70,C71,C72,C73,C74,C75,C77,C79,C81,C83,C86,C88,C90,C92,C93,C94,C95,C96,C98",C_0603_1608Metric,,45,SMT,
-1u,"C11,C13,C15,C16,C18,C35,C85,C89,C99",C_0603_1608Metric,,9,SMT,
-2u2 100V,"C3,C4",C_1210_3225Metric,,2,SMT,
-2u2,"C33,C34",C_0603_1608Metric,,2,SMT,
-12p,"C37,C38",C_0603_1608Metric,,2,SMT,
-10n,"C43,C44,C45,C46,C48,C49,C50,C51,C53,C54,C55,C56,C57,C58,C61,C65",C_0603_1608Metric,,16,SMT,
-1n,"C59,C60,C63,C64,C67,C68,C87,C91",C_0603_1608Metric,,8,SMT,
-4n7,C6,C_0603_1608Metric,,1,SMT,
-47p,C7,C_0603_1608Metric,,1,SMT,
-1u 50V,"C76,C78,C80,C82,C84",C_0805_2012Metric,,5,SMT,
-22u,"C8,C9",C_1206_3216Metric,,2,SMT,
-1N4148W,"D1,D2,D3,D4",D_SOD-123,1N4148W,4,SMT,
-SS310,"D10,D11,D18,D19,D21,D23,D6,D7",D_SMA,SS310,8,SMT,100 V 3 A Schottky
-green,"D12,D13",LED_0603_1608Metric,,2,SMT,
-red,"D14,D25",LED_0603_1608Metric,,2,SMT,
-BAT54S,"D15,D16",SOT-23,BAT54S,2,SMT,
-BZT52C12,"D17,D22,D5",D_SOD-123,BZT52C12,3,SMT,12 V zener
-SMCJ58A,D20,D_SMC,SMCJ58A,1,SMT,SPV clamp
-yellow,D24,LED_0603_1608Metric,,1,SMT,
-blue,D26,LED_0603_1608Metric,,1,SMT,
-SMCJ33A,D8,D_SMC,SMCJ33A,1,SMT,load dump
-B360A,D9,D_SMA,B360A-13-F,1,SMT,buck catch diode
-PTC 1.1A,F1,Fuse_1812_4532Metric,1812L110/33MR,1,SMT,Littelfuse 33 V
-PTC 0.5A,F2,Fuse_1812_4532Metric,1812L050/30PR,1,SMT,
-600R@100MHz,FB1,L_0603_1608Metric,,1,SMT,
-TE 176122-6,J1,TE_176122-6_RA,176122-6,1,hand solder,or Ballenger CONN-100747
-SWD 2x5 1.27,J10,PinHeader_2x05_P1.27mm_Vertical_SMD,FTSH-105-01-F-DV-K,1,SMT,Samtec
-RUN switch,J11,JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical,,1,hand solder,
-UPDI,J12,PinHeader_1x03_P2.54mm_Vertical,,1,hand solder,
-Tails E5,J2,Tails_E5,,1,hand solder,
-Tails E6,J3,Tails_E6,,1,hand solder,
-Tails E8,J4,Tails_E8,,1,hand solder,
-USB-C,J5,USB_C_Receptacle_HRO_TYPE-C-31-M-12,TYPE-C-31-M-12,1,hand solder,HRO 16P
-microSD,J6,microSD_HC_Hirose_DM3AT-SF-PEJM5,DM3AT-SF-PEJM5,1,hand solder,Hirose
-Micro-Fit 2x6,J7,Molex_Micro-Fit_3.0_43045-1212_2x06_P3.00mm_Vertical,43045-1212,1,hand solder,Molex vertical
-G5LE-1-DC12,"K1,K2,K3",Relay_SPDT_Omron-G5LE-1,G5LE-1 DC12,3,hand solder,Omron SPDT 10 A
-G5V-2-H1-DC12,"K4,K5,K6,K7",Relay_DPDT_Omron_G5V-2,G5V-2-H1 DC12,4,hand solder,"Omron DPDT 2 A, 150 mW coil"
-10uH,L1,L_Sunlord_SWPA6045S,SWPA6045S100MT,1,SMT,Sunlord 10 uH 3 A
-2N7002,"Q1,Q11,Q17,Q18,Q2,Q3,Q4,Q6,Q7,Q9",SOT-23,2N7002,10,SMT,
-Si2309CDS,"Q10,Q5,Q8",SOT-23,SI2309CDS-T1-GE3,3,SMT,60 V P-FET
-AO3422,Q12,SOT-23,AO3422,1,SMT,55 V 2 A
-IPD50N10S3L-16,"Q13,Q16",TO-252-2,IPD50N10S3L16ATMA1,2,SMT,"100 V logic-level N-FET, DPAK"
-SUD50P10-43L,Q14,TO-252-2,SUD50P10-43L-E3,1,SMT,"100 V P-FET, DPAK [VERIFY stock]"
-BSS123,Q15,SOT-23,BSS123,1,SMT,100 V
-0,"R1,R115,R29,R31",R_0603_1608Metric,,4,SMT,
-47k,"R10,R80",R_0603_1608Metric,,2,SMT,
-100k,"R100,R101,R110,R12,R20,R3,R38,R39,R40,R5,R62,R66,R7,R70,R74,R82,R83,R89,R9,R92,R98,R99",R_0603_1608Metric,,22,SMT,
-10k,"R102,R108,R109,R114,R16,R19,R23,R24,R27,R28,R42,R43,R48,R49,R50,R51,R52,R53,R54,R55,R56,R57,R58,R59,R60,R78,R79,R85,R87,R90,R94,R96",R_0603_1608Metric,,32,SMT,
-1k,"R103,R104,R105,R106,R107,R111,R2,R21,R22,R25,R26,R4,R6,R8",R_0603_1608Metric,,14,SMT,
-4k7,"R11,R18,R65,R69,R73,R77,R81",R_0603_1608Metric,,7,SMT,
-5k1,"R112,R113",R_0603_1608Metric,,2,SMT,
-16k5,R13,R_0603_1608Metric,,1,SMT,
-196k,R14,R_0603_1608Metric,,1,SMT,
-52k3,R15,R_0603_1608Metric,,1,SMT,
-16k9,R17,R_0603_1608Metric,,1,SMT,
-120,R30,R_0603_1608Metric,,1,SMT,
-2k49 1%,"R32,R33,R34,R35,R36,R37",R_0603_1608Metric,,6,SMT,
-15k,"R41,R91,R97",R_0603_1608Metric,,3,SMT,
-1M,"R44,R46,R64,R68,R72,R76",R_0603_1608Metric,,6,SMT,
-22k,"R45,R47,R63,R67,R71,R75",R_0603_1608Metric,,6,SMT,
-1k5,R61,R_0603_1608Metric,,1,SMT,
-4R7,R84,R_0603_1608Metric,,1,SMT,
-0R02 2W,R86,R_2512_6332Metric,,1,SMT,
-2k2,R88,R_0603_1608Metric,,1,SMT,
-10R,R93,R_0603_1608Metric,,1,SMT,
-0R05 1W,R95,R_2512_6332Metric,,1,SMT,
-47k,"RN1,RN4,RN7",R_Array_Convex_4x0603,,3,SMT,
-100k,"RN10,RN12,RN14,RN16,RN18,RN20,RN22,RN24,RN26,RN28,RN30,RN32",R_Array_Convex_4x0603,,12,SMT,
-22k,"RN11,RN13,RN15,RN17,RN19,RN21,RN23,RN25,RN27,RN29,RN31,RN33",R_Array_Convex_4x0603,,12,SMT,
-10k,"RN2,RN34,RN5,RN8",R_Array_Convex_4x0603,,4,SMT,
-15k,"RN3,RN6,RN9",R_Array_Convex_4x0603,,3,SMT,
-BOOT,SW1,SW_SPST_PTS810,,1,SMT,
-10k NTC,TH1,R_0603_1608Metric,NCP18XH103F03RB,1,SMT,
-TPS54360B,U1,TI_SO-PowerPAD-8_ThermalVias,TPS54360BDDAR,1,SMT,
-MCP6004,"U10,U8,U9",SOIC-14_3.9x8.7mm_P1.27mm,MCP6004T-I/SL,3,SMT,
-STM32H743ZIT6,U100,LQFP-144_20x20mm_P0.5mm,STM32H743ZIT6,1,SMT,
-MAX9926UAEE+,"U11,U12",QSOP-16_3.9x4.9mm_P0.635mm,MAX9926UAEE+,2,SMT,
-LM2903,"U13,U14",SOIC-8_3.9x4.9mm_P1.27mm,LM2903DR,2,SMT,
-CD74HC4067M,"U15,U16,U17",SOIC-24W_7.5x15.4mm_P1.27mm,CD74HC4067M96,3,SMT,
-DRV8803DW,"U18,U19,U20,U21,U22",SOIC-20W_7.5x12.8mm_P1.27mm,DRV8803DWR,5,SMT,
-AP2112K-3.3,"U2,U3",SOT-23-5,AP2112K-3.3TRG1,2,SMT,
-UCC27517ADBVR,"U23,U26",SOT-23-5,UCC27517ADBVR,2,SMT,
-INA240A1,"U24,U27",SOIC-8_3.9x4.9mm_P1.27mm,INA240A1DR,2,SMT,
-74LVC1G08,"U25,U28,U29,U30,U31",SOT-23-5,SN74LVC1G08DBVR,5,SMT,
-ATtiny1616-SN,U32,SOIC-20W_7.5x12.8mm_P1.27mm,ATTINY1616-SNR,1,SMT,
-ESP32-S3-WROOM-1-N16R8,U33,ESP32-S3-WROOM-1,ESP32-S3-WROOM-1-N16R8,1,SMT,
-USBLC6-2SC6,U34,SOT-23-6,USBLC6-2SC6,1,SMT,
-REF3030,U4,SOT-23,REF3030AIDBZR,1,SMT,
-TPS7B4253QDDARQ1,U5,HSOP-8-1EP_3.9x4.9mm_P1.27mm_EP2.41x3.1mm,TPS7B4253QDDARQ1,1,SMT,
-LM4040-5.0,U6,SOT-23,LM4040DIM3-5.0/NOPB,1,SMT,LM4040DBZ-5 footprint
-SN65HVD230,U7,SOIC-8_3.9x4.9mm_P1.27mm,SN65HVD230DR,1,SMT,
-25MHz,Y1,Crystal_SMD_3225-4Pin_3.2x2.5mm,ABM8-25.000MHZ-B2-T,1,SMT,"3225, 18 pF"
+Comment,Designator,Footprint,MPN,LCSC,Qty,Assembly,Buy link,Note
+1u,C1,C_0805_2012Metric,CL21B105KBFNNNE,C28323,1,SMT,https://www.lcsc.com/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_samsung-electro-mechanics-cl21b105kbfnnne_C28323.html,
+10u,"C10,C12,C14,C20,C97",C_0805_2012Metric,CL21A106KAYNNNE,C15850,5,SMT,https://www.lcsc.com/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_samsung-electro-mechanics-cl21a106kaynnne_C15850.html,
+4u7,"C100,C32",C_0805_2012Metric,CL21A475KAQNNNE,C1779,2,SMT,https://www.lcsc.com/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_samsung-electro-mechanics-cl21a475kaqnnne_C1779.html,
+100n,"C101,C17,C19,C2,C21,C22,C23,C24,C25,C26,C27,C28,C29,C30,C31,C36,C39,C40,C41,C42,C47,C5,C52,C62,C66,C69,C70,C71,C72,C73,C74,C75,C77,C79,C81,C83,C86,C88,C90,C92,C93,C94,C95,C96,C98",C_0603_1608Metric,CC0603KRX7R9BB104,C14663,45,SMT,https://www.lcsc.com/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_yageo-cc0603krx7r9bb104_C14663.html,
+1u,"C11,C13,C15,C16,C18,C35,C85,C89,C99",C_0603_1608Metric,CL10A105KB8NNNC,C15849,9,SMT,https://www.lcsc.com/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_samsung-electro-mechanics-cl10a105kb8nnnc_C15849.html,
+2u2 100V,"C3,C4",C_1210_3225Metric,GRM32ER72A225KA35L,C86054,2,SMT,https://www.lcsc.com/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_murata-electronics-grm32er72a225ka35l_C86054.html,
+2u2,"C33,C34",C_0603_1608Metric,CL10A225KO8NNNC,C23630,2,SMT,https://www.lcsc.com/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_samsung-electro-mechanics-cl10a225ko8nnnc_C23630.html,
+12p,"C37,C38",C_0603_1608Metric,CL10C120JB8NNNC,C38523,2,SMT,https://www.lcsc.com/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_samsung-electro-mechanics-cl10c120jb8nnnc_C38523.html,
+10n,"C43,C44,C45,C46,C48,C49,C50,C51,C53,C54,C55,C56,C57,C58,C61,C65",C_0603_1608Metric,0603B103K500NT,C57112,16,SMT,https://www.lcsc.com/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_fh-guangdong-fenghua-advanced-tech-0603b103k500nt_C57112.html,
+1n,"C59,C60,C63,C64,C67,C68,C87,C91",C_0603_1608Metric,CL10B102KB8NNNC,C1588,8,SMT,https://www.lcsc.com/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_samsung-electro-mechanics-cl10b102kb8nnnc_C1588.html,
+4n7,C6,C_0603_1608Metric,0603B472K500NT,C53987,1,SMT,https://www.lcsc.com/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_fh-guangdong-fenghua-advanced-tech-0603b472k500nt_C53987.html,
+47p,C7,C_0603_1608Metric,CL10C470JB8NNNC,C1671,1,SMT,https://www.lcsc.com/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_samsung-electro-mechanics-cl10c470jb8nnnc_C1671.html,
+1u 50V,"C76,C78,C80,C82,C84",C_0805_2012Metric,CL21B105KBFNNNE,C28323,5,SMT,https://www.lcsc.com/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_samsung-electro-mechanics-cl21b105kbfnnne_C28323.html,
+22u,"C8,C9",C_1206_3216Metric,CL31A226KAHNNNE,C12891,2,SMT,https://www.lcsc.com/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_samsung-electro-mechanics-cl31a226kahnnne_C12891.html,
+1N4148W,"D1,D2,D3,D4",D_SOD-123,1N4148W,C81598,4,SMT,https://www.lcsc.com/product-detail/switching-diodes_st-semtech-1n4148w_C81598.html,
+SS310,"D10,D11,D18,D19,D21,D23,D6,D7",D_SMA,SS310,C15874,8,SMT,https://www.lcsc.com/product-detail/schottky-diodes_mdd-microdiode-semiconductor-ss310_C15874.html,100 V 3 A Schottky
+green,"D12,D13",LED_0603_1608Metric,LTST-C191KGKT,C125098,2,SMT,https://www.lcsc.com/product-detail/led-indication-discrete_lite-on-ltst-c191kgkt_C125098.html,
+red,"D14,D25",LED_0603_1608Metric,KT-0603R,C2286,2,SMT,https://www.lcsc.com/product-detail/led-indication-discrete_hubei-kento-elec-kt-0603r_C2286.html,
+BAT54S,"D15,D16",SOT-23,BAT54S,C19726,2,SMT,https://www.lcsc.com/product-detail/schottky-diodes_onsemi-bat54slt1g_C19726.html,
+BZT52C12,"D17,D22,D5",D_SOD-123,BZT52C12-7-F,C124196,3,SMT,https://www.lcsc.com/product-detail/zener-diodes_diodes-incorporated-bzt52c12-7-f_C124196.html,12 V zener
+SMCJ58A,D20,D_SMC,SMCJ58A,C357975,1,SMT,https://www.lcsc.com/product-detail/esd-and-surge-protection-tvs-esd_dowo-smcj58a_C357975.html,SPV clamp
+yellow,D24,LED_0603_1608Metric,LTST-C191KSKT,C125100,1,SMT,https://www.lcsc.com/product-detail/led-indication-discrete_lite-on-ltst-c191kskt_C125100.html,
+blue,D26,LED_0603_1608Metric,LTST-C191TBKT,C99290,1,SMT,https://www.lcsc.com/product-detail/led-indication-discrete_lite-on-ltst-c191tbkt_C99290.html,
+SMCJ33A,D8,D_SMC,SMCJ33A,C438109,1,SMT,https://www.lcsc.com/product-detail/esd-and-surge-protection-tvs-esd_shandong-jingdao-microelectronics-smcj33a_C438109.html,load dump
+B360A,D9,D_SMA,B360A-13-F,C94193,1,SMT,https://www.lcsc.com/product-detail/schottky-diodes_diodes-incorporated-b360a-13-f_C94193.html,buck catch diode
+PTC 1.1A,F1,Fuse_1812_4532Metric,1812L110/33MR,C142747,1,SMT,https://www.lcsc.com/product-detail/resettable-fuses_littelfuse-1812l110-33mr_C142747.html,Littelfuse 33 V
+PTC 0.5A,F2,Fuse_1812_4532Metric,1812L050/30PR,C151168,1,SMT,https://www.lcsc.com/product-detail/resettable-fuses_littelfuse-1812l050-30pr_C151168.html,
+600R@100MHz,FB1,L_0603_1608Metric,BLM18KG601SN1D,C85833,1,SMT,https://www.lcsc.com/product-detail/ferrite-beads_murata-electronics-blm18kg601sn1d_C85833.html,
+TE 176122-6,J1,TE_176122-6_RA,176122-6,C5171845,1,hand solder,https://www.mouser.com/ProductDetail/TE-Connectivity/176122-6,or Ballenger CONN-100747
+SWD 2x5 1.27,J10,PinHeader_2x05_P1.27mm_Vertical_SMD,FTSH-105-01-F-DV-K,C5382952,1,SMT,https://www.lcsc.com/product-detail/pin-headers_samtec-ftsh-105-01-f-dv-k_C5382952.html,Samtec
+RUN switch,J11,JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical,B2B-PH-K-S(LF)(SN),C131337,1,hand solder,https://www.lcsc.com/product-detail/wire-to-board-connector_jst-b2b-ph-k-s-lf-sn_C131337.html,
+UPDI,J12,PinHeader_1x03_P2.54mm_Vertical,PZ254V-11-03P,C2937625,1,hand solder,https://www.lcsc.com/product-detail/pin-headers_xfcn-pz254v-11-03p_C2937625.html,
+Tails E5,J2,Tails_E5,,,1,hand solder,,
+Tails E6,J3,Tails_E6,,,1,hand solder,,
+Tails E8,J4,Tails_E8,,,1,hand solder,,
+USB-C,J5,USB_C_Receptacle_HRO_TYPE-C-31-M-12,TYPE-C-31-M-12,C165948,1,hand solder,https://www.lcsc.com/product-detail/usb-connectors_korean-hroparts-elec-type-c-31-m-12_C165948.html,HRO 16P
+microSD,J6,microSD_HC_Hirose_DM3AT-SF-PEJM5,DM3AT-SF-PEJM5,C114218,1,hand solder,https://www.lcsc.com/product-detail/sd-card-memory-card-connector_hrs-hirose-dm3at-sf-pejm5_C114218.html,Hirose
+Micro-Fit 2x6,J7,Molex_Micro-Fit_3.0_43045-1212_2x06_P3.00mm_Vertical,43045-1212,C485572,1,hand solder,https://www.lcsc.com/product-detail/wire-to-board-connector_molex-430451212_C485572.html,Molex vertical
+G5LE-1-DC12,"K1,K2,K3",Relay_SPDT_Omron-G5LE-1,G5LE-1-DC12,C152694,3,hand solder,https://www.mouser.com/ProductDetail/Omron-Electronics/G5LE-1-DC12,Omron SPDT 10 A
+G5V-2-H1-DC12,"K4,K5,K6,K7",Relay_DPDT_Omron_G5V-2,G5V-2-H1-DC12,C128021,4,hand solder,https://www.lcsc.com/product-detail/signal-relays_omron-electronics-g5v-2-h1-dc12_C128021.html,"Omron DPDT 2 A, 150 mW coil"
+10uH,L1,L_Sunlord_SWPA6045S,SWPA6045S100MT,C79272,1,SMT,https://www.lcsc.com/product-detail/power-inductors_sunlord-swpa6045s100mt_C79272.html,Sunlord 10 uH 3 A
+2N7002,"Q1,Q11,Q17,Q18,Q2,Q3,Q4,Q6,Q7,Q9",SOT-23,2N7002,C8545,10,SMT,https://www.lcsc.com/product-detail/mosfets_jiangsu-changjing-electronics-technology-co-ltd-2n7002_C8545.html,
+Si2309CDS,"Q10,Q5,Q8",SOT-23,SI2309CDS-T1-GE3,C10493,3,SMT,https://www.lcsc.com/product-detail/mosfets_vishay-intertech-si2309cds-t1-ge3_C10493.html,60 V P-FET
+AO3422,Q12,SOT-23,AO3422,C37130,1,SMT,https://www.lcsc.com/product-detail/mosfets_alpha-omega-semicon-ao3422_C37130.html,55 V 2 A
+IPD50N10S3L-16,"Q13,Q16",TO-252-2,IPD50N10S3L16ATMA1,C3279057,2,SMT,https://www.lcsc.com/product-detail/mosfets_infineon-technologies-ipd50n10s3l16atma1_C3279057.html,"100 V logic-level N-FET, DPAK"
+SUD50P10-43L,Q14,TO-252-2,SUD50P10-43L-E3,C5456609,1,SMT,https://www.lcsc.com/product-detail/mosfets_vbsemi-elec-sud50p10-43l-e3-vb_C5456609.html,"100 V P-FET, DPAK [VERIFY stock]"
+BSS123,Q15,SOT-23,BSS123,C78962,1,SMT,https://www.lcsc.com/product-detail/mosfets_nexperia-bss123-215_C78962.html,100 V
+0,"R1,R115,R29,R31",R_0603_1608Metric,0603WAF0000T5E,C21189,4,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_uni-royal-uniroyal-elec-0603waf0000t5e_C21189.html,
+47k,"R10,R80",R_0603_1608Metric,0603WAF4702T5E,C25819,2,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_uni-royal-uniroyal-elec-0603waf4702t5e_C25819.html,
+100k,"R100,R101,R110,R12,R20,R3,R38,R39,R40,R5,R62,R66,R7,R70,R74,R82,R83,R89,R9,R92,R98,R99",R_0603_1608Metric,0603WAF1003T5E,C25803,22,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_uni-royal-uniroyal-elec-0603waf1003t5e_C25803.html,
+10k,"R102,R108,R109,R114,R16,R19,R23,R24,R27,R28,R42,R43,R48,R49,R50,R51,R52,R53,R54,R55,R56,R57,R58,R59,R60,R78,R79,R85,R87,R90,R94,R96",R_0603_1608Metric,0603WAF1002T5E,C25804,32,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_uni-royal-uniroyal-elec-0603waf1002t5e_C25804.html,
+1k,"R103,R104,R105,R106,R107,R111,R2,R21,R22,R25,R26,R4,R6,R8",R_0603_1608Metric,0603WAF1001T5E,C21190,14,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_uni-royal-uniroyal-elec-0603waf1001t5e_C21190.html,
+4k7,"R11,R18,R65,R69,R73,R77,R81",R_0603_1608Metric,0603WAF4701T5E,C23162,7,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_uni-royal-uniroyal-elec-0603waf4701t5e_C23162.html,
+5k1,"R112,R113",R_0603_1608Metric,0603WAF5101T5E,C23186,2,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_uni-royal-uniroyal-elec-0603waf5101t5e_C23186.html,
+16k5,R13,R_0603_1608Metric,RC0603FR-0716K5L,C273769,1,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_yageo-rc0603fr-0716k5l_C273769.html,
+196k,R14,R_0603_1608Metric,RC0603FR-07196KL,C273761,1,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_yageo-rc0603fr-07196kl_C273761.html,
+52k3,R15,R_0603_1608Metric,RC0603FR-0752K3L,C185323,1,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_yageo-rc0603fr-0752k3l_C185323.html,
+16k9,R17,R_0603_1608Metric,RC0603FR-0716K9L,C137789,1,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_yageo-rc0603fr-0716k9l_C137789.html,
+120,R30,R_0603_1608Metric,0603WAF1200T5E,C22787,1,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_uni-royal-uniroyal-elec-0603waf1200t5e_C22787.html,
+2k49 1%,"R32,R33,R34,R35,R36,R37",R_0603_1608Metric,RC0603FR-072K49L,C108190,6,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_yageo-rc0603fr-072k49l_C108190.html,
+15k,"R41,R91,R97",R_0603_1608Metric,0603WAF1502T5E,C22809,3,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_uni-royal-uniroyal-elec-0603waf1502t5e_C22809.html,
+1M,"R44,R46,R64,R68,R72,R76",R_0603_1608Metric,0603WAF1004T5E,C22935,6,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_uni-royal-uniroyal-elec-0603waf1004t5e_C22935.html,
+22k,"R45,R47,R63,R67,R71,R75",R_0603_1608Metric,0603WAF2202T5E,C31850,6,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_uni-royal-uniroyal-elec-0603waf2202t5e_C31850.html,
+1k5,R61,R_0603_1608Metric,0603WAF1501T5E,C22843,1,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_uni-royal-uniroyal-elec-0603waf1501t5e_C22843.html,
+4R7,R84,R_0603_1608Metric,0603WAF470KT5E,C23164,1,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_uni-royal-uniroyal-elec-0603waf470kt5e_C23164.html,
+0R02 2W,R86,R_2512_6332Metric,CRA2512-FZ-R020ELF,C840620,1,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_bourns-cra2512-fz-r020elf_C840620.html,
+2k2,R88,R_0603_1608Metric,0603WAF2201T5E,C4190,1,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_uni-royal-uniroyal-elec-0603waf2201t5e_C4190.html,
+10R,R93,R_0603_1608Metric,0603WAF100JT5E,C22859,1,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_uni-royal-uniroyal-elec-0603waf100jt5e_C22859.html,
+0R05 1W,R95,R_2512_6332Metric,WSL2512R0500FEA,C413486,1,SMT,https://www.lcsc.com/product-detail/chip-resistor-surface-mount_vishay-intertech-wsl2512r0500fea_C413486.html,
+47k,"RN1,RN4,RN7",R_Array_Convex_4x0603,YC164-JR-0747KL,C779384,3,SMT,https://www.lcsc.com/product-detail/resistor-networks-arrays_yageo-yc164-jr-0747kl_C779384.html,
+100k,"RN10,RN12,RN14,RN16,RN18,RN20,RN22,RN24,RN26,RN28,RN30,RN32",R_Array_Convex_4x0603,YC164-JR-07100KL,C192933,12,SMT,https://www.lcsc.com/product-detail/resistor-networks-arrays_yageo-yc164-jr-07100kl_C192933.html,
+22k,"RN11,RN13,RN15,RN17,RN19,RN21,RN23,RN25,RN27,RN29,RN31,RN33",R_Array_Convex_4x0603,YC164-FR-0722KL,C728875,12,SMT,https://www.lcsc.com/product-detail/resistor-networks-arrays_yageo-yc164-fr-0722kl_C728875.html,
+10k,"RN2,RN34,RN5,RN8",R_Array_Convex_4x0603,YC164-JR-0710KL,C107374,4,SMT,https://www.lcsc.com/product-detail/resistor-networks-arrays_yageo-yc164-jr-0710kl_C107374.html,
+15k,"RN3,RN6,RN9",R_Array_Convex_4x0603,YC164-JR-0715KL,C695201,3,SMT,https://www.lcsc.com/product-detail/resistor-networks-arrays_yageo-yc164-jr-0715kl_C695201.html,
+BOOT,SW1,SW_SPST_PTS810,PTS810 SJM 250 SMTR LFS,C116501,1,SMT,https://www.lcsc.com/product-detail/tactile-switches_c-k-pts810sjm250smtrlfs_C116501.html,
+10k NTC,TH1,R_0603_1608Metric,NCP18XH103F03RB,C13564,1,SMT,https://www.lcsc.com/product-detail/ntc-thermistors_murata-electronics-ncp18xh103f03rb_C13564.html,
+TPS54360B,U1,TI_SO-PowerPAD-8_ThermalVias,TPS54360BDDAR,C524806,1,SMT,https://www.lcsc.com/product-detail/dc-dc-converters_texas-instruments-tps54360bddar_C524806.html,
+MCP6004,"U10,U8,U9",SOIC-14_3.9x8.7mm_P1.27mm,MCP6004T-I/SL,C7378,3,SMT,https://www.lcsc.com/product-detail/operational-amplifier_microchip-tech-mcp6004t-i-sl_C7378.html,
+STM32H743ZIT6,U100,LQFP-144_20x20mm_P0.5mm,STM32H743ZIT6,C114408,1,SMT,https://www.lcsc.com/product-detail/microcontrollers-mcu-mpu-soc_stmicroelectronics-stm32h743zit6_C114408.html,
+MAX9926UAEE+,"U11,U12",QSOP-16_3.9x4.9mm_P0.635mm,MAX9926UAEE+T,C970723,2,SMT,https://www.lcsc.com/product-detail/C970723.html,
+LM2903,"U13,U14",SOIC-8_3.9x4.9mm_P1.27mm,LM2903DR,C57474,2,SMT,https://www.lcsc.com/product-detail/comparators_onsemi-lm2903dr2g_C57474.html,
+CD74HC4067M,"U15,U16,U17",SOIC-24W_7.5x15.4mm_P1.27mm,CD74HC4067M96,C496123,3,SMT,https://www.lcsc.com/product-detail/analog-switches-multiplexers_texas-instruments-cd74hc4067m96_C496123.html,
+DRV8803DW,"U18,U19,U20,U21,U22",SOIC-20W_7.5x12.8mm_P1.27mm,DRV8803DWR,C543038,5,SMT,https://www.lcsc.com/product-detail/stepper-motor-driver_texas-instruments-drv8803dwr_C543038.html,
+AP2112K-3.3,"U2,U3",SOT-23-5,AP2112K-3.3TRG1,C23380830,2,SMT,https://www.lcsc.com/product-detail/voltage-regulators-linear-low-drop-out-ldo-regulators_tech-public-ap2112k-3-3trg1_C23380830.html,
+UCC27517ADBVR,"U23,U26",SOT-23-5,UCC27517ADBVR,C20623192,2,SMT,https://www.lcsc.com/product-detail/gate-drivers_umw-youtai-semiconductor-co-ltd-ucc27517adbvr-umw_C20623192.html,
+INA240A1,"U24,U27",SOIC-8_3.9x4.9mm_P1.27mm,INA240A1DR,C2060769,2,SMT,https://www.lcsc.com/product-detail/current-sense-amplifiers_texas-instruments-ina240a1dr_C2060769.html,
+74LVC1G08,"U25,U28,U29,U30,U31",SOT-23-5,SN74LVC1G08DBVR,C7666,5,SMT,https://www.lcsc.com/product-detail/logic-gates_texas-instruments-sn74lvc1g08dbvr_C7666.html,
+ATtiny1616-SN,U32,SOIC-20W_7.5x12.8mm_P1.27mm,ATTINY1616-SNR,C609652,1,SMT,https://www.lcsc.com/product-detail/microcontrollers-mcu-mpu-soc_microchip-tech-attiny1616-snr_C609652.html,
+ESP32-S3-WROOM-1-N16R8,U33,ESP32-S3-WROOM-1,ESP32-S3-WROOM-1-N16R8,C2913202,1,SMT,https://www.lcsc.com/product-detail/wifi-modules_espressif-systems-esp32-s3-wroom-1-n16r8_C2913202.html,
+USBLC6-2SC6,U34,SOT-23-6,USBLC6-2SC6,C2827654,1,SMT,https://www.lcsc.com/product-detail/esd-and-surge-protection-tvs-esd_tech-public-usblc6-2sc6_C2827654.html,
+REF3030,U4,SOT-23,REF3030AIDBZR,C38423,1,SMT,https://www.lcsc.com/product-detail/voltage-reference_texas-instruments-ref3030aidbzr_C38423.html,
+TPS7B4253QDDARQ1,U5,HSOP-8-1EP_3.9x4.9mm_P1.27mm_EP2.41x3.1mm,TPS7B4253QDDARQ1,C129339,1,SMT,https://www.lcsc.com/product-detail/voltage-regulators-linear-low-drop-out-ldo-regulators_texas-instruments-tps7b4253qddarq1_C129339.html,
+LM4040-5.0,U6,SOT-23,LM4040DIM3-5.0/NOPB,C206488,1,SMT,https://www.lcsc.com/product-detail/voltage-reference_texas-instruments-lm4040dim3-5-0-nopb_C206488.html,LM4040DBZ-5 footprint
+SN65HVD230,U7,SOIC-8_3.9x4.9mm_P1.27mm,SN65HVD230DR,C12084,1,SMT,https://www.lcsc.com/product-detail/can-transceivers_texas-instruments-sn65hvd230dr_C12084.html,
+25MHz,Y1,Crystal_SMD_3225-4Pin_3.2x2.5mm,ABM8-25.000MHZ-B2-T,C596899,1,SMT,https://www.lcsc.com/product-detail/crystals_abracon-llc-abm8-25-000mhz-b2-t_C596899.html,"3225, 18 pF"

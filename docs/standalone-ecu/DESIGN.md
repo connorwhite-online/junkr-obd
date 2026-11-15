@@ -26,10 +26,10 @@ time (about 10 ms).
 | Fuel quantity | Spill valve (SPV, 1-2 Ω) | E5-11 | peak and hold, low side, scheduled in NE pump angle |
 | Injection timing | Timing control valve (TCV, 10-14 Ω) | E5-12 | PWM, closed loop on the TDC vs NE phase |
 | SPV supply | Spill valve relay (SVR) | E8-13 | relay coil, cut on overspeed |
-| Shifts | A343F S1, S2 | E8 | low side, solenoid table below |
-| Lock-up | SL | E8 | low side, 4th gear only |
-| EGR, intake throttle (S/TH1, S/TH2), S-REL | VSVs | E8 | low side |
-| Main relay | M-REL | E5 | high side, diode-ORed with the stock ECU |
+| Shifts | A343F S1, S2 | E5-2, E5-15 | low side, solenoid table below |
+| Lock-up | SL | E5-1 | low side, 4th gear only |
+| EGR, intake throttle (S/TH1, S/TH2), S-REL | VSVs | E5-24, E5-10, E5-9, E8-2 | low side |
+| Main relay | M-REL | E8-3 | high side, diode-ORed with the stock ECU |
 | Lamps, tach, VF, IMO, TT, ACT, A/C | | | open drain, wired-OR with the stock ECU |
 
 A343F solenoids: 1st S1 on S2 off, 2nd on/on, 3rd off/on, OD off/off. With

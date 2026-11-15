@@ -43,7 +43,17 @@ def gerbers():
     return zpath
 
 
+def sourcing():
+    """(Comment, Footprint) -> row of sourcing.csv: the exact MPN, LCSC number and buy link."""
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "sourcing.csv")) as f:
+        return {(r["Comment"], r["Footprint"]): r for r in csv.DictReader(f)}
+
+
+TAILS = ("J2", "J3", "J4")   # hand-made shadow-mode pigtails, never fab assembled
+
+
 def bom_cpl():
+    SRC = sourcing()
     board = P.LoadBoard(BOARD)
     parts = {p.ref: p for p in CIR.c.parts}
     groups = collections.OrderedDict()
@@ -66,10 +76,29 @@ def bom_cpl():
     os.makedirs(FAB, exist_ok=True)
     with open(os.path.join(FAB, "bom.csv"), "w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["Comment", "Designator", "Footprint", "MPN", "Qty", "Assembly", "Note"])
+        w.writerow(["Comment", "Designator", "Footprint", "MPN", "LCSC", "Qty", "Assembly", "Buy link", "Note"])
         for (value, fpn, mpn), g in groups.items():
-            w.writerow([value, ",".join(g["refs"]), fpn.split(":")[1], mpn, len(g["refs"]),
-                        "hand solder" if g["hand"] else "SMT", g["note"]])
+            src = SRC.get((value, fpn.split(":")[1]), {})
+            w.writerow([value, ",".join(g["refs"]), fpn.split(":")[1], src.get("MPN") or mpn, src.get("LCSC", ""),
+                        len(g["refs"]), "hand solder" if g["hand"] else "SMT", src.get("Buy link", ""), g["note"]])
+    # JLCPCB turnkey assembly: their BOM and CPL formats, everything except the shadow tails
+    jdir = os.path.join(FAB, "jlcpcb")
+    os.makedirs(jdir, exist_ok=True)
+    with open(os.path.join(jdir, "bom_jlcpcb.csv"), "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["Comment", "Designator", "Footprint", "LCSC Part #"])
+        for (value, fpn, mpn), g in groups.items():
+            refs = [r for r in g["refs"] if r not in TAILS]
+            if not refs:
+                continue
+            src = SRC.get((value, fpn.split(":")[1]), {})
+            w.writerow([src.get("MPN") or mpn or value, ",".join(refs), fpn.split(":")[1], src.get("LCSC", "")])
+    with open(os.path.join(jdir, "cpl_jlcpcb.csv"), "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["Designator", "Mid X", "Mid Y", "Layer", "Rotation"])
+        for ref, x, y, side, rot in cpl:
+            if ref not in TAILS:
+                w.writerow([ref, "%.3fmm" % x, "%.3fmm" % y, side.capitalize(), "%.1f" % rot])
     with open(os.path.join(FAB, "cpl.csv"), "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["Designator", "Mid X", "Mid Y", "Layer", "Rotation"])
