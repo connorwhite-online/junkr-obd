@@ -1,0 +1,15 @@
+(footprint "C_0603" (version 20221018) (generator pcbnew)
+  (layer "F.Cu")
+  (fp_text reference "REF**" (at 0 0) (layer "F.SilkS") hide
+      (effects (font (size 1.27 1.27) (thickness 0.15)))
+    (tstamp 73fa9c57-84b1-4441-ae22-d781cdb7b296)
+  )
+  (fp_text value "10n DNP" (at 0 0) (layer "F.SilkS") hide
+      (effects (font (size 1.27 1.27) (thickness 0.15)))
+    (tstamp c66cb7c6-2c0d-4968-b7db-42697e5c472c)
+  )
+  (pad "1" smd roundrect (at -0.8 0) (size 0.9 0.95) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
+    (thermal_bridge_angle 45) (tstamp 46a217ad-7628-4e82-b54e-7fca3b0d17c1))
+  (pad "2" smd roundrect (at 0.799999 0) (size 0.9 0.95) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
+    (thermal_bridge_angle 45) (tstamp b81de8e7-0a66-4aec-8c75-09c170b0f249))
+)
