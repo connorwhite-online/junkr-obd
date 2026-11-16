@@ -41,6 +41,18 @@ struct Table2D {
         float b = z[j + 1][i] + (z[j + 1][i + 1] - z[j + 1][i]) * fx;
         return a + (b - a) * fy;
     }
+    // Calls f(row, col, weight) for the (up to) four cells that at(vx, vy)
+    // blends, so a learner can spread a correction the same way it is read.
+    template <class F>
+    void each_weight(float vx, float vy, F f) {
+        size_t i, j; float fx, fy;
+        axis_pos(x, NX, vx, i, fx);
+        axis_pos(y, NY, vy, j, fy);
+        f(j, i, (1 - fx) * (1 - fy));
+        f(j, i + 1, fx * (1 - fy));
+        f(j + 1, i, (1 - fx) * fy);
+        f(j + 1, i + 1, fx * fy);
+    }
     // Inverse lookup along x for a fixed y (z must rise with x): the x that gives z.
     float inv_x(float vz, float vy) const {
         size_t j; float fy;

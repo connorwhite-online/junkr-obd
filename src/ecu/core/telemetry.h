@@ -53,6 +53,9 @@ inline uint32_t sample_flags(const Engine &e, const Sensors &s, const HalStatus 
     if (e.tdc().valid()) f |= F_TDC_VALID;
     if (h.standalone) f |= F_STANDALONE;
     if (e.timing().timing_fault()) f |= F_TIMING_FAULT;
+    if (e.exhaust().egt_limiting()) f |= F_EGT_LIMIT;
+    if (e.exhaust().wb_valid()) f |= F_WB_VALID;
+    if (e.exhaust().learning()) f |= F_WB_LEARN;
     return f;
 }
 
@@ -91,6 +94,15 @@ inline void fill_sample(jlog::Sample &x, uint32_t t_us, uint32_t seq, const Engi
     x.set(C_MUX2, h.mux[2]);
     x.set(C_LOOP_US, (float)h.loop_us);
     x.set_u32(C_SEGMENTS, e.ne().segments());
+    const Exhaust &ex = e.exhaust();
+    x.set(C_EGT, ex.egt_c());
+    x.set(C_EGT_V, ex.egt_v());
+    x.set(C_LAMBDA, ex.lambda());
+    x.set(C_WB_V, ex.wb_v());
+    x.set(C_EGT_SCALE, ex.egt_scale() * 100);
+    x.set(C_RICH_CUT, ex.rich_cut() * 100);
+    x.set(C_SMOKE_TRIM, (ex.smoke_scale(s.map_kpa, e.ne().rpm()) - 1) * 100);
+    x.set(C_Q_LIMIT, e.fuel().limit());
 }
 
 class Telemetry {

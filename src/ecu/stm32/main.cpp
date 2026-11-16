@@ -178,6 +178,8 @@ static void read_sensors() {
     sens.speed_kmh = (per && micros() - spd_last < 500000) ? 3.6e9f / (per * SPD_PULSES_PER_KM) : 0;
     sens.arm_switch = mux(2, 14);   // RUN_SW
     sens.supervisor_ok = digitalRead(PE12);
+    sens.aux_v[0] = harness_v(PC5);    // AUX_AN1 (J7-7): EGT amp or wideband, set in cal.aux_use
+    sens.aux_v[1] = harness_v(PF11);   // AUX_AN2 (J7-8)
 }
 
 // ---------------------------------------------------------------- outputs

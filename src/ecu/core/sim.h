@@ -28,6 +28,11 @@ struct SimParams {
     float spv_true_delay_us = 300;  // actual valve response
     float spill_scale = 1.0f;       // true Q / modelled Q (calibration error)
     float ne_jitter_us = 0;         // edge noise
+    // Exhaust: air from MAP and a fixed VE, fuel from the burnt Q.
+    float ve = 0.75f, intake_k = 330;   // volumetric efficiency, charge temperature
+    float air_scale = 1.0f;             // <1: less air than the map assumes (altitude, dirty filter)
+    float egt_gain = 1.0f;              // >1: hotter than usual (towing, hot day)
+    float egt_tau_s = 2.5f, lambda_lag_s = 0.3f;
 };
 
 class Sim {
@@ -50,6 +55,10 @@ public:
     uint64_t injections() const { return injections_; }
     bool starter = false;
     float tcv_duty = 0;
+    float map_kpa = 100;            // set by the test (no turbo model)
+    SimParams &params() { return p_; }   // change the plant mid-run
+    float egt_c() const { return egt_; }
+    float lambda() const { return lam_; }
 
     // Advance the model by dt_us, calling the sink for each edge.
     void step(Sink &s, double dt_us) {
@@ -103,12 +112,24 @@ public:
             injections_++;
             last_open_deg_ = a;
         }
+        exhaust(rpm_now, dt);
         theta_ = th1;
         t_us_ += dt_us;
     }
     float last_open_deg() const { return last_open_deg_; }
 
 private:
+    void exhaust(float rpm, double dt) {
+        // 3.0 l / 4 cylinders = 0.75 l per stroke; diesel stoich 14.5, 0.835 mg/mm3.
+        float rho = map_kpa * 1000.0f / (287.0f * p_.intake_k);
+        float air_mg = rho * 0.75e-3f * p_.ve * p_.air_scale * 1e6f;
+        float fuel_mg = q_seg_ * 0.835f;
+        float lam = fuel_mg > 0.4f ? air_mg / fuel_mg / 14.5f : 10.0f;
+        if (lam > 10) lam = 10;
+        lam_ += (float)((lam - lam_) * dt / p_.lambda_lag_s);
+        float egt_ss = rpm > 100 ? 50 + 720.0f / lam * p_.egt_gain : 20;
+        egt_ += (float)((egt_ss - egt_) * dt / p_.egt_tau_s);
+    }
     void on_segment_start(Sink &s, double t, long k) {
         // The previous segment's fuel burns now.
         q_seg_ = q_next_;
@@ -126,6 +147,7 @@ private:
     SpvPlan plan_{};
     bool pending_ = false, opening_ = false, have_ne_ = false;
     double ne_prev_ = 0;
+    float egt_ = 20, lam_ = 10;
     uint64_t injections_ = 0;
 };
 

@@ -18,6 +18,8 @@ struct FuelInputs {
     float ect_c;
     bool cranking;
     bool pedal_fault;   // limp: idle plus a little
+    float smoke_scale = 1;   // wideband trim on the smoke limit (exhaust.h)
+    float limit_scale = 1;   // EGT derate and rich floor on the final limit
 };
 
 class FuelController {
@@ -31,7 +33,7 @@ public:
 
     // Requested Q in mm3/stroke. dt in seconds.
     float update(const FuelInputs &in, float dt) {
-        if (in.cranking) { integ_ = 0; q_ = c_.q_start.at(in.ect_c); return q_; }
+        if (in.cranking) { integ_ = 0; smoke_held_ = false; q_ = c_.q_start.at(in.ect_c); return q_; }
         float pedal = in.pedal_fault ? clampf(in.pedal_pct, 0, 8) : in.pedal_pct;
         float q = c_.q_driver.at(pedal, in.rpm);
         // Idle governor: only near idle with the pedal up.
@@ -44,8 +46,11 @@ public:
             integ_ *= 0.98f;
         }
         float lim = c_.q_max.at(in.rpm);
-        float smoke = c_.q_smoke.at(in.map_kpa, in.rpm);
+        float smoke = c_.q_smoke.at(in.map_kpa, in.rpm) * in.smoke_scale;
+        smoke_held_ = smoke < lim && q > smoke * 0.97f;   // the smoke limit is what holds Q
         if (smoke < lim) lim = smoke;
+        lim *= clampf(in.limit_scale, 0, 1);
+        limit_ = lim;
         if (q > lim) q = lim;
         // Overspeed taper, then cut.
         if (in.rpm > c_.rpm_hard_cut) q = 0;
@@ -55,10 +60,13 @@ public:
         return q_;
     }
     float q() const { return q_; }
+    float limit() const { return limit_; }
+    bool smoke_held() const { return smoke_held_; }
 
 private:
     const Calibration &c_;
-    float integ_ = 0, q_ = 0;
+    float integ_ = 0, q_ = 0, limit_ = 0;
+    bool smoke_held_ = false;
 };
 
 // One segment's SPV events, in NE terms the timer ISR can act on directly.

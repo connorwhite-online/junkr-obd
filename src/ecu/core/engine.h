@@ -10,6 +10,7 @@
 #pragma once
 #include <stdint.h>
 #include "calib.h"
+#include "exhaust.h"
 #include "fuel.h"
 #include "safety.h"
 #include "shadow.h"
@@ -32,6 +33,7 @@ struct Sensors {
     bool od_switch_on = true, brake = false, starter = false;
     bool supervisor_ok = true;
     bool arm_switch = false;          // RUN switch + user arm in the app
+    float aux_v[2] = {0, 0};          // AUX_AN1/2 (EGT amp, wideband), harness volts
 };
 
 struct Commands {
@@ -47,7 +49,7 @@ struct Commands {
 
 class Engine {
 public:
-    explicit Engine(Calibration &c) : cal_(c), fuel_(c), timing_(c), trans_(c), safety_(c), learn_(c) {}
+    explicit Engine(Calibration &c) : cal_(c), fuel_(c), timing_(c), trans_(c), safety_(c), learn_(c), exh_(c) {}
 
     void set_mode(Mode m) { mode_ = m; }
     Mode mode() const { return mode_; }
@@ -77,12 +79,21 @@ public:
         if (stalled || rpm < 150) running_ = false;
         if (rpm > cal_.rpm_crank_exit) running_ = true;
         bool cranking = !running_;
+        run_s_ = running_ ? run_s_ + dt : 0;
         SafetyInputs si{rpm, ne_.synced(), stalled, ne_.sync_losses(), s.pedal, s.va_v, s.idl,
                         s.ect_v, s.map_v, s.vbatt, s.supervisor_ok, timing_.timing_fault()};
         SafetyOutputs so = safety_.update(si, dt);
         float ect = so.ect_fault ? 80.0f : s.ect_c;      // limp defaults
         float map = so.map_fault ? 100.0f : s.map_kpa;   // no boost credit
-        FuelInputs fi{rpm, pedal(s), map, ect, cranking, so.pedal_fault};
+        // Exhaust sensors first: their limits shape this loop's fuel. "Fueling"
+        // means our SPV plan is what the engine gets (takeover relays in).
+        ExhaustInputs ei{{s.aux_v[0], s.aux_v[1]}, rpm, map, running_ && !stalled, run_s_,
+                         cmd_.takeover && fuel_ok_, fuel_.smoke_held(), dt};
+        exh_.update(ei);
+        if (exh_.dtc_egt()) exh_dtc_ |= DTC_EGT;
+        if (exh_.dtc_wb()) exh_dtc_ |= DTC_WIDEBAND;
+        FuelInputs fi{rpm, pedal(s), map, ect, cranking, so.pedal_fault, exh_.smoke_scale(map, rpm),
+                      exh_.limit_scale()};
         cmd_.q = fuel_.update(fi, dt);
         fuel_ok_ = so.fuel_allowed;
         TimingInputs ti{rpm, cmd_.q, ect, cranking || stalled, tdc_.valid() && !stalled,
@@ -95,7 +106,7 @@ public:
         cmd_.takeover = mode_ == Mode::Takeover && s.arm_switch && s.supervisor_ok;
         cmd_.arm_req = cmd_.takeover;
         cmd_.spv = plan_;
-        cmd_.dtc = so.dtc;
+        cmd_.dtc = so.dtc | exh_dtc_;
         return cmd_;
     }
 
@@ -106,6 +117,8 @@ public:
     const FuelController &fuel() const { return fuel_; }
     const ShadowLearner &learner() const { return learn_; }
     const A343F &trans() const { return trans_; }
+    const Exhaust &exhaust() const { return exh_; }
+    Exhaust &exhaust() { return exh_; }
     const Commands &commands() const { return cmd_; }
 
 private:
@@ -118,6 +131,9 @@ private:
     A343F trans_;
     Safety safety_;
     ShadowLearner learn_;
+    Exhaust exh_;
+    uint32_t exh_dtc_ = 0;
+    float run_s_ = 0;
     Commands cmd_;
     SpvPlan plan_{};
     Mode mode_ = Mode::Shadow;
