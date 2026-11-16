@@ -122,7 +122,7 @@ def shadow():
     wire(ax, [(275, 80), (275, 92)], color=MUTE, lw=1.2, ls="--")
     # notes
     ax.text(16, 84, "STEPS", fontsize=10, weight="bold")
-    steps = ["Battery negative off. Remove the glovebox (EWD269F p.104 shows the ECU position).",
+    steps = ["Battery negative off. Remove the glovebox (EWD269F p.27, RHD, shows the ECU position).",
              "Unplug E5, E6, E8 from the stock ECU and plug them into JUNKR J1.",
              "Plug the three tails into the stock ECU. Each tail only fits its own socket.",
              "Fit the RUN switch to the dash, OFF. Battery on, key on: the truck must start and drive exactly as before."]

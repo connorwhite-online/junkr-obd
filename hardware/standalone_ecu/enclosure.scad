@@ -108,6 +108,12 @@ module lid() {
         }
         // AUX Micro-Fit (board x 166.9 .. 190.1, y 3 .. 12.8), through the lid
         translate([bx(166.4), by(13.3), TOP - 10]) cube([24.2, 10.8, FLOOR + 11]);
+        // Shadow-mode tails J4 (E8), J3 (E6), J2 (E5): the 150 mm pigtails are
+        // soldered at board y 27..32.5 and leave straight up through the lid,
+        // one slot per plug so each bundle stays together. Fit edge trim.
+        for (t = [[47.3, 83.6], [83.9, 110.2], [110.9, 154.2]])
+            hull() for (x = [t[0] + 4.5, t[1] - 4.5])
+                translate([bx(x), by(31), TOP - 8]) cylinder(d = 9, h = FLOOR + 9);
         // LED windows: RUN / FAULT / ARM / supervisor
         for (p = [[118, 112], [122, 112], [126, 112], [138, 100]])
             translate([bx(p[0]), by(p[1]), TOP - 1]) cylinder(d = 2.2, h = FLOOR + 2);
