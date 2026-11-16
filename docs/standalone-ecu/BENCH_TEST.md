@@ -28,11 +28,14 @@ the tails and the RUN switch in reach.
 
 ## Stage 2: flash and talk
 
-1. USB-C to a laptop: the ESP32 enumerates. Flash it, then let it flash the
-   STM32 (ROM bootloader over USART1) and the ATtiny (UPDI). SWD (J10) is
-   there as a fallback.
-2. The ESP32 serves the tuner app. The STM32 status line (`D,...`) shows
-   up at 50 Hz.
+1. USB-C to a laptop: the ESP32 enumerates. Flash it (`pio run -e ecu-comms -t upload`),
+   then the STM32 (ROM bootloader over USART1, or SWD on J10) and the ATtiny (UPDI).
+2. With a microSD card in, join the `JUNKR-ECU` Wi-Fi and open
+   `http://junkr.local`: a drive file is recording, `link` is up, the live
+   view updates, and `frames_bad` and `ring_overflow` stay at 0. Leave it
+   running 30 minutes, download the drive and run
+   `python3 tools/junkrlog.py info` on it: 100 Hz samples, 0 bad frames, no
+   `dropped` events. See [LOGGING.md](LOGGING.md).
 3. SAFE_OK rises 0.5 s after boot (supervisor sees the heartbeat), ARM
    stays low (RUN switch off).
 

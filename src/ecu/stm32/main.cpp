@@ -19,6 +19,7 @@
 #include "board_pins.h"
 #include "core/engine.h"
 #include "core/table.h"
+#include "core/telemetry.h"
 
 using namespace ecu;
 
@@ -28,6 +29,21 @@ static Sensors sens;
 
 static HardwareTimer t2(TIM2), t5(TIM5), t1(TIM1), t8(TIM8);
 static Uart esp_link(PA10, PA9);   // USART1 to the ESP32 (also the ROM bootloader)
+
+#ifndef FW_VERSION
+#define FW_VERSION "dev"
+#endif
+#define LINK_BAUD 2000000   // ESP32 logger (src/ecu_comms) must match
+
+// Telemetry writes only what fits in the UART TX buffer (SERIAL_TX_BUFFER_SIZE
+// in platformio.ini), so logging can never stall the 1 kHz loop.
+struct UartTx : LinkTx {
+    size_t room() override { return (size_t)esp_link.availableForWrite(); }
+    void write(const uint8_t *p, size_t n) override { esp_link.write(p, n); }
+};
+static UartTx uart_tx;
+static Telemetry telem(uart_tx, FW_VERSION);
+static HalStatus hal;
 
 constexpr float SPV_PEAK_US = 450;    // full current until the valve has pulled in [VERIFY]
 constexpr float SPV_HOLD_PCT = 35;    // hold duty at 20 kHz [VERIFY on the bench, ISPV]
@@ -71,6 +87,7 @@ static void ne_isr() {
     uint32_t t = t2.getCaptureCompare(1, TICK_COMPARE_FORMAT);
     eng.on_ne(t);
     const NeDecoder &ne = eng.ne();
+    if (ne.synced() && ne.tooth_index() == 0) telem.on_segment(eng);
     const SpvPlan &p = eng.spv_plan();
     if (!ne.synced() || !p.inject) {
         if (spv_on) spv_set(false);
@@ -181,23 +198,21 @@ static void write_outputs(const Commands &c) {
 }
 
 // ---------------------------------------------------------------- link to the ESP32
-// 50 Hz CSV line the ESP32 logs and serves to the tuner app:
-// D,ms,rpm,q,adv,adv_tgt,tcv,ped,map,ect,gear,dtc,mode,agree
-static void report() {
-    char b[160];
-    const Commands &c = eng.commands();
-    snprintf(b, sizeof b, "D,%lu,%.0f,%.1f,%.1f,%.1f,%.0f,%.0f,%.0f,%.0f,%d,%lu,%d,%lu\n",
-             (unsigned long)millis(), eng.ne().rpm(), c.q, eng.tdc().advance_deg(cal.tdc_cal_offset),
-             eng.timing().target(), c.tcv_duty, sens.pedal, sens.map_kpa, sens.ect_c, eng.trans().gear(),
-             (unsigned long)c.dtc, (int)eng.mode(), (unsigned long)eng.learner().agree_run());
-    esp_link.print(b);
+// Full-rate binary log (shared/ecu_log.h, docs/standalone-ecu/LOGGING.md):
+// every channel at 100 Hz, one record per injection, and events.
+static void report(uint32_t loop_us) {
+    hal.stock_tcv_duty = stock_tcv_duty;
+    for (int m = 0; m < 3; m++) hal.mux[m] = mux_bits[m];
+    hal.loop_us = loop_us;
+    hal.arm = digitalRead(PE10);
+    telem.poll(t2_now(), eng, cal, sens, hal);   // same clock as the edge timestamps
 }
 
 // ---------------------------------------------------------------- setup / loop
 static bool standalone = false;
 
 void setup() {
-    esp_link.begin(921600);
+    esp_link.begin(LINK_BAUD);
     // VC_OFF_MCU high first: our sensor 5 V stays off until we know the
     // stock ECU is not there (it has a 100k pull-up, so it is off at reset too).
     pinMode(PD9, OUTPUT);
@@ -250,6 +265,7 @@ void setup() {
         digitalWrite(PD10, HIGH);
         standalone = true;
     }
+    hal.standalone = standalone;
 }
 
 void loop() {
@@ -261,13 +277,16 @@ void loop() {
     const Commands &c = eng.update(t2_now(), sens, 0.001f);
     write_outputs(c);
     digitalWrite(PE8, ++n & 1);   // HB to the ATtiny: it trips if this stops
-    if (n % 20 == 0) report();
+    report(micros() - now);
     if (esp_link.available()) {
         // Minimal command set from the ESP32: "T" request takeover, "S" shadow.
         int ch = esp_link.read();
         if (ch == 'S') eng.set_mode(Mode::Shadow);
         // Takeover needs a long run of agreement with the stock ECU, unless
         // there is no stock ECU at all (standalone, bench or engine stand).
-        if (ch == 'T' && (standalone || eng.learner().agrees())) eng.set_mode(Mode::Takeover);
+        if (ch == 'T') {
+            if (standalone || eng.learner().agrees()) eng.set_mode(Mode::Takeover);
+            else telem.event(t2_now(), jlog::E_TAKEOVER_DENIED, eng.learner().agree_run(), 0);
+        }
     }
 }
