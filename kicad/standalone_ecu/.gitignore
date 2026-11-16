@@ -1,0 +1,9 @@
+# router variants (tagged runs); the final board is junkr_ecu.kicad_pcb
+junkr_ecu_*.kicad_*
+!junkr_ecu_unrouted.kicad_pcb
+!junkr_ecu_unrouted.kicad_pro
+route_report_*.txt
+drc_report_*.txt
+*.kicad_prl
+fab/gerbers/
+*-bak

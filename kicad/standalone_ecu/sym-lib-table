@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name "junkr_ecu")(type "KiCad")(uri "${KIPRJMOD}/lib/junkr_ecu.kicad_sym")(options "")(descr "Junkr ECU parts"))
+)
