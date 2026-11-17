@@ -37,9 +37,12 @@ regenerates all of the above from the board.
 
 1. jlcpcb.com, Order now, upload `junkr_ecu_gerbers.zip`.
 2. Layers **6**, 200 x 140 mm (read from the Gerbers), thickness 1.6 mm,
-   surface finish **ENIG**, outer copper 1 oz, inner 0.5 oz, via covering
-   tented, minimum via hole 0.2 mm / diameter 0.45 mm (the board's vias
-   are 0.45/0.2).
+   material FR4 **TG155** (heat under the dash), surface finish **ENIG**,
+   outer copper 1 oz, inner 0.5 oz, specify stackup **No** (nothing on the
+   board needs controlled impedance), via covering **Epoxy Filled &
+   Capped** (JLC's 6-layer default), min via hole/diameter
+   **0.2mm/(0.3/0.35mm)** (the smallest vias are 0.2 mm holes, 0.45 mm
+   pads; all vias are through-hole), board outline tolerance regular.
 3. Quantity 5 (the minimum). **PCB Assembly** on, **Standard** PCBA,
    top side, assemble 2 to 5 of them.
 4. Upload `bom_jlcpcb.csv` and `cpl_jlcpcb.csv`.
