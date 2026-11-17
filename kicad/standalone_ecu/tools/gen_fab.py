@@ -38,7 +38,10 @@ def gerbers():
                           stdout=subprocess.DEVNULL)
     zpath = os.path.join(FAB, "junkr_ecu_gerbers.zip")
     with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
+        # Layers and drills only, at the top level: JLC's parser chokes on extras.
         for f in sorted(os.listdir(gdir)):
+            if f.endswith(".gbrjob") or "drl_map" in f:
+                continue
             z.write(os.path.join(gdir, f), f)
     return zpath
 

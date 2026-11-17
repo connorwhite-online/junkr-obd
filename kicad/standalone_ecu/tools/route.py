@@ -48,7 +48,7 @@ JITTER = float(os.environ.get("ROUTE_JITTER", "0.0"))
 PRE_NETS = ("3V3", "3V3A", "VREF")
 FINE = set(os.environ.get("ROUTE_FINE", "U100").split(","))
 RAIL_PRI = 1 if os.environ.get("ROUTE_RAILFIRST") else 3
-SMALL_VIA = tuple(float(v) for v in os.environ.get("ROUTE_VIA", "0.45,0.2").split(","))   # signal via: dia, drill
+SMALL_VIA = tuple(float(v) for v in os.environ.get("ROUTE_VIA", "0.45,0.3").split(","))   # signal via: dia, drill
 VIA = {"Default": SMALL_VIA, "Rail": SMALL_VIA, "Power": (0.8, 0.4), "HighCurrent": (1.0, 0.5)}
 
 lib = ctypes.CDLL(os.environ.get("ROUTER_SO", "/tmp/claude-0/work/router_core2.so"))
@@ -826,7 +826,7 @@ def set_rules(board):
     ds.m_TrackMinWidth = P.FromMM(0.12)
     ds.m_HoleClearance = P.FromMM(0.2)
     ds.m_HoleToHoleMin = P.FromMM(0.25)
-    ds.m_MinThroughDrill = P.FromMM(0.2)
+    ds.m_MinThroughDrill = P.FromMM(0.3)
     ds.m_MinResolvedSpokes = 1   # GND pins that also have tracks and plane vias
     ds.m_ViasMinSize = P.FromMM(0.4)
     ds.m_ViasMinAnnularWidth = P.FromMM(0.1)

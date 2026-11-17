@@ -41,8 +41,9 @@ regenerates all of the above from the board.
    outer copper 1 oz, inner 0.5 oz, specify stackup **No** (nothing on the
    board needs controlled impedance), via covering **Epoxy Filled &
    Capped** (JLC's 6-layer default), min via hole/diameter
-   **0.2mm/(0.3/0.35mm)** (the smallest vias are 0.2 mm holes, 0.45 mm
-   pads; all vias are through-hole), board outline tolerance regular.
+   **0.3mm/(0.4/0.45mm)**, the cheapest option (the smallest vias are
+   0.3 mm holes in 0.45 mm pads; all vias are through-hole), board outline
+   tolerance regular.
 3. Quantity 5 (the minimum). **PCB Assembly** on, **Standard** PCBA,
    top side, assemble 2 to 5 of them.
 4. Upload `bom_jlcpcb.csv` and `cpl_jlcpcb.csv`.
