@@ -19,7 +19,7 @@ STM32 and the microSD slot are already on the board.
 
 | Record | Rate | Contents |
 |---|---|---|
-| SAMPLE | 100 Hz | 30 channels, listed below |
+| SAMPLE | 100 Hz | 38 channels, listed below |
 | INJ | every injection (each 180 crank deg) | segment count, crank period for that segment, planned Q and SPV window |
 | EVENT | on change | boot, mode change, DTC set/clear, sync loss, ARM / SAFE_OK change, takeover refused, dropped frames, link up/down, loop overrun |
 | META | every second | firmware version, calibration CRC-32 and size, board |
@@ -31,8 +31,8 @@ cylinder balance and smoothness can be worked out afterwards
 (`cylinder_slot` = segment % 4; which physical cylinder slot 0 is gets
 fixed on the car).
 
-A simulated drive comes to about 11 kB/s, so **about 40 MB per hour of
-driving**. A 32 GB card holds roughly 800 hours. When the card runs low,
+A simulated drive comes to about 13 kB/s, so **about 47 MB per hour of
+driving**. A 32 GB card holds roughly 680 hours. When the card runs low,
 the oldest drives that have already been uploaded are deleted. Drives
 that haven't been uploaded are never deleted.
 
@@ -51,12 +51,16 @@ that haven't been uploaded are never deleted.
 | vbatt | V | |
 | speed | km/h | |
 | range, gear, mode | enum | mode 0 shadow, 1 takeover |
-| flags | bits | synced, rpm_valid, inject, takeover, arm_req, arm_sw, supervisor_ok, arm, idl, brake, starter, od_sw, s1, s2, sl, svr, timing_open_loop, tdc_valid, standalone, timing_fault |
-| dtc | bits | ne, timing, pedal, overspeed, ect, map, vbatt, supervisor |
+| flags | bits | synced, rpm_valid, inject, takeover, arm_req, arm_sw, supervisor_ok, arm, idl, brake, starter, od_sw, s1, s2, sl, svr, timing_open_loop, tdc_valid, standalone, timing_fault, egt_limit, wb_valid, wb_learn |
+| dtc | bits | ne, timing, pedal, overspeed, ect, map, vbatt, supervisor, egt, wideband |
 | sync_losses, agree_run, segments | count | |
 | stock_tcv_duty | % | stock ECU's TCV, in shadow mode |
 | mux0..2 | bits | every slow switch input, raw |
 | loop_us | us | control loop time (CPU headroom) |
+| egt, egt_v | C, V | exhaust temperature before the turbo, raw volts ([EXHAUST.md](EXHAUST.md)) |
+| lambda, wb_v | -, V | wideband lambda, raw volts |
+| egt_scale, rich_cut, smoke_trim | % | EGT fuel-limit allowance, rich-floor pull, live smoke-map trim |
+| q_limit | mm3/stroke | final fuel limit after all of the above |
 
 Channels are added by appending to `CHANNELS` in `shared/ecu_log.h`. Old
 decoders keep working because every log carries its own schema.
@@ -167,5 +171,5 @@ compile.
   drive says which map it ran.
 - Verify the 2 Mbaud link and SD write rate on the real board
   (BENCH_TEST.md).
-- Add the CAN channels (hub, gauge, wideband) to the log when those nodes
-  exist.
+- Add the CAN channels (hub, gauge, CAN wideband) to the log when those
+  nodes exist. The analog EGT and wideband on AUX are already logged.

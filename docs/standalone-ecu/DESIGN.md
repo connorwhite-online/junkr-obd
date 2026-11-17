@@ -140,12 +140,13 @@ credit) and the OEM stall behaviour.
 
 | Path | What |
 | --- | --- |
-| `src/ecu/core/` | Engine core, header-only, no heap, host-testable: NE/TDC decoder, fuel and SPV planner, timing PI, A343F, safety, shadow learner, pump/engine simulator |
+| `src/ecu/core/` | Engine core, header-only, no heap, host-testable: NE/TDC decoder, fuel and SPV planner, timing PI, A343F, safety, shadow learner, EGT protection and wideband smoke-limit trim (`exhaust.h`, [EXHAUST.md](EXHAUST.md)), pump/engine simulator with lambda and EGT |
 | `src/ecu/stm32/main.cpp` | STM32H743 HAL layer (Arduino STM32 core): TIM2 input capture on all timing edges, TIM5 SPV scheduler, TIM1 SPV peak/hold, TIM8 TCV, muxed inputs, full-rate jlog stream to the ESP32 (`core/telemetry.h`). Builds for the board and for a NUCLEO-H743ZI: `pio run -e ecu` |
 | `src/ecu_safety/` | ATtiny1616 supervisor: `pio run -e ecu-safety` |
 | `src/ecu_comms/` | ESP32-S3: logs every drive to microSD, Wi-Fi drive list, download, live view and auto-upload ([LOGGING.md](LOGGING.md)): `pio run -e ecu-comms` |
 | `shared/ecu_log.h`, `tools/junkrlog.py` | Log format, and the decoder to CSV / Parquet |
 | `test/test_ecu/` | 18 tests against the simulator: sync and rpm at 150-4500 rpm, noise rejection, advance measurement, delivered Q, cold start to idle, rev limiter, supervisor cut, stall, pedal and sensor faults, A343F shifts, shadow learning, supervisor trips: `pio test -e native -f test_ecu` |
+| `test/test_exhaust/` | 9 tests: EGT reading, faults and fuel pull, wideband trim rich and lean, trim bounds, no lean trim without EGT, rich floor, shadow mode, sensor faults: `pio test -e native -f test_exhaust` |
 
 The simulator closes every loop the firmware has (crank inertia, torque per
 mm³ with a timing-efficiency penalty, a first-order timer piston, real SPV

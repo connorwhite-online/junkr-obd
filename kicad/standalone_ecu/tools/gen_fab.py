@@ -38,7 +38,10 @@ def gerbers():
                           stdout=subprocess.DEVNULL)
     zpath = os.path.join(FAB, "junkr_ecu_gerbers.zip")
     with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
+        # Layers and drills only, at the top level: JLC's parser chokes on extras.
         for f in sorted(os.listdir(gdir)):
+            if f.endswith(".gbrjob") or "drl_map" in f:
+                continue
             z.write(os.path.join(gdir, f), f)
     return zpath
 
@@ -72,6 +75,11 @@ VARIANTS = {
 }
 
 
+# Body centre relative to the footprint origin (KiCad axes, unrotated), for
+# footprints whose origin is not the part centre JLC's models use.
+CPL_OFFSET = {"Relay_DPDT_Omron_G5V-2": (3.81, 8.9)}
+
+
 def bom_cpl():
     SRC = sourcing()
     board = P.LoadBoard(BOARD)
@@ -91,6 +99,13 @@ def bom_cpl():
                                     "note": note, "sheet": p.sheet})
         g["refs"].append(ref)
         pos = fp.GetPosition()
+        off = CPL_OFFSET.get(str(fp.GetFPID().GetLibItemName()))
+        if off:   # footprint origin is pin 1; JLC places by body centre
+            import math
+            a = math.radians(fp.GetOrientationDegrees())
+            dx, dy = off
+            pos = P.VECTOR2I(pos.x + P.FromMM(dx * math.cos(a) + dy * math.sin(a)),
+                             pos.y + P.FromMM(-dx * math.sin(a) + dy * math.cos(a)))
         side = "bottom" if fp.IsFlipped() else "top"
         cpl.append((ref, P.ToMM(pos.x), -P.ToMM(pos.y), side, fp.GetOrientationDegrees()))
     os.makedirs(FAB, exist_ok=True)

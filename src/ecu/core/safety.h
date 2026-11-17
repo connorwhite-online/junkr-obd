@@ -17,6 +17,8 @@ enum Dtc : uint32_t {
     DTC_MAP = 1u << 5,         // MAP out of range (Toyota 31/32)
     DTC_VBATT = 1u << 6,
     DTC_SUPERVISOR = 1u << 7,  // ATtiny withdrew SAFE_OK
+    DTC_EGT = 1u << 8,         // fitted EGT probe/amp open, shorted or implausible
+    DTC_WIDEBAND = 1u << 9,    // fitted wideband output out of range after warm-up
 };
 
 struct SafetyInputs {

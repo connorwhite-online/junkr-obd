@@ -3,9 +3,13 @@
 // (shadow.h) replaces the fuel and timing maps with what the stock ECU
 // actually does, before this ECU is ever allowed to take over. [VERIFY]
 #pragma once
+#include <stdint.h>
 #include "table.h"
 
 namespace ecu {
+
+// What is wired to each AUX analog input (J7 pins 7 and 8, 0-5 V).
+enum class AuxUse : uint8_t { None, Egt, Wideband };
 
 struct Calibration {
     // Driver request: Q (mm3/stroke) from pedal % (x) and rpm (y).
@@ -64,6 +68,28 @@ struct Calibration {
     float rpm_svr_cut = 5200;                         // supervisor drops the SVR relay
     float rpm_crank_exit = 500;
     float pedal_mismatch_pct = 12;                    // VA above this with IDL closed = fault
+
+    // ---- Exhaust sensors on the AUX plug (exhaust.h, docs/standalone-ecu/EXHAUST.md)
+    AuxUse aux_use[2] = {AuxUse::None, AuxUse::None};   // AUX_AN1, AUX_AN2
+    // EGT amplifier: two points of its linear 0-5 V output. [VERIFY] from its datasheet.
+    float egt_v0 = 0.0f, egt_c0 = 0, egt_v1 = 5.0f, egt_c1 = 1250;
+    // Pre-turbo EGT protection: the fuel limit falls linearly from 100 % at
+    // start to egt_min_scale at end. [VERIFY] 1KZ-TE: aluminium head, keep it cool.
+    float egt_derate_start_c = 650, egt_derate_end_c = 750, egt_min_scale = 0.6f;
+    float egt_fault_scale = 0.85f;   // fuel limit while a fitted EGT sensor has failed
+    // Wideband controller: two points of its linear analog output. [VERIFY]
+    // against the controller's output setting.
+    float wb_v0 = 0.0f, wb_l0 = 0.5f, wb_v1 = 5.0f, wb_l1 = 2.5f;
+    float wb_warmup_s = 25;          // ignore the sensor until the engine has run this long
+    // Smoke target: leanest-allowed lambda at the fuel limit, by rpm. [VERIFY] on the road.
+    Table1D<4> lambda_target{{1000, 2000, 3000, 4000}, {1.30f, 1.25f, 1.22f, 1.25f}};
+    float lambda_floor = 1.10f;      // richer than this anywhere: pull fuel at once
+    // Live smoke-limit trim, stored per q_smoke cell. Fuel can come off much
+    // further than it can go on, and it only goes on with a healthy EGT.
+    float trim_min = -0.15f, trim_max = 0.05f;
+    float trim_rate_rich = 0.25f;    // trim per second per unit lambda error, too rich
+    float trim_rate_lean = 0.04f;    // the same, too lean (slow on purpose)
+    float rich_cut_rate = 1.5f, rich_cut_max = 0.3f;   // floor protection, per s and max fraction
 
     // A343F shift schedule, vehicle km/h against pedal % (x).
     Table1D<4> up12{{0, 30, 60, 100}, {14, 20, 30, 45}};

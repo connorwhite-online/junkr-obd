@@ -41,9 +41,9 @@ EVENTS = {
 FLAGS = [
     "synced", "rpm_valid", "inject", "takeover", "arm_req", "arm_sw", "supervisor_ok", "arm",
     "idl", "brake", "starter", "od_sw", "s1", "s2", "sl", "svr", "timing_open_loop", "tdc_valid",
-    "standalone", "timing_fault",
+    "standalone", "timing_fault", "egt_limit", "wb_valid", "wb_learn",
 ]
-DTCS = ["ne", "timing", "pedal", "overspeed", "ect", "map", "vbatt", "supervisor"]
+DTCS = ["ne", "timing", "pedal", "overspeed", "ect", "map", "vbatt", "supervisor", "egt", "wideband"]
 MODES = {0: "shadow", 1: "takeover"}
 
 

@@ -89,7 +89,7 @@ enum Flag : uint32_t {
     F_IDL = 1u << 8, F_BRAKE = 1u << 9, F_STARTER = 1u << 10, F_OD_SW = 1u << 11,
     F_S1 = 1u << 12, F_S2 = 1u << 13, F_SL = 1u << 14, F_SVR = 1u << 15,
     F_TIMING_OPEN_LOOP = 1u << 16, F_TDC_VALID = 1u << 17, F_STANDALONE = 1u << 18,
-    F_TIMING_FAULT = 1u << 19,
+    F_TIMING_FAULT = 1u << 19, F_EGT_LIMIT = 1u << 20, F_WB_VALID = 1u << 21, F_WB_LEARN = 1u << 22,
 };
 
 // Event codes (T_EVENT payload: u32 t_us, u8 code, u32 a, u32 b).
@@ -112,7 +112,8 @@ enum Ch {
     C_RPM, C_RPM_INST, C_Q, C_SPV_CLOSE, C_SPV_OPEN, C_ADV, C_ADV_TARGET, C_ADV_ERR, C_TCV,
     C_PEDAL, C_VA_V, C_MAP, C_MAP_V, C_ECT, C_ECT_V, C_VBATT, C_SPEED, C_RANGE, C_GEAR, C_MODE,
     C_FLAGS, C_DTC, C_SYNC_LOSSES, C_AGREE_RUN, C_STOCK_TCV, C_MUX0, C_MUX1, C_MUX2, C_LOOP_US,
-    C_SEGMENTS, C_COUNT
+    C_SEGMENTS, C_EGT, C_EGT_V, C_LAMBDA, C_WB_V, C_EGT_SCALE, C_RICH_CUT, C_SMOKE_TRIM, C_Q_LIMIT,
+    C_COUNT
 };
 
 constexpr Channel CHANNELS[C_COUNT] = {
@@ -146,6 +147,14 @@ constexpr Channel CHANNELS[C_COUNT] = {
     {"mux2", "bits", 'H', 1},
     {"loop_us", "us", 'H', 1},
     {"segments", "", 'I', 1},
+    {"egt", "C", 'h', 10},
+    {"egt_v", "V", 'H', 1000},
+    {"lambda", "", 'H', 1000},
+    {"wb_v", "V", 'H', 1000},
+    {"egt_scale", "%", 'H', 100},
+    {"rich_cut", "%", 'H', 100},
+    {"smoke_trim", "%", 'h', 100},
+    {"q_limit", "mm3/st", 'H', 100},
 };
 
 constexpr size_t wire_size(char t) { return (t == 'i' || t == 'I') ? 4 : 2; }
