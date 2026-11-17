@@ -18,5 +18,9 @@ for p in tapbox_base tapbox_lid; do
   echo "-> $p"
   openscad -q -o "$OUT/$p.stl" -D "part=\"$p\"" main.scad
 done
+for p in base lid; do
+  echo "-> tapbox_min_$p"
+  openscad -q -o "$OUT/tapbox_min_$p.stl" -D "part=\"$p\"" tapbox_min.scad
+done
 echo "-> fit_coupon"
 openscad -q -o "$OUT/fit_coupon.stl" fit_coupon.scad
